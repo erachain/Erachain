@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Longs;
 import org.erachain.core.item.ItemCls;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -52,12 +53,15 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
 
     public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, boolean descending) {
 
+        Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? Longs.toByteArray(Long.MAX_VALUE) : new byte[0]);
+        Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? new byte[0] : Longs.toByteArray(Long.MAX_VALUE));
+
         if (parent == null) {
-            return getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending);
+            return getIterator(fromKey, toKey, descending);
         } else {
-            IteratorCloseable<Tuple3<Long, Byte, byte[]>> iteratorParent = parent.getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending);
-            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(iteratorParent,
-                    getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending)),
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    parent.getIterator(fromKey, toKey, descending),
+                    getIterator(fromKey, toKey, descending)),
                     new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR), descending);
         }
     }
