@@ -393,10 +393,15 @@ public class Refi extends EpochDAPPjson {
                     // CALC new REFERALS COUNT
                     if (personKey != null) {
                         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(personKey);
-                        if (person.isAlive(block.getTimestamp())
+                        if (person.isAlive(block == null ? rSend.getTimestamp() : block.getTimestamp()) // block may be NULL on test unconfirmed
                                 // if not MAX
-                                && (Integer) pointNew[4] < MAX_REFERALS_COUNT) {
+                                && (Integer) pointNew[4] < MAX_REFERALS_COUNT
+                                // TODO тут будет расхождение если в форке обработка а потом слив данных идет или если без протокольных индексов...
+                                // in FORK not worked... getTransactionsByAddressAndType = NULL
+                                && !dcSet.isFork()
+                        ) {
                             pointNew[4] = calcReferalsCount(dcSet, person);
+                            status += " Referrals: " + pointNew[4] + ".";
                         }
                     }
 
