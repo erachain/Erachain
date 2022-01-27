@@ -1387,6 +1387,11 @@ public class DCSet extends DBASet implements Closeable {
         return this.itemUnionMap;
     }
 
+    /**
+     * used for save protocoled data of Items. For example - issued persons of person
+     *
+     * @return
+     */
     public ItemsValuesMap getItemsValuesMap() {
         return this.itemsValuesMap;
     }

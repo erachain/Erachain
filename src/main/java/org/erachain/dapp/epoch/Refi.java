@@ -6,6 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.persons.PersonCls;
@@ -14,10 +15,13 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemsValuesMap;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -161,11 +165,26 @@ public class Refi extends EpochDAPPjson {
      */
     private int calcReferalsCount(DCSet dcSet, PersonCls person) {
 
+
         TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = dcSet.getPersonAddressMap().getItems(person.getKey());
+        if (addresses.isEmpty())
+            return 0;
 
         int count = 0;
 
-        if (!addresses.isEmpty()) {
+        if (true) {
+            ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersons(person.getKey(), ItemCls.PERSON_TYPE, false)) {
+                while (iterator.hasNext()) {
+                    count++;
+                }
+            } catch (IOException e) {
+                Long error = null;
+                error++;
+            }
+
+        } else {
+            /// OLD version
 
             TransactionFinalMap txsMap = dcSet.getTransactionFinalMap();
 

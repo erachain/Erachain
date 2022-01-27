@@ -51,10 +51,23 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
         }
     }
 
-    public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, boolean descending) {
+    /**
+     * search
+     *
+     * @param personKey
+     * @param descending
+     * @return
+     */
+    public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, int itemType, boolean descending) {
 
-        Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? Longs.toByteArray(Long.MAX_VALUE) : new byte[0]);
-        Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? new byte[0] : Longs.toByteArray(Long.MAX_VALUE));
+        byte[] itemIssuedBytesMAX = Longs.toByteArray(Long.MAX_VALUE);
+        // first byte as type
+        itemIssuedBytesMAX[0] = (byte) itemType;
+
+        byte[] itemIssuedBytesMIN = new byte[]{(byte) itemType};
+
+        Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMAX : itemIssuedBytesMIN);
+        Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMIN : itemIssuedBytesMAX);
 
         if (parent == null) {
             return getIterator(fromKey, toKey, descending);
@@ -64,5 +77,23 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
                     getIterator(fromKey, toKey, descending)),
                     new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR), descending);
         }
+    }
+
+    public byte[] makeIssuedItemKey(ItemCls item) {
+        byte[] itemIssuedBytes = Longs.toByteArray(item.getKey());
+        // first byte as type
+        itemIssuedBytes[0] = (byte) item.getItemType();
+        return itemIssuedBytes;
+
+    }
+
+    public void putIssuedItem(ItemCls issuer, ItemCls item, Long dbRef) {
+        put(new Fun.Tuple3(issuer.getKey(), issuer.getItemType(), makeIssuedItemKey(item)), Longs.toByteArray(dbRef));
+
+    }
+
+    public void deleteIssuedItem(ItemCls issuer, ItemCls item) {
+        delete(new Fun.Tuple3(issuer.getKey(), issuer.getItemType(), makeIssuedItemKey(item)));
+
     }
 }
