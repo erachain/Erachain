@@ -64,7 +64,7 @@ public class Refi extends EpochDAPPjson {
     static final BigDecimal STAKE_KOEFF_5 = new BigDecimal("0.30");
     static final BigDecimal STAKE_KOEFF_6 = new BigDecimal("0.35");
     public static final int REFERRAL_LEVEL_DEEP = 5;
-    public static final int REFERRAL_SHARE2 = 1;
+    public static final int REFERRAL_SHARE2 = 3;
     public static final int MAX_REFERRALS_COUNT = 100;
     public static final BigDecimal MAX_REFERRALS_STAKE = new BigDecimal(150000);
     /**
