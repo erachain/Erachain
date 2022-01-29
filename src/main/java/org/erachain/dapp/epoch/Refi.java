@@ -32,7 +32,7 @@ public class Refi extends EpochDAPPjson {
 
 
     static public final int ID = 1012;
-    static public final String NAME = "Referal dApp";
+    static public final String NAME = "Referral dApp";
     static public final String ASSET_NAME = "REFI";
     static public final long ASSET_QUALITY = 25000000;
     public static final int ASSET_DECIMALS = 18;
@@ -175,7 +175,7 @@ public class Refi extends EpochDAPPjson {
             IssueItemRecord tx;
             Long personKey;
             TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses;
-            BigDecimal refferalStake;
+            BigDecimal referralStake;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 dbRef = Longs.fromByteArray(issuesMap.get(key));
@@ -189,8 +189,8 @@ public class Refi extends EpochDAPPjson {
                     continue;
 
                 for (String address : addresses.keySet()) {
-                    refferalStake = balancesMap.get(crypto.getShortBytesFromAddress(address), assetKey).a.b;
-                    totalStake = totalStake.add(refferalStake);
+                    referralStake = balancesMap.get(crypto.getShortBytesFromAddress(address), assetKey).a.b;
+                    totalStake = totalStake.add(referralStake);
                 }
 
                 count++;
@@ -209,12 +209,12 @@ public class Refi extends EpochDAPPjson {
 
     }
 
-    private static void processReferalLevel(DCSet dcSet, int level, BigInteger referalGift, Account invitedAccount,
-                                            long invitedPersonKey, boolean asOrphan,
-                                            long royaltyAssetKey, int royaltyAssetScale,
-                                            List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
+    private static void processReferralLevel(DCSet dcSet, int level, BigInteger referralGift, Account invitedAccount,
+                                             long invitedPersonKey, boolean asOrphan,
+                                             long royaltyAssetKey, int royaltyAssetScale,
+                                             List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
 
-        if (referalGift.signum() <= 0)
+        if (referralGift.signum() <= 0)
             return;
 
         String messageLevel;
@@ -236,7 +236,7 @@ public class Refi extends EpochDAPPjson {
                 || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
             // break loop
-            BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
+            BigDecimal giftBG = new BigDecimal(referralGift, royaltyAssetScale);
             invitedAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
                     giftBG, false, false, false);
 
@@ -253,7 +253,7 @@ public class Refi extends EpochDAPPjson {
         PersonCls issuer = (PersonCls) dcSet.getItemPersonMap().get(issuerPersonKey);
         if (!issuer.isAlive(timestamp)) {
             // SKIP this LEVEL for DEAD persons
-            processReferalLevel(dcSet, level, referalGift, issuerAccount, issuerPersonKey, asOrphan,
+            processReferralLevel(dcSet, level, referralGift, issuerAccount, issuerPersonKey, asOrphan,
                     royaltyAssetKey, royaltyAssetScale,
                     txCalculated, message, dbRef, timestamp);
             return;
@@ -263,9 +263,9 @@ public class Refi extends EpochDAPPjson {
 
         if (level > 1) {
 
-            BigInteger giftNext = referalGift.shiftRight(REFERRAL_LEVEL_KOEFFS[directLevel]);
+            BigInteger giftNext = referralGift.shiftRight(REFERRAL_LEVEL_KOEFFS[directLevel]);
 
-            BigDecimal giftBG = new BigDecimal(referalGift.subtract(giftNext), royaltyAssetScale);
+            BigDecimal giftBG = new BigDecimal(referralGift.subtract(giftNext), royaltyAssetScale);
             issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey, giftBG,
                     false, false, false);
 
@@ -276,7 +276,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             if (giftNext.signum() > 0) {
-                processReferalLevel(dcSet, --level, giftNext, issuerAccount, issuerPersonKey, asOrphan,
+                processReferralLevel(dcSet, --level, giftNext, issuerAccount, issuerPersonKey, asOrphan,
                         royaltyAssetKey, royaltyAssetScale,
                         txCalculated, message, dbRef, timestamp);
             }
@@ -284,9 +284,9 @@ public class Refi extends EpochDAPPjson {
         } else {
             // this is END LEVEL
             // GET REST of GIFT
-            BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
+            BigDecimal giftBG = new BigDecimal(referralGift, royaltyAssetScale);
             issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
-                    new BigDecimal(referalGift, royaltyAssetScale), false, false, false);
+                    new BigDecimal(referralGift, royaltyAssetScale), false, false, false);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
@@ -296,15 +296,15 @@ public class Refi extends EpochDAPPjson {
         }
     }
 
-    private static Long processReferal(DCSet dcSet, int level, BigDecimal stakeReward, Account creator, boolean asOrphan,
-                                       AssetCls royaltyAsset,
-                                       Block block,
-                                       String message, long dbRef, long timestamp) {
+    private static Long processReferral(DCSet dcSet, int level, BigDecimal stakeReward, Account creator, boolean asOrphan,
+                                        AssetCls royaltyAsset,
+                                        Block block,
+                                        String message, long dbRef, long timestamp) {
 
         if (stakeReward.signum() <= 0)
             return null;
 
-        BigInteger refferalGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERRAL_SHARE2);
+        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERRAL_SHARE2);
 
         List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
         long royaltyAssetKey = royaltyAsset.getKey();
@@ -316,12 +316,12 @@ public class Refi extends EpochDAPPjson {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             royaltyAsset.getMaker().changeBalance(dcSet, !asOrphan, false, royaltyAssetKey,
-                    new BigDecimal(refferalGift, royaltyAssetScale), false, false, true);
+                    new BigDecimal(referralGift, royaltyAssetScale), false, false, true);
 
             return null;
         }
 
-        processReferalLevel(dcSet, level, refferalGift, creator, personDuration.a, asOrphan,
+        processReferralLevel(dcSet, level, referralGift, creator, personDuration.a, asOrphan,
                 royaltyAssetKey, royaltyAssetScale,
                 txCalculated, message, dbRef, timestamp);
 
@@ -353,7 +353,7 @@ public class Refi extends EpochDAPPjson {
 
                 // ORPHAN REFERRALS
                 AssetCls asset = rSend.getAsset();
-                processReferal(dcSet, REFERRAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
+                processReferral(dcSet, REFERRAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
                         asset, null, null, rSend.getDBRef(), rSend.getTimestamp());
 
             }
@@ -407,7 +407,7 @@ public class Refi extends EpochDAPPjson {
 
                     // PROCESS REFERRALS
                     AssetCls asset = rSend.getAsset();
-                    Long personKey = processReferal(dcSet, REFERRAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
+                    Long personKey = processReferral(dcSet, REFERRAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
                             asset, block,
                             ASSET_NAME + " referral bonus " + "@" + rSend.viewHeightSeq(),
                             rSend.getDBRef(), rSend.getTimestamp());
@@ -417,9 +417,9 @@ public class Refi extends EpochDAPPjson {
                         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(personKey);
                         if (person.isAlive(block == null ? rSend.getTimestamp() : block.getTimestamp()) // block may be NULL on test unconfirmed
                         ) {
-                            Tuple2<Integer, BigDecimal> refferals = calcReferrals(dcSet, assetKey, person);
-                            status += " Referrals count: " + refferals.a + ", stake: " + refferals.b.toPlainString();
-                            pointNew[4] = refferals;
+                            Tuple2<Integer, BigDecimal> referrals = calcReferrals(dcSet, assetKey, person);
+                            status += " Referrals count: " + referrals.a + ", stake: " + referrals.b.toPlainString();
+                            pointNew[4] = referrals;
                         }
                     }
 
