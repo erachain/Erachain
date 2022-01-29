@@ -64,9 +64,9 @@ public class Refi extends EpochDAPPjson {
     static final BigDecimal STAKE_KOEFF_5 = new BigDecimal("0.30");
     static final BigDecimal STAKE_KOEFF_6 = new BigDecimal("0.35");
     public static final int REFERRAL_LEVEL_DEEP = 5;
-    public static final int REFERRAL_SHARE2 = 3;
+    public static final int REFERRAL_SHARE2 = 1;
     public static final int MAX_REFERRALS_COUNT = 100;
-    public static final BigDecimal MAX_REFERRALS_STAKE = new BigDecimal(15000);
+    public static final BigDecimal MAX_REFERRALS_STAKE = new BigDecimal(150000);
     /**
      * divide by power of 2
      */
@@ -91,7 +91,7 @@ public class Refi extends EpochDAPPjson {
             return STAKE_KOEFF_1;
 
         BigDecimal koeff;
-        if (referrals.a >= 100 && referrals.b.compareTo(new BigDecimal(150000)) >= 0) {
+        if (referrals.a >= MAX_REFERRALS_COUNT && referrals.b.compareTo(MAX_REFERRALS_STAKE) >= 0) {
             koeff = STAKE_KOEFF_6;
         } else if (referrals.a >= 100 && referrals.b.compareTo(new BigDecimal(50000)) >= 0) {
             koeff = STAKE_KOEFF_5;
@@ -120,8 +120,8 @@ public class Refi extends EpochDAPPjson {
      * @param point
      * @return
      */
-    private static Object[] makeNewPoin(Long assetKey, Long refDB, Integer height,
-                                        Account account, BigDecimal stake, Object[] point) {
+    private static Object[] makeNewPoint(Long assetKey, Long refDB, Integer height,
+                                         Account account, BigDecimal stake, Object[] point) {
 
         Object[] pointNew;
 
@@ -304,7 +304,7 @@ public class Refi extends EpochDAPPjson {
         if (stakeReward.signum() <= 0)
             return null;
 
-        BigInteger referalGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERRAL_SHARE2);
+        BigInteger refferalGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERRAL_SHARE2);
 
         List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
         long royaltyAssetKey = royaltyAsset.getKey();
@@ -316,12 +316,12 @@ public class Refi extends EpochDAPPjson {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             royaltyAsset.getMaker().changeBalance(dcSet, !asOrphan, false, royaltyAssetKey,
-                    new BigDecimal(referalGift, royaltyAssetScale), false, false, true);
+                    new BigDecimal(refferalGift, royaltyAssetScale), false, false, true);
 
             return null;
         }
 
-        processReferalLevel(dcSet, level, referalGift, creator, personDuration.a, asOrphan,
+        processReferalLevel(dcSet, level, refferalGift, creator, personDuration.a, asOrphan,
                 royaltyAssetKey, royaltyAssetScale,
                 txCalculated, message, dbRef, timestamp);
 
@@ -378,8 +378,8 @@ public class Refi extends EpochDAPPjson {
                 BigDecimal stake = recipient.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
                 recipientPoint = (Object[]) valueGet(dcSet, recipientAddress);
 
-                Object[] pointNew = makeNewPoin(assetKey, refDB, height, recipient, stake, recipientPoint);
-                status += " Reciever reward: " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
+                Object[] pointNew = makeNewPoint(assetKey, refDB, height, recipient, stake, recipientPoint);
+                status += " Receiver reward: " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 // STORE NEW POINT
                 valuePut(dcSet, recipientAddress, pointNew);
@@ -397,7 +397,7 @@ public class Refi extends EpochDAPPjson {
                 BigDecimal stake = sender.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
                 senderPoint = (Object[]) valueGet(dcSet, senderAddress);
 
-                Object[] pointNew = makeNewPoin(assetKey, refDB, height, sender, stake, senderPoint);
+                Object[] pointNew = makeNewPoint(assetKey, refDB, height, sender, stake, senderPoint);
                 status += " Sender reward " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 int lastHeightAction = (Integer) pointNew[0];
