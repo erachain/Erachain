@@ -10,16 +10,16 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemsValuesMap;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -65,7 +65,8 @@ public class Refi extends EpochDAPPjson {
     static final BigDecimal STAKE_KOEFF_6 = new BigDecimal("0.35");
     public static final int REFERRAL_LEVEL_DEEP = 5;
     public static final int REFERRAL_SHARE2 = 3;
-    public static final int MAX_REFERRALS_COUNT = 50;
+    public static final int MAX_REFERRALS_COUNT = 100;
+    public static final BigDecimal MAX_REFERRALS_STAKE = new BigDecimal(15000);
     /**
      * divide by power of 2
      */
@@ -84,28 +85,24 @@ public class Refi extends EpochDAPPjson {
         return txCreator.equals(adminAddress);
     }
 
-    private static BigDecimal stakeKoeff(Account account, BigDecimal stake, Integer referralsCount) {
+    private static BigDecimal stakeKoeff(Tuple2<Integer, BigDecimal> referrals) {
+
+        if (referrals == null)
+            return STAKE_KOEFF_1;
 
         BigDecimal koeff;
-        if (stake.compareTo(new BigDecimal(150000)) >= 0) {
+        if (referrals.a >= 100 && referrals.b.compareTo(new BigDecimal(150000)) >= 0) {
             koeff = STAKE_KOEFF_6;
-        } else if (stake.compareTo(new BigDecimal(50000)) >= 0) {
+        } else if (referrals.a >= 100 && referrals.b.compareTo(new BigDecimal(50000)) >= 0) {
             koeff = STAKE_KOEFF_5;
-        } else if (stake.compareTo(new BigDecimal(15000)) >= 0) {
+        } else if (referrals.a >= 50 && referrals.b.compareTo(new BigDecimal(15000)) >= 0) {
             koeff = STAKE_KOEFF_4;
-        } else if (stake.compareTo(new BigDecimal(1500)) >= 0) {
+        } else if (referrals.a >= 20 && referrals.b.compareTo(new BigDecimal(1500)) >= 0) {
             koeff = STAKE_KOEFF_3;
-        } else if (stake.compareTo(new BigDecimal(150)) >= 0) {
+        } else if (referrals.a >= 10 && referrals.b.compareTo(new BigDecimal(150)) >= 0) {
             koeff = STAKE_KOEFF_2;
-        } else if (stake.compareTo(new BigDecimal(10)) >= 0) {
+        } else {
             koeff = STAKE_KOEFF_1;
-        } else
-            return BigDecimal.ZERO;
-
-        if (referralsCount >= MAX_REFERRALS_COUNT) {
-            koeff = koeff.add(new BigDecimal("0.1"));
-        } else if (referralsCount >= 5) {
-            koeff = koeff.add(new BigDecimal("0.05"));
         }
 
         return koeff;
@@ -129,10 +126,10 @@ public class Refi extends EpochDAPPjson {
         Object[] pointNew;
 
         if (point == null) {
-            pointNew = new Object[]{height, BigDecimal.ZERO, height, stakeKoeff(account, stake, 0), 0};
+            pointNew = new Object[]{height, BigDecimal.ZERO, height, stakeKoeff(null), 0};
         } else if (height.equals(point[2])) {
             // не пересчитываем - только коэффициент
-            pointNew = new Object[]{point[0], point[1], height, stakeKoeff(account, stake, (Integer) point[4]), point[4]};
+            pointNew = new Object[]{point[0], point[1], height, stakeKoeff((Tuple2<Integer, BigDecimal>) point[4]), point[4]};
         } else {
             // расчет новой ожидающей награды у получателя и обновление даты для нового начала отсчета потом
             BigDecimal pendingReward = (BigDecimal) point[1];
@@ -150,7 +147,7 @@ public class Refi extends EpochDAPPjson {
                 }
             }
 
-            pointNew = new Object[]{point[0], pendingRewardNew, height, stakeKoeff(account, stake, (Integer) point[4]), point[4]};
+            pointNew = new Object[]{point[0], pendingRewardNew, height, stakeKoeff((Tuple2<Integer, BigDecimal>) point[4]), point[4]};
         }
 
         return pointNew;
@@ -163,47 +160,52 @@ public class Refi extends EpochDAPPjson {
      * @param person
      * @return
      */
-    private int calcReferralsCount(DCSet dcSet, PersonCls person) {
-
-
-        TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = dcSet.getPersonAddressMap().getItems(person.getKey());
-        if (addresses.isEmpty())
-            return 0;
+    private Tuple2<Integer, BigDecimal> calcReferrals(DCSet dcSet, Long assetKey, PersonCls person) {
 
         int count = 0;
+        BigDecimal totalStake = BigDecimal.ZERO;
 
-        if (true) {
-            ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
-            try (IteratorCloseable<Fun.Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(person.getKey(), ItemCls.PERSON_TYPE, false)) {
-                while (iterator.hasNext()) {
-                    iterator.next();
-                    count++;
+        ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+        PersonAddressMap personAddresses = dcSet.getPersonAddressMap();
+        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
+        try (IteratorCloseable<Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(person.getKey(), ItemCls.PERSON_TYPE, false)) {
+            Tuple3<Long, Byte, byte[]> key;
+            Long dbRef;
+            IssueItemRecord tx;
+            Long personKey;
+            TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses;
+            BigDecimal refferalStake;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                dbRef = Longs.fromByteArray(issuesMap.get(key));
+                tx = (IssueItemRecord) txMap.get(dbRef);
+                if (tx.isWiped())
+                    continue;
+
+                personKey = tx.getKey();
+                addresses = personAddresses.getItems(personKey);
+                if (addresses == null || addresses.isEmpty())
+                    continue;
+
+                for (String address : addresses.keySet()) {
+                    refferalStake = balancesMap.get(crypto.getShortBytesFromAddress(address), assetKey).a.b;
+                    totalStake = totalStake.add(refferalStake);
                 }
-            } catch (IOException e) {
-                Long error = null;
-                error++;
-            }
 
-        } else {
-            /// OLD version
+                count++;
 
-            TransactionFinalMap txsMap = dcSet.getTransactionFinalMap();
-
-            // for each address of this person
-            for (String address : addresses.keySet()) {
-
-                List<Transaction> issuedPersons = txsMap.getTransactionsByAddressAndType(crypto.getShortBytesFromAddress(address),
-                        Transaction.ISSUE_PERSON_TRANSACTION, MAX_REFERRALS_COUNT, 0);
-                if (issuedPersons != null) {
-                    count += issuedPersons.size();
-                }
-
-                if (count > MAX_REFERRALS_COUNT)
+                if (count >= MAX_REFERRALS_COUNT && totalStake.compareTo(MAX_REFERRALS_STAKE) >= 0) {
+                    // MAX KOEFF REACHED
                     break;
+                }
             }
+        } catch (IOException e) {
+            Long error = null;
+            error++;
         }
 
-        return count;
+        return new Tuple2<>(count, totalStake);
 
     }
 
@@ -414,11 +416,10 @@ public class Refi extends EpochDAPPjson {
                     if (personKey != null) {
                         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(personKey);
                         if (person.isAlive(block == null ? rSend.getTimestamp() : block.getTimestamp()) // block may be NULL on test unconfirmed
-                                // if not MAX
-                                && (Integer) pointNew[4] < MAX_REFERRALS_COUNT
                         ) {
-                            pointNew[4] = calcReferralsCount(dcSet, person);
-                            status += " Referrals: " + pointNew[4] + ".";
+                            Tuple2<Integer, BigDecimal> refferals = calcReferrals(dcSet, assetKey, person);
+                            status += " Referrals count: " + refferals.a + ", stake: " + refferals.b.toPlainString();
+                            pointNew[4] = refferals;
                         }
                     }
 
