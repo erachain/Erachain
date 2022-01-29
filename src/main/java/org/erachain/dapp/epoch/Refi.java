@@ -126,7 +126,7 @@ public class Refi extends EpochDAPPjson {
         Object[] pointNew;
 
         if (point == null) {
-            pointNew = new Object[]{height, BigDecimal.ZERO, height, stakeKoeff(null), 0};
+            pointNew = new Object[]{height, BigDecimal.ZERO, height, stakeKoeff(null), null};
         } else if (height.equals(point[2])) {
             // не пересчитываем - только коэффициент
             pointNew = new Object[]{point[0], point[1], height, stakeKoeff((Tuple2<Integer, BigDecimal>) point[4]), point[4]};
@@ -311,7 +311,7 @@ public class Refi extends EpochDAPPjson {
         if (stakeReward.signum() <= 0)
             return null;
 
-        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERRAL_SHARE2);
+        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale(), BigDecimal.ROUND_DOWN).unscaledValue().shiftRight(REFERRAL_SHARE2);
 
         List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
         long royaltyAssetKey = royaltyAsset.getKey();
