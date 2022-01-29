@@ -85,7 +85,7 @@ public class Refi extends EpochDAPPjson {
         return txCreator.equals(adminAddress);
     }
 
-    private static BigDecimal stakeKoeff(Tuple2<Integer, BigDecimal> referrals) {
+    private BigDecimal stakeKoeff(Tuple2<Integer, BigDecimal> referrals) {
 
         if (referrals == null)
             return STAKE_KOEFF_1;
@@ -93,13 +93,13 @@ public class Refi extends EpochDAPPjson {
         BigDecimal koeff;
         if (referrals.a >= MAX_REFERRALS_COUNT && referrals.b.compareTo(MAX_REFERRALS_STAKE) >= 0) {
             koeff = STAKE_KOEFF_6;
-        } else if (referrals.a >= 100 && referrals.b.compareTo(new BigDecimal(50000)) >= 0) {
+        } else if (referrals.a >= 50 && referrals.b.compareTo(new BigDecimal(50000)) >= 0) {
             koeff = STAKE_KOEFF_5;
-        } else if (referrals.a >= 50 && referrals.b.compareTo(new BigDecimal(15000)) >= 0) {
+        } else if (referrals.a >= 20 && referrals.b.compareTo(new BigDecimal(15000)) >= 0) {
             koeff = STAKE_KOEFF_4;
-        } else if (referrals.a >= 20 && referrals.b.compareTo(new BigDecimal(1500)) >= 0) {
+        } else if (referrals.a >= 10 && referrals.b.compareTo(new BigDecimal(1500)) >= 0) {
             koeff = STAKE_KOEFF_3;
-        } else if (referrals.a >= 10 && referrals.b.compareTo(new BigDecimal(150)) >= 0) {
+        } else if (referrals.a >= 5 && referrals.b.compareTo(new BigDecimal(150)) >= 0) {
             koeff = STAKE_KOEFF_2;
         } else {
             koeff = STAKE_KOEFF_1;
@@ -120,8 +120,8 @@ public class Refi extends EpochDAPPjson {
      * @param point
      * @return
      */
-    private static Object[] makeNewPoint(Long assetKey, Long refDB, Integer height,
-                                         Account account, BigDecimal stake, Object[] point) {
+    private Object[] makeNewPoint(Long assetKey, Long refDB, Integer height,
+                                  Account account, BigDecimal stake, Object[] point) {
 
         Object[] pointNew;
 
@@ -164,6 +164,7 @@ public class Refi extends EpochDAPPjson {
 
         int count = 0;
         BigDecimal totalStake = BigDecimal.ZERO;
+        boolean maxReached = false;
 
         ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
@@ -197,6 +198,7 @@ public class Refi extends EpochDAPPjson {
 
                 if (count >= MAX_REFERRALS_COUNT && totalStake.compareTo(MAX_REFERRALS_STAKE) >= 0) {
                     // MAX KOEFF REACHED
+                    maxReached = true;
                     break;
                 }
             }
@@ -204,6 +206,11 @@ public class Refi extends EpochDAPPjson {
             Long error = null;
             error++;
         }
+
+        if (maxReached)
+            status += " Referrals count: >=" + MAX_REFERRALS_COUNT + ", stake: >=" + MAX_REFERRALS_STAKE.toPlainString() + ".";
+        else
+            status += " Referrals count: " + count + ", stake: " + totalStake.toPlainString() + ".";
 
         return new Tuple2<>(count, totalStake);
 
@@ -418,7 +425,9 @@ public class Refi extends EpochDAPPjson {
                         if (person.isAlive(block == null ? rSend.getTimestamp() : block.getTimestamp()) // block may be NULL on test unconfirmed
                         ) {
                             Tuple2<Integer, BigDecimal> referrals = calcReferrals(dcSet, assetKey, person);
-                            status += " Referrals count: " + referrals.a + ", stake: " + referrals.b.toPlainString();
+                            BigDecimal newKoeff = stakeKoeff(referrals);
+                            status += " New Koeff: " + newKoeff.toPlainString() + ".";
+                            pointNew[3] = newKoeff;
                             pointNew[4] = referrals;
                         }
                     }
