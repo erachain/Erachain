@@ -312,6 +312,8 @@ public class Refi extends EpochDAPPjson {
             return null;
 
         BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale(), BigDecimal.ROUND_DOWN).unscaledValue().shiftRight(REFERRAL_SHARE2);
+        if (referralGift.signum() <= 0)
+            return null;
 
         List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
         long royaltyAssetKey = royaltyAsset.getKey();
@@ -349,10 +351,10 @@ public class Refi extends EpochDAPPjson {
             Object[] state = removeState(dcSet, rSend.getDBRef());
 
             // RESTORE OLD POINT
-            valueSet(dcSet, senderAddress, state[0]);
+            valuePut(dcSet, senderAddress, state[0]);
 
             // RESTORE OLD POINT
-            valueSet(dcSet, recipientAddress, state[1]);
+            valuePut(dcSet, recipientAddress, state[1]);
 
             BigDecimal stakeReward = (BigDecimal) state[2];
             if (stakeReward != null && stakeReward.signum() > 0) {
