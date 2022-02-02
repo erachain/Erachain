@@ -73,25 +73,26 @@ public abstract class DAPPFactory {
 
         RSend txSend = (RSend) transaction;
 
-        if (BlockChain.TEST_MODE) {
+        if (false && BlockChain.TEST_MODE) {
             Refi dapp = Refi.tryMakeJob(txSend);
             if (dapp != null)
                 return dapp;
         }
 
-        if (!txSend.getRecipient().isDAppOwned())
-            return null;
+        if (!txSend.getRecipient().isDAppOwned()) {
+            ///// OLD VERSION
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
+            ) {
+                if (txSend.hasPacket()) {
 
-        ///// OLD VERSION
-        if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
-        ) {
-            if (txSend.hasPacket()) {
-
-            } else if (txSend.getAmount().signum() < 0) {
-                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+                } else if (txSend.getAmount().signum() < 0) {
+                    return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+                }
             }
+            //////
+
+            return null;
         }
-        //////
 
         /////// NEW VERSION
 
