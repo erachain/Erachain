@@ -29,7 +29,8 @@ public class PublicKeyAccount extends Account {
     }
 
     public static boolean validLen(String publicKey) {
-        return publicKey.length() >= PublicKeyAccount.PUBLIC_KEY_LENGTH + (PublicKeyAccount.PUBLIC_KEY_LENGTH >> 3);
+        return publicKey.length() >= PublicKeyAccount.PUBLIC_KEY_LENGTH
+                && publicKey.length() < PublicKeyAccount.PUBLIC_KEY_LENGTH + 7 + (PublicKeyAccount.PUBLIC_KEY_LENGTH >> 1);
     }
 
     public static boolean isValidPublicKey(String publicKey) {
