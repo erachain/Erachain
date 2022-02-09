@@ -162,6 +162,7 @@
   "AS_INSIDE_ACCESS_1": "Передать права доступа",
   "AS_INSIDE_ACCESS_2": "Наделить правами доступа",
   "AS_INSIDE_ACCESS_2B": "Отозвать права доступа (сторно)",
+  "AS_INSIDE_ACCESS_2R": "Вернуть права доступа",
   "AS_INSIDE_ACCESS_4": "Потратить права доступа",
   "AS_INSIDE_VOTE_Issue": "Выпустить голоса",
   "AS_INSIDE_VOTE_1": "Передать голоса",
