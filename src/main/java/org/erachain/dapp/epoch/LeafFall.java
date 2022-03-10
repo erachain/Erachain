@@ -41,7 +41,7 @@ public class LeafFall extends EpochDAPP {
 
     // use for check: need to initiate values?
     static final Fun.Tuple2 INIT_KEY = new Fun.Tuple2(ID, "i");
-    static final Fun.Tuple2 COUN_VAR = new Fun.Tuple2(ID, "c");
+    static final Fun.Tuple2 COUNT_VAR = new Fun.Tuple2(ID, "c");
 
     public LeafFall() {
         super(ID);
@@ -221,7 +221,7 @@ public class LeafFall extends EpochDAPP {
 
     private void loadValues(SmartContractValues valuesMap) {
         keyInit = (Long) valuesMap.get(INIT_KEY);
-        count = (Integer) valuesMap.get(COUN_VAR);
+        count = (Integer) valuesMap.get(COUNT_VAR);
     }
 
     @Override
@@ -246,7 +246,7 @@ public class LeafFall extends EpochDAPP {
 
         action(dcSet, block, transaction, false);
 
-        valuesMap.put(COUN_VAR, ++count);
+        valuesMap.put(COUNT_VAR, ++count);
 
         return false;
     }
@@ -271,7 +271,7 @@ public class LeafFall extends EpochDAPP {
              */
             wipe(dcSet, valuesMap);
         } else {
-            valuesMap.put(COUN_VAR, --count);
+            valuesMap.put(COUNT_VAR, --count);
         }
 
     }
@@ -286,7 +286,7 @@ public class LeafFall extends EpochDAPP {
 
         // TODO - сделать удаление всех разом по Tuple2(id, null)
         valuesMap.delete(INIT_KEY);
-        valuesMap.delete(COUN_VAR);
+        valuesMap.delete(COUNT_VAR);
     }
 
 }
