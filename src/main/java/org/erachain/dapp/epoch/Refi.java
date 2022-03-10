@@ -523,7 +523,7 @@ public class Refi extends EpochDAPPjson {
 
     @Override
     public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
-        fail("unknow command");
+        fail("unknown command");
         return false;
     }
 
@@ -538,7 +538,7 @@ public class Refi extends EpochDAPPjson {
         else if ("init".equals(command))
             return init(dcSet, block, commandTX, false);
 
-        fail("unknow command");
+        fail("unknown command");
         return false;
 
     }

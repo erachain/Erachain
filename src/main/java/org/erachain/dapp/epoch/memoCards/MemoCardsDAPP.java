@@ -869,7 +869,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
         }
 
-        fail("unknow command");
+        fail("unknown command");
         return false;
 
     }
@@ -881,7 +881,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             return random(dcSet, block, (RSend) transaction, false);
         }
 
-        fail("unknow command");
+        fail("unknown command");
         return false;
 
     }
