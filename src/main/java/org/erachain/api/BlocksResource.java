@@ -32,6 +32,10 @@ public class BlocksResource {
     @Context
     HttpServletRequest request;
 
+    /**
+     * @param signature signature or height of block
+     * @return
+     */
     @GET
     @Path("/{signature}")
     public static String getBlock(@PathParam("signature") String signature) {
@@ -57,7 +61,7 @@ public class BlocksResource {
 
         //CHECK IF BLOCK EXISTS
         if (block == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+            throw ApiErrorFactory.getInstance().createError(Transaction.BLOCK_NOT_EXIST);
         }
 
         return block.toJson().toJSONString();

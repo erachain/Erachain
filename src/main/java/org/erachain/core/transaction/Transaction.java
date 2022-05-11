@@ -280,9 +280,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
-    public static final int INVALID_TRANSACTION_TYPE = 550;
-    public static final int INVALID_BLOCK_HEIGHT = 599;
     public static final int TELEGRAM_DOES_NOT_EXIST = 541;
+    public static final int INVALID_TRANSACTION_TYPE = 550;
+    public static final int BLOCK_NOT_EXIST = 597;
+    public static final int INVALID_BLOCK_HEIGHT = 598;
     public static final int NOT_YET_RELEASED = 599;
     public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
 

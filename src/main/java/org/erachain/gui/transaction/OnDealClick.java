@@ -556,6 +556,9 @@ public class OnDealClick {
                 mess = "Invalid packet size";
                 break;
 
+            case Transaction.BLOCK_NOT_EXIST:
+                mess = "Block not exist";
+                break;
             case Transaction.INVALID_BLOCK_HEIGHT:
                 mess = "Invalid block height";
                 break;
