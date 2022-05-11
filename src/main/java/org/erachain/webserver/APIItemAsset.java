@@ -10,10 +10,14 @@ import org.erachain.api.ItemAssetsResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMapImpl;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,7 +31,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 //import com.google.gson.Gson;
@@ -50,7 +53,7 @@ public class APIItemAsset {
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base64 of asset with the given key.");
-        help.put("GET apiasset/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
+        help.put("GET apiasset/find?filter={name_string}&ontrade={assetKey}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use [ontrade] for select only traded assets. }Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for see as small video (use it for the tiles list for example). Install `ffmpeg` for preview option, see makePreview.bat for Windows or install ffmpeg on Unix");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -147,23 +150,25 @@ public class APIItemAsset {
     @GET
     @Path("find/{filter_name_string}")
     public static Response findOld(@PathParam("filter_name_string") String filter,
+                                   @QueryParam("ontrade") Long onTradeKey,
                                    @QueryParam("from") Long fromID,
                                    @QueryParam("offset") int offset,
                                    @QueryParam("limit") int limit) {
 
-        return find(filter, fromID, offset, limit, true);
+        return find(filter, onTradeKey, fromID, offset, limit, true);
     }
 
     @GET
     @Path("find")
     public static Response find(@QueryParam("filter") String filter,
+                                @QueryParam("ontrade") Long onTradeKey,
                                 @QueryParam("from") Long fromID,
                                 @QueryParam("offset") int offset,
                                 @QueryParam("limit") int limit,
                                 @DefaultValue("true") @QueryParam("desc") boolean descending) {
 
-        if (limit > 100) {
-            limit = 100;
+        if (limit <= 0 || limit > 25) {
+            limit = 25;
         }
 
         if (filter == null || filter.isEmpty()) {
@@ -175,13 +180,54 @@ public class APIItemAsset {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
+        OrderMapImpl ordersMap = DCSet.getInstance().getOrderMap();
+
+        IteratorCloseable<Long> iterator = null;
+        Pair<String, IteratorCloseable<Long>> resultKeys;
 
         JSONArray array = new JSONArray();
 
-        if (list != null) {
-            for (ItemCls item : list) {
-                array.add(item.toJson());
+        try {
+
+            resultKeys = map.getKeysIteratorByFilterAsArray(filter, fromID, offset, descending);
+            if (resultKeys.getA() == null) {
+
+                iterator = resultKeys.getB();
+
+                int count = 0;
+                int countSkippedOnTrade = 0;
+                Long key;
+
+                while (iterator.hasNext()) {
+
+                    key = iterator.next();
+
+                    if (onTradeKey != null) {
+                        Order bidLastOrder = ordersMap.getHaveWanFirst(key, onTradeKey);
+                        Order askLastOrder = ordersMap.getHaveWanFirst(onTradeKey, key);
+                        if (bidLastOrder == null && askLastOrder == null) {
+                            if (countSkippedOnTrade++ > 25)
+                                // for stop overload
+                                countSkippedOnTrade = 0;
+                            else
+                                continue;
+                        }
+                    }
+
+                    ItemCls item = map.get(key);
+                    array.add(item.toJson());
+
+                    if (++count >= limit)
+                        break;
+
+                }
+            }
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
             }
         }
 
