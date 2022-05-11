@@ -53,7 +53,7 @@ public class APIItemAsset {
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base64 of asset with the given key.");
-        help.put("GET apiasset/find?filter={name_string}&ontrade={assetKey}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use [ontrade] for select only traded assets. }Use patterns from 5 chars in words. Default {descending} - true");
+        help.put("GET apiasset/find?filter={name_string}&ontrade={assetKey}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use [ontrade] for select only traded assets (each limit*2). }Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for see as small video (use it for the tiles list for example). Install `ffmpeg` for preview option, see makePreview.bat for Windows or install ffmpeg on Unix");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -206,7 +206,7 @@ public class APIItemAsset {
                         Order bidLastOrder = ordersMap.getHaveWanFirst(key, onTradeKey);
                         Order askLastOrder = ordersMap.getHaveWanFirst(onTradeKey, key);
                         if (bidLastOrder == null && askLastOrder == null) {
-                            if (countSkippedOnTrade++ > 25)
+                            if (countSkippedOnTrade++ > limit * 2)
                                 // for stop overload
                                 countSkippedOnTrade = 0;
                             else
