@@ -312,8 +312,8 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "GET blocks/child/<signature>",
-                            "Returns the child block of the block that matches the given signature.",
+                            "GET blocks/child/<signature or height>",
+                            "Returns the child block of the block that matches the given signature or height.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
@@ -335,11 +335,6 @@ public class ApiClient {
                             "GET blocks/headers/<signature>",
                             "Returns the list oof block headers - for test networ response in controller.Controller.onMessage(GET_SIGNATURES_TYPE).",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
-                    },
-                    {
-                            "GET blocks/byheight/<height>",
-                            "Returns the block whith given height.",
-                            "Errors: 301 - Block does not exist."
                     },
                     {
                             "GET blocks/fromheight/<height>",
