@@ -297,9 +297,8 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
                     },
                     {
-                            "GET blocks/<signature>",
-                            "Returns the block that matches the given signature.",
-                            "Errors: 101 - Invalid signature. 301 - Block does not exist."
+                            "GET blocks/<signature or height>",
+                            "Returns the block that matches the given signature or height.",
                     },
                     {
                             "GET blocks/first",
@@ -312,8 +311,8 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "GET blocks/child/<signature or height>",
-                            "Returns the child block of the block that matches the given signature or height.",
+                            "GET blocks/child/<signature>",
+                            "Returns the child block of the block that matches the given signature.",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
