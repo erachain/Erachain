@@ -90,6 +90,7 @@ public class BlocksResource {
     }
 
     @GET
+    @Deprecated
     @Path("/height/{signature}")
     public static String getHeight(@PathParam("signature") String signature) {
         //DECODE SIGNATURE
