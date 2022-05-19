@@ -526,7 +526,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewSubTypeName() {
-        if (packet == null && (amount == null || amount.signum() == 0))
+        if (packet == null && (amount == null || amount.signum() == 0)
+                || asset == null) // в телеграммах может быть несуществующий актив - он без проверки идет - чтобы не падал JSON
             return "";
 
         if (packet == null) {
