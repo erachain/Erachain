@@ -393,15 +393,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (feeKoeff == BigDecimal.ZERO) {
             assetFee = assetFeeMin;
         } else {
-            assetFee = amount.abs().multiply(feeKoeff).setScale(asset.getScale(), RoundingMode.DOWN);
+            assetFee = amount.abs().multiply(feeKoeff).setScale(asset.getScale(), RoundingMode.UP);
             if (assetFee.compareTo(assetFeeMin) < 0) {
                 // USE MINIMAL VALUE
-                assetFee = assetFeeMin.setScale(asset.getScale(), RoundingMode.DOWN);
+                assetFee = assetFeeMin.setScale(asset.getScale(), RoundingMode.UP);
             }
         }
 
         BigDecimal burnedFeeKoeff = BlockChain.ASSET_BURN_PERCENTAGE(height, key);
-        BigDecimal assetBurned = burnedFeeKoeff == BigDecimal.ZERO ? BigDecimal.ZERO : assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
+        BigDecimal assetBurned = burnedFeeKoeff == BigDecimal.ZERO ? BigDecimal.ZERO
+                : assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
 
         return new Tuple2<>(assetFee, assetBurned);
 
