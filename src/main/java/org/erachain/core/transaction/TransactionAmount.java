@@ -1687,7 +1687,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             debtBalance = debtBalance.max(amount);
 
             if (debtBalance.signum() != 0) {
-                processAction(dcSet, !asOrphan, creator, asset.getMaker(), ACTION_DEBT,
+                processAction(dcSet, !asOrphan, creator, recipient, ACTION_DEBT,
                         absKey, asset, key, debtBalance.negate(), backward, incomeReverse);
             }
         }
