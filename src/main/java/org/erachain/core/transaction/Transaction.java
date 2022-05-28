@@ -164,6 +164,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int NOT_ENOUGH_ERA_USE_100 = 106;
     public static final int NOT_ENOUGH_ERA_OWN_1000 = 107;
     public static final int NOT_ENOUGH_ERA_USE_1000 = 108;
+    public static final int NOT_ENOUGH_ERA_OWN_10000 = 109;
+    public static final int NOT_ENOUGH_ERA_USE_10000 = 110;
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int INVALID_PERSONALIZY_ANOTHER_PERSON = 118;
