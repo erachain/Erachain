@@ -339,79 +339,118 @@ public class CreateOrderPanel extends JPanel {
     //нужно отдельно цену считаь для подстановок извне
     public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying, boolean recurse) {
 
+        sellButton.setEnabled(false);
+
         if (recurse) {
             noUpdateFields = true;
 
             addQueve(editedField);
         }
 
+        BigDecimal amount = BigDecimal.ZERO;
+        BigDecimal price = BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO;
+
         try {
 
-            BigDecimal amount = null;
-            BigDecimal price;
-            BigDecimal total = null;
-
-            if (recurse && notQueved(txtAmountWant)
-                    || !recurse && queve[1].equals(txtAmountWant)) {
-                amount = new BigDecimal(txtAmountHave.getText());
-                price = new BigDecimal(txtPrice.getText());
-                if (buying) {
-                    total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
-                } else {
-                    total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
-                }
-                txtAmountWant.setText(total.toPlainString());
-
-            } else if (recurse && notQueved(txtPrice)
-                    || !recurse && queve[1].equals(txtPrice)) {
-                amount = new BigDecimal(txtAmountHave.getText());
-                total = new BigDecimal(txtAmountWant.getText());
-                if (buying) {
-                    price = Order.calcPrice(amount, total, want.getScale());
-                } else {
-                    price = Order.calcPrice(amount, total, want.getScale());
-                }
-                txtPrice.setText(price.toPlainString());
-
-            } else if (recurse && notQueved(txtAmountHave)
-                    || !recurse && queve[1].equals(txtAmountHave)) {
-                total = new BigDecimal(txtAmountWant.getText());
-                price = new BigDecimal(txtPrice.getText());
-                if (buying) {
-                    amount = total.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
-                } else {
-                    amount = total.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
-                }
-                txtAmountHave.setText(amount.toPlainString());
-            }
-
-            if (amount.signum() == 0 || total.signum() == 0) {
-                sellButton.setEnabled(false);
-            }
-
-        } catch (Exception e) {
-            sellButton.setEnabled(false);
-        }
-
-        if (recurse) {
-
-            if (queve[1] != null) {
-                // так же пересчитать еще и поле второе для точности
-                calculateAmounts(queve[1], buying, false);
-            }
-
             try {
-                BigDecimal value = new BigDecimal(editedField.getText());
-                if (value.signum() <= 0) {
-                    sellButton.setEnabled(false);
-                } else {
-                    sellButton.setEnabled(true);
+                if (recurse && notQueved(txtAmountWant)
+                        || !recurse && queve[1].equals(txtAmountWant)) {
+
+                    amount = new BigDecimal(txtAmountHave.getText());
+                    if (amount.signum() == 0) {
+                        return;
+                    }
+
+                    price = new BigDecimal(txtPrice.getText());
+                    if (price.signum() == 0) {
+                        return;
+                    }
+
+                    if (buying) {
+                        total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
+                    } else {
+                        total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                    }
+                    txtAmountWant.setText(total.toPlainString());
+
+                } else if (recurse && notQueved(txtPrice)
+                        || !recurse && queve[1].equals(txtPrice)) {
+
+                    amount = new BigDecimal(txtAmountHave.getText());
+                    if (amount.signum() == 0) {
+                        return;
+                    }
+
+                    total = new BigDecimal(txtAmountWant.getText());
+                    if (total.signum() == 0) {
+                        return;
+                    }
+
+                    if (buying) {
+                        price = Order.calcPrice(amount, total, want.getScale());
+                    } else {
+                        price = Order.calcPrice(amount, total, want.getScale());
+                    }
+                    txtPrice.setText(price.toPlainString());
+
+                } else if (recurse && notQueved(txtAmountHave)
+                        || !recurse && queve[1].equals(txtAmountHave)) {
+
+                    total = new BigDecimal(txtAmountWant.getText());
+                    if (total.signum() == 0) {
+                        return;
+                    }
+
+                    price = new BigDecimal(txtPrice.getText());
+                    if (price.signum() == 0) {
+                        return;
+                    }
+
+                    if (buying) {
+                        amount = total.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
+                    } else {
+                        amount = total.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
+                    }
+                    txtAmountHave.setText(amount.toPlainString());
                 }
             } catch (Exception e) {
                 sellButton.setEnabled(false);
+                return;
             }
 
+            if (recurse) {
+
+                if (queve[1] != null) {
+                    // так же пересчитать еще и поле второе для точности
+                    calculateAmounts(queve[1], buying, false);
+                }
+
+                try {
+                    BigDecimal value = new BigDecimal(editedField.getText());
+                    if (value.signum() <= 0) {
+                        sellButton.setEnabled(false);
+                    } else {
+                        sellButton.setEnabled(true);
+                    }
+                } catch (Exception e) {
+                    sellButton.setEnabled(false);
+                }
+
+                noUpdateFields = false;
+
+            } else {
+
+                if (amount.signum() != 0 && price.signum() != 0 && total.signum() != 0) {
+                    sellButton.setEnabled(true);
+                }
+
+            }
+
+        } finally {
+
             noUpdateFields = false;
+
         }
 
     }
