@@ -346,6 +346,14 @@ public class OnDealClick {
             case Transaction.INVALID_ORDER_CREATOR:
                 mess = "Invalid order creator";
                 break;
+
+            case Transaction.ORDER_AMOUNT_HAVE_SO_SMALL:
+                mess = "Order have amount so small";
+                break;
+            case Transaction.ORDER_AMOUNT_WANT_SO_SMALL:
+                mess = "Order want amount so small";
+                break;
+
             case Transaction.INVALID_PAYMENTS_LENGTH:
                 mess = "Invalid payment length";
                 break;
