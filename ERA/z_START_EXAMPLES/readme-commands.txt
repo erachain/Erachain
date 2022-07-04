@@ -30,6 +30,7 @@ Start forging pool
 !! Need setup forging pool [address] by settings_fpool.json (see example in settings_fpool-example.json).
 !! Need switch ON web server [-web=on -weballowed=*] - for see statistics
 See RPC and API fpool commands for control and statistic.
+Send in DEBT some forging stake to pool address (setted in settings_pool.json) for start forging. You may confiscate that DEBT (backward) later.
 
 -backup
 
