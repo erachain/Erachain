@@ -32,7 +32,8 @@ function assets(data) {
         output += '<tr>';
         output += '<td>';
         //output += makeMediaIcon(item, '', 'width:2em')
-        output += '<div class="row" style="white-space:normal;"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>' + makeMediaIcon(item, '', 'width:3em') + '</a></div><div class="col-lg-10">';
+        output += '<div class="row" style="white-space:normal;"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>'
+            + makeMediaIcon(item, '', 'width: 4em; padding: 10px;') + '</a></div><div class="col-lg-10">';
         output += '<div class="row"><a href=?asset=' + item.key + get_lang() + '>' + cutBlank(escapeHtml(item.nameOrig), 70) + '</a></div>';
         output += '<div class="row" style="font-size:0.8em">' + item.key;
 

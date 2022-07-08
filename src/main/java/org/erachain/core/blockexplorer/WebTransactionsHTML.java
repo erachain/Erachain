@@ -857,7 +857,7 @@ public class WebTransactionsHTML {
 
         if (signature != null) {
             out += Lang.T("Signature", langObj) + ": "
-                    + "<a href=?tx=" + Base58.encode(signature) + ">" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + "</a><br>";
+                    + "<a href=?tx=" + Base58.encode(signature) + BlockExplorer.get_Lang(langObj) + ">" + Base58.encode(signature) + "</a><br>";
         }
 
         return out;

@@ -247,6 +247,9 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());
 
+        if (creatorPerson != null) {
+            dcSet.getItemsValuesMap().putIssuedItem(creatorPerson, item, dbRef);
+        }
     }
 
     @Override
@@ -262,6 +265,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected void orphanItem() {
         //DELETE FROM DATABASE
         key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
+
+        if (creatorPerson != null) {
+            dcSet.getItemsValuesMap().deleteIssuedItem(creatorPerson, item);
+        }
     }
 
     @Override

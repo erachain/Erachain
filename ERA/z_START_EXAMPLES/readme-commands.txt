@@ -26,9 +26,11 @@ example for auto make wallet keys: -seed=3:new:1
 
 -fpool
 Start forging pool
-!! Used only with -pass parameter
-Setup by settings_fpool.json (see example in settings_fpool-example.json).
+!! Used only with [-pass] parameter
+!! Need setup forging pool [address] by settings_fpool.json (see example in settings_fpool-example.json).
+!! Need switch ON web server [-web=on -weballowed=*] - for see statistics
 See RPC and API fpool commands for control and statistic.
+Send in DEBT some forging stake to pool address (setted in settings_pool.json) for start forging. You may confiscate that DEBT (backward) later.
 
 -backup
 

@@ -1,7 +1,6 @@
 package org.erachain.dbs;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
@@ -27,6 +26,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     protected Map<T, U> map;
     @Getter
     protected DCUMapImpl<T, U> parent;
+    Comparator<? super T> COMPARATOR = Fun.COMPARATOR;
+
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     //protected ConcurrentHashMap deleted;
@@ -186,20 +187,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 return new IteratorCloseableImpl(map.keySet().iterator());
             }
 
-            List<T> list = new ArrayList<>();
-            Iterator<T> parentIterator = parent.getIterator();
-            while (parentIterator.hasNext()) {
-                T key = parentIterator.next();
-                // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key)
-                        || map.containsKey(key))
-                    continue;
-                list.add(key);
-            }
-
-            /// тут нет дублей они уже удалены и дубли не взяты
-            /// return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
-            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR));
+            // new STYLE
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parent.getIterator(), deleted),
+                    map.keySet().iterator()), COMPARATOR, false);
 
         } finally {
             this.outUses();
@@ -207,32 +198,61 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     }
 
     public IteratorCloseable<T> getDescendingIterator() {
+
+        if (map instanceof HashMap) {
+            return null;
+        }
+
         this.addUses();
 
         try {
             if (parent == null) {
-                if (map instanceof NavigableMap) {
-                    return new IteratorCloseableImpl(((NavigableMap) map).descendingMap().keySet().iterator());
-                } else {
-                    return null;
-                }
+                return new IteratorCloseableImpl(((NavigableMap) map).descendingMap().keySet().iterator());
             }
 
-            List<T> list = new ArrayList<>();
-            Iterator<T> parentIterator = parent.getDescendingIterator();
-            while (parentIterator.hasNext()) {
-                T key = parentIterator.next();
-                // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key)
-                        || map.containsKey(key))
-                    continue;
-                list.add(key);
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parent.getDescendingIterator(), deleted),
+                    ((NavigableMap) map).descendingMap().keySet().iterator()), COMPARATOR, true);
+
+        } finally {
+            this.outUses();
+        }
+
+    }
+
+    public IteratorCloseable<T> getIterator(T fromKey, T toKey, boolean descending) {
+        this.addUses();
+
+        try {
+
+            IteratorCloseable<T> iterator;
+            if (descending) {
+                iterator =
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                // берем индекс с обратным отсчетом
+                                ((NavigableMap) this.map).descendingMap()
+                                        // задаем границы, так как он обратный границы меняем местами
+                                        .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey,
+                                                toKey == null ? LO : toKey).keySet().iterator());
+            } else {
+
+                iterator =
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                ((NavigableMap) this.map)
+                                        // задаем границы, так как он обратный границы меняем местами
+                                        .subMap(fromKey == null ? LO : fromKey,
+                                                toKey == null ? HI : toKey).keySet().iterator());
             }
 
-            /// тут нет дублей они уже удалены и дубли не взяты
-            /// return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
-            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(),
-                    ((NavigableMap) map).descendingMap().keySet().iterator()), Fun.COMPARATOR));
+            if (parent == null) {
+                return iterator;
+            }
+
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parent.getIterator(fromKey, toKey, descending), deleted),
+                    iterator), COMPARATOR, descending);
 
         } finally {
             this.outUses();
@@ -241,34 +261,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     }
 
     public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
-        this.addUses();
-
-        try {
-            if (descending) {
-                return
-                        // делаем закрываемый Итератор
-                        IteratorCloseableImpl.make(
-                                // берем индекс с обратным отсчетом
-                                ((NavigableMap) this.map).descendingMap()
-                                        // задаем границы, так как он обратный границы меняем местами
-                                        .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey,
-                                                LO).keySet().iterator());
-            }
-
-            return
-                    // делаем закрываемый Итератор
-                    IteratorCloseableImpl.make(
-                            ((NavigableMap) this.map)
-                                    // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromKey == null ? LO : fromKey,
-                                            HI).keySet().iterator());
-
-
-        } finally {
-            this.outUses();
-        }
-
+        return getIterator(fromKey, null, descending);
     }
+
 
     // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
 

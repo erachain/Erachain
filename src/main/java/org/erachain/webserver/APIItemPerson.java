@@ -1,5 +1,6 @@
 package org.erachain.webserver;
 
+import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
@@ -11,10 +12,8 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemPersonMap;
-import org.erachain.datachain.KKPersonStatusMap;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -63,6 +62,9 @@ public class APIItemPerson {
 
         help.put("GET apiperson/addresses/{key}?full", "Get Person Addresses");
         help.put("GET apiperson/statuses/{key}", "Get Person Statuses");
+
+        help.put("GET apiperson/issues/{person}/{itemtype}?offset=0&limit=100desc={false}", "Get issued items by Person. ItemType: 1 - ASSET, 2 - IMPRINT, 3 - TEMPLATE, 4 - PERSON, 5 - STATUS, 7 - STATEMENT, 8 - POLL");
+
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -144,6 +146,63 @@ public class APIItemPerson {
                 .entity(sum.toPlainString()).build();
     }
 
+    @GET
+    @Path("issues/{person}/{itemtype}")
+    public Response getIssues(@Context UriInfo info,
+                              @PathParam("person") long personKey, @PathParam("itemtype") int itemType,
+                              @QueryParam("offset") int offset,
+                              @QueryParam("limit") int limit
+    ) {
+
+        ItemCls person = dcSet.getItemPersonMap().get(personKey);
+        if (person == null)
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("person not found").build();
+
+        if (limit > 100 || limit <= 0) {
+            limit = 100;
+        }
+
+        boolean desc = API.checkBoolean(info, "desc");
+
+        JSONArray jsonArray = new JSONArray();
+        ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
+        try (IteratorCloseable<Fun.Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(personKey, itemType, desc)) {
+            Fun.Tuple3<Long, Byte, byte[]> key;
+            byte[] itemBytes;
+            while (iterator.hasNext() && limit > 0) {
+                key = iterator.next();
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+                JSONArray itemRes = new JSONArray();
+
+                // GET seqNo FIRST!
+                itemRes.add(Transaction.viewDBRef(Longs.fromByteArray(issuesMap.get(key))));
+
+                // GET ITEM KEY
+                itemBytes = key.c;
+                // CLEAR type byte
+                itemBytes[0] = 0;
+                itemRes.add(Longs.fromByteArray(itemBytes));
+
+                jsonArray.add(itemRes);
+
+                limit--;
+            }
+        } catch (IOException e) {
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage()).build();
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(jsonArray.toJSONString()).build();
+    }
 
     /**
      * Get Status for Person

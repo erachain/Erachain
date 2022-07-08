@@ -417,8 +417,12 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
             IteratorCloseable<Long> iteratorOut = IteratorCloseableImpl.make(treeSet.iterator());
 
-            if (offset > 0)
+            if (offset > 0) {
+                if (offset > 1000)
+                    offset = 1000;
+
                 Iterators.advance(iteratorOut, offset);
+            }
 
             return new Pair<>(null, iteratorOut);
 

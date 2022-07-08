@@ -18,6 +18,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
@@ -137,6 +139,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             labelGBC.gridy = labelGBC.gridy + 4;
 
             if (r_Send.isEncrypted()) {
+
                 //ENCRYPTED CHECKBOX
 
                 //ENCRYPTED
@@ -154,42 +157,57 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
                 encrypted.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (!Controller.getInstance().isWalletUnlocked()) {
-                            //ASK FOR PASSWORD
-                            String password = PasswordPane.showUnlockWalletDialog(th);
-                            if (!Controller.getInstance().unlockWallet(password)) {
-                                //WRONG PASSWORD
-                                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        encrypt(encrypted, r_Send);
+                    }
+                });
 
-                                encrypted.setSelected(!encrypted.isSelected());
-
-                                return;
-                            }
-                        }
-
-                        if (!encrypted.isSelected()) {
-
-                            byte[] decryptedData = Controller.getInstance().decrypt(r_Send.getCreator(),
-                                    r_Send.getRecipient(), r_Send.getData());
-
-                            if (decryptedData == null) {
-                                jTextArea_Messge.setText(Lang.T("Decrypt Error!"));
-                            } else {
-                                jTextArea_Messge.setText(r_Send.isText() ?
-                                        new String(decryptedData, StandardCharsets.UTF_8)
-                                        : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
-
-                                encrypted.setSelected(!encrypted.isSelected());
-                            }
-
-                        } else {
-                            jTextArea_Messge.setText(r_Send.viewData());
+                jTextArea_Messge.text_pane.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            encrypted.setSelected(!encrypted.isSelected());
+                            encrypt(encrypted, r_Send);
                         }
                     }
                 });
+
             }
         }
 
         this.setVisible(true);
     }
+
+    private void encrypt(JCheckBox encrypted, final RSend r_Send) {
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            //ASK FOR PASSWORD
+            String password = PasswordPane.showUnlockWalletDialog(th);
+            if (!Controller.getInstance().unlockWallet(password)) {
+                //WRONG PASSWORD
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+                encrypted.setSelected(true);
+
+                return;
+            }
+        }
+
+        if (!encrypted.isSelected()) {
+
+            byte[] decryptedData = Controller.getInstance().decrypt(r_Send.getCreator(),
+                    r_Send.getRecipient(), r_Send.getData());
+
+            if (decryptedData == null) {
+                jTextArea_Messge.setText(Lang.T("Decrypt Error!"));
+            } else {
+                jTextArea_Messge.setText(r_Send.isText() ?
+                        new String(decryptedData, StandardCharsets.UTF_8)
+                        : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
+
+                //encrypted.setSelected(!encrypted.isSelected());
+            }
+
+        } else {
+            jTextArea_Messge.setText(r_Send.viewData());
+        }
+    }
+
 }

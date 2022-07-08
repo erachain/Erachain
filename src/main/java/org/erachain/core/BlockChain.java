@@ -405,10 +405,18 @@ public class BlockChain {
      * какие проценты сжигаем при переводе активов - Ключ : процент
      */
     public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE_TAB = new HashMap<>();
+    /**
+     * 1 - all to asset owner; 0 - all to block forger
+     */
     public static final BigDecimal ASSET_BURN_PERCENTAGE_DEFAULT = new BigDecimal("0.5");
 
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - не начислять
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
+
+    /**
+     * минимальная ставка на бирже для актива - абсолютное значение!
+     */
+    public static final HashMap<Long, BigDecimal> EXCHANGE_MIN_AMOUNT_TAB = new HashMap<>();
 
     /**
      * По какому активу считаем дивиденды
@@ -523,6 +531,12 @@ public class BlockChain {
                     new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
 
             // это как пример для отладки
+
+            // Процент за перевод и Минимальная комиссия
+            /**
+             * Если тут не задана минимальная величина комиссии для актива, и процент с него не берется
+             */
+
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(1L, new BigDecimal("0.05"));
 
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(12L, new BigDecimal("0.00005"));
@@ -530,6 +544,9 @@ public class BlockChain {
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(18L, new BigDecimal("0.05"));
 
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(95L, new BigDecimal("0.05"));
+
+            if (false)
+                EXCHANGE_MIN_AMOUNT_TAB.put(95L, new BigDecimal(245));
 
             if (DEMO_MODE) {
                 // GENERAL TRUST

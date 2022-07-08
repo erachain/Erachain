@@ -393,17 +393,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (feeKoeff == BigDecimal.ZERO) {
             assetFee = assetFeeMin;
         } else {
-            assetFee = amount.abs().multiply(feeKoeff).setScale(asset.getScale(), RoundingMode.DOWN);
+            assetFee = amount.abs().multiply(feeKoeff).setScale(asset.getScale(), RoundingMode.UP);
             if (assetFee.compareTo(assetFeeMin) < 0) {
                 // USE MINIMAL VALUE
-                assetFee = assetFeeMin.setScale(asset.getScale(), RoundingMode.DOWN);
+                assetFee = assetFeeMin.setScale(asset.getScale(), RoundingMode.UP);
             }
         }
 
         BigDecimal burnedFeeKoeff = BlockChain.ASSET_BURN_PERCENTAGE(height, key);
-        BigDecimal assetFurned = burnedFeeKoeff == BigDecimal.ZERO ? BigDecimal.ZERO : assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
+        BigDecimal assetBurned = burnedFeeKoeff == BigDecimal.ZERO ? BigDecimal.ZERO
+                : assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
 
-        return new Tuple2<>(assetFee, assetFurned);
+        return new Tuple2<>(assetFee, assetBurned);
 
     }
 
@@ -526,7 +527,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewSubTypeName() {
-        if (packet == null && (amount == null || amount.signum() == 0))
+        if (packet == null && (amount == null || amount.signum() == 0)
+                || asset == null) // в телеграммах может быть несуществующий актив - он без проверки идет - чтобы не падал JSON
             return "";
 
         if (packet == null) {
@@ -1016,8 +1018,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         return new Fun.Tuple2<>(NOT_DEBTABLE_ASSET, null);
                                 }
 
-                                // CLAIMs DEBT - only for OWNER
-                                if (asset.isOutsideType()) {
+                                // CLAIMS DEBT - only for OWNER except BILL
+                                if (asset.isOutsideType()
+                                        && assetType != AssetCls.AS_OUTSIDE_BILL
+                                        && assetType != AssetCls.AS_OUTSIDE_BILL_EX) {
                                     if (!recipient.equals(asset.getMaker())) {
                                         return new Fun.Tuple2<>(INVALID_CLAIM_DEBT_RECIPIENT, "recipient != asset maker");
                                     } else if (creator.equals(asset.getMaker())) {
@@ -1117,10 +1121,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
                                 }
 
-                                // CLAIMs - invalid for backward to CREATOR - need use SPEND instead
+                                // CLAIMS - invalid for backward to CREATOR - need use SPEND instead
                                 if (asset.isOutsideType() && recipient.equals(asset.getMaker())) {
                                     // ERROR
-                                    return new Fun.Tuple2<>(INVALID_CLAIM_RECIPIENT, "recipient == asset maker");
+                                    return new Fun.Tuple2<>(INVALID_CLAIM_RECIPIENT, "recipient == asset maker, try SPEND instead");
                                 }
 
 
@@ -1683,7 +1687,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             debtBalance = debtBalance.max(amount);
 
             if (debtBalance.signum() != 0) {
-                processAction(dcSet, !asOrphan, creator, asset.getMaker(), ACTION_DEBT,
+                processAction(dcSet, !asOrphan, creator, recipient, ACTION_DEBT,
                         absKey, asset, key, debtBalance.negate(), backward, incomeReverse);
             }
         }

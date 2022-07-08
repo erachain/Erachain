@@ -109,18 +109,20 @@ public class TransactionsPool extends MonitoredThread {
             if (txSignsMap.contains(((Transaction) item).getSignature()))
                 return;
 
+            Transaction utx = (Transaction) item;
+            utx.resetEpochDAPP(); // иначе в ГУИ валится - флаг полднят а контракта нету
+
             // ADD TO UNCONFIRMED TRANSACTIONS
             // нужно проверять существующие для правильного отображения числа их в статусе ГУИ
             // TODO посмотреть почему сюда двойные записи часто прилетают из sender.network.checkHandledTransactionMessages(data, sender, false)
             if (controller.useGui) {
                 // если GUI включено то только если нет в карте то событие пошлется тут
                 // возможно пока стояла в осереди другая уже добавилась - но опять же из Пира все дубли должны были убираться
-                Transaction utx = (Transaction) item;
                 if (!utxMap.set(utx.getSignature(), utx)) {
                     clearCount++;
                 }
             } else {
-                utxMap.putDirect((Transaction) item);
+                utxMap.putDirect(utx);
                 clearCount++;
             }
         } else if (item instanceof Long) {

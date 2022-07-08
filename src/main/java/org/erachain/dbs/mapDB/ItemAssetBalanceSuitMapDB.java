@@ -138,6 +138,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
                         // ASSET KEY
                         byte[] assetKeyBytes = new byte[8];
+                        // get ASSET KEY and copy it
                         System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                         return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));

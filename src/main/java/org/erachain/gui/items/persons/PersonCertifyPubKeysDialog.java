@@ -1,6 +1,5 @@
 package org.erachain.gui.items.persons;
 
-import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -90,37 +89,31 @@ public class PersonCertifyPubKeysDialog extends JDialog {
     }
 
     private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails) {
-        String toValue = pubKeyTxt.getText();
-        if (toValue == null) {
+        String pubKeyStr = pubKeyTxt.getText();
+        if (pubKeyStr == null || pubKeyStr.trim().isEmpty()) {
             pubKeyDetails.setText("");
             return;
         }
-        toValue = toValue.trim();
 
-        // CHECK IF RECIPIENT IS VALID ADDRESS
-        boolean isValid = false;
-        try {
-            isValid = !toValue.isEmpty() && PublicKeyAccount.isValidPublicKey(toValue);
-        } catch (Exception e) {
-        }
+        pubKeyStr = pubKeyStr.trim();
 
-        if (!isValid) {
-            pubKeyDetails.setText(ApiErrorFactory.getInstance().messageError(Transaction.INVALID_ADDRESS));
+        if (Base58.isExtraSymbols(pubKeyStr)) {
+            pubKeyDetails.setText(Lang.T(OnDealClick.resultMess(Transaction.INVALID_PUBLIC_KEY)));
             return;
         }
 
-        PublicKeyAccount account = new PublicKeyAccount(toValue);
+        PublicKeyAccount pubKey = new PublicKeyAccount(pubKeyStr);
+
+        if (!pubKey.isValid()) {
+            pubKeyDetails.setText(Lang.T(OnDealClick.resultMess(Transaction.INVALID_PUBLIC_KEY)));
+            return;
+        }
+
         // SHOW PubKey for BANK
-        String personDetails = "+" + account.getBase32() + "<br>";
-
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            pubKeyDetails.setText("<html>" + personDetails
-                    + Lang.T("Status must be OK to show public key details.") + "</html>");
-            return;
-        }
+        String personDetails = "+" + pubKey.getBase32() + "<br>";
 
         // SHOW account for FEE asset
-        Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DCSet.getInstance());
+        Tuple4<Long, Integer, Integer, Integer> addressDuration = pubKey.getPersonDuration(DCSet.getInstance());
 
         if (addressDuration == null) {
             personDetails += "<b>" + Lang.T("Account is valid for certification") + "</b>";
@@ -140,7 +133,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
             personDetails += "<br>" + Lang.T("Person is still alive");
 
         }
-        pubKeyDetails.setText("<html>" + personDetails + "<br>" + account.toString(Transaction.FEE_KEY) + "</html>");
+        pubKeyDetails.setText("<html>" + personDetails + "<br>" + pubKey.toString(Transaction.FEE_KEY) + "</html>");
 
     }
 
@@ -187,24 +180,24 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         }
 
         List<PublicKeyAccount> certifiedPublicKeys = new ArrayList<PublicKeyAccount>();
-        if (pubKey1Txt.getText().length() > 30) {
-            PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText()));
+        if (!pubKey1Txt.getText().isEmpty() && pubKey1Txt.getText().length() < 55) {
+            PublicKeyAccount userAccount1 = new PublicKeyAccount(Base58.decode(pubKey1Txt.getText(), PublicKeyAccount.PUBLIC_KEY_LENGTH));
             if (userAccount1.isValid())
                 certifiedPublicKeys.add(userAccount1);
         }
-        if (pubKey2Txt.getText().length() > 30) {
-            PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText()));
+        if (!pubKey2Txt.getText().isEmpty() && pubKey2Txt.getText().length() < 55) {
+            PublicKeyAccount userAccount2 = new PublicKeyAccount(Base58.decode(pubKey2Txt.getText(), PublicKeyAccount.PUBLIC_KEY_LENGTH));
             if (userAccount2.isValid())
                 certifiedPublicKeys.add(userAccount2);
         }
-        if (pubKey3Txt.getText().length() > 30) {
-            PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText()));
+        if (!pubKey3Txt.getText().isEmpty() && pubKey3Txt.getText().length() < 55) {
+            PublicKeyAccount userAccount3 = new PublicKeyAccount(Base58.decode(pubKey3Txt.getText(), PublicKeyAccount.PUBLIC_KEY_LENGTH));
             if (userAccount3.isValid())
                 certifiedPublicKeys.add(userAccount3);
         }
 
         if (certifiedPublicKeys.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Nothing to personalize"),
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T(OnDealClick.resultMess(Transaction.INVALID_PUBLIC_KEY)),
                     Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             Button_Confirm.setEnabled(true);

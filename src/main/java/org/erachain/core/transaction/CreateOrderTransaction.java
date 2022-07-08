@@ -634,6 +634,25 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
         }
 
+        // CHECK MIN AMOUNTS
+        if (!BlockChain.EXCHANGE_MIN_AMOUNT_TAB.isEmpty()) {
+            BigDecimal minAmount = BlockChain.EXCHANGE_MIN_AMOUNT_TAB.get(haveKey);
+            if (minAmount != null) {
+                if (minAmount.compareTo(amountHave) > 0) {
+                    errorValue = minAmount.toPlainString();
+                    return ORDER_AMOUNT_HAVE_SO_SMALL;
+                }
+            }
+
+            minAmount = BlockChain.EXCHANGE_MIN_AMOUNT_TAB.get(wantKey);
+            if (minAmount != null) {
+                if (minAmount.compareTo(amountWant) > 0) {
+                    errorValue = minAmount.toPlainString();
+                    return ORDER_AMOUNT_WANT_SO_SMALL;
+                }
+            }
+        }
+
         return super.isValid(forDeal, checkFlags);
     }
 

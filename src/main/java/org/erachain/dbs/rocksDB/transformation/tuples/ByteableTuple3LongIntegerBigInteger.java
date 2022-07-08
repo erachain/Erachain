@@ -1,6 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation.tuples;
 
-import org.erachain.dbs.rocksDB.transformation.*;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 
 public class ByteableTuple3LongIntegerBigInteger extends ByteableTuple3<String, Long, String> {
 
@@ -10,6 +13,7 @@ public class ByteableTuple3LongIntegerBigInteger extends ByteableTuple3<String, 
 
     @Override
     public int[] sizeElements() {
+        // TODO - wrong ? Long.BYTES !
         return new int[]{Long.BYTES,Integer.BYTES};
     }
 
