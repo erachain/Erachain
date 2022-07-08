@@ -14,7 +14,7 @@ ErachainBP is a Java application and supported by all operation systems.
 
 ## ⛓ Links
 
-- API - https://app.swaggerhub.com/apis-docs/Erachain/era-api
+- API - https://app.swaggerhub.com/apis-docs/Erachain/era-api/1.0.0-oas3
 - RPC - http://datachains.world/static/RPC.html
 - JS SDK - https://github.com/erachain/sdk-js
 - PHP SDK - https://github.com/erachain/sdk-php
