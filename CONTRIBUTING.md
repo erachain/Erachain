@@ -19,7 +19,7 @@ email <support@erachain.org>.
 
 ## Code of Conduct
 
-See CODE_OF_CONDUCT.md.
+See [CODE OF CONDUCT](https://github.com/erachain/Erachain/blob/master/CODE%20OF%20CONDUCT.md) for more details.
 
 ## Where to Ask Questions
 
