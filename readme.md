@@ -1,4 +1,27 @@
-# Blockchain platform Erachain
+# Erachain Blockchain platform
+
+## Erachain Open Source Server
+
+Erachain software is a feature rich blockchain platform with built-in functions and dApps. This is the canonical source
+of ErachainBP where all development takes place.
+
+Keep up with the latest news and articles, and find out all about events happening on the
+Erachain [website](https://erachain.org/).
+
+## Software stack
+
+ErachainBP is a Java application and supported by all operation systems.
+
+## ⛓ Links
+
+- API - https://gitlab.com/erachain/node-API
+- RPC - https://gitlab.com/erachain/node-RPC
+- JS SDK - https://gitlab.com/erachain/sdk-js
+- PHP SDK - https://gitlab.com/erachain/sdk-php
+
+## Documentation
+
+All documentation can be found on <>.
 
 # 🚀️ Clone and Build (Windows)
 
@@ -143,33 +166,18 @@ see readme in /z_GENESIS_EXAMPLES
 
 Disable journaling on NTFS command line: fsutil usn deletejournal /d c:
 
-## 🤝 Contributing
+# 🤝 Contributing
 
-If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+ErachainBP is an open source project and we are very happy to accept community contributions. Please refer
+to [Contributing to GitLab page](https://) for more details.
 
 For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests
 as appropriate.
 
-## ℹ️ Support (get help)
+# Getting help
 
-Keep up with the latest news and articles, and find out all about events happening on
-the [Erachain](https://erachain.org/).
+If something isn't clear, feel free to ask by email <support@erachain.org> or [Discord](https://discord.gg/vcDbPHyZ).
 
-- [Telegram Community (Eng)](https://t.me/erachain_en)
-- [Telegram Community (Ru)](https://t.me/erachain_ru)
-- [Telegram Dev Chat] (https://t.me/erachain_dev)
-
-## ⛓ Links
-
-- Node API - https://gitlab.com/erachain/node-API
-- Node RPC - https://gitlab.com/erachain/node-RPC
-- SDK JS - https://gitlab.com/erachain/sdk-js
-- SDK PHP - https://gitlab.com/erachain/sdk-php
-- Web Wallet - https://gitlab.com/erachain/web_wallet
-
-## 📝 Licence
-
-The code in this project is licensed under [*License] (./LICENSE)
 
 # ✨ Appendix: Extra-mining, extra-stacking and extra-inviting
 
@@ -252,3 +260,16 @@ is, if the calculated value of commission will be less, then the specified lowes
 The settings of `extra-burn` are in the module core.BlockChain:  
 `ASSET_BURN_PERCENTAGE` - list by asset number, value - the share of burn. If the asset is not specified in this list,
 but is set in the list `ASSET_TRANSFER_PERCENTAGE`, then by default half of the commission is burnt.
+
+# Hiring
+
+We are hiring developers, support people, and production engineers all the time. If you're interested, please write to
+us <info@erachain.org>
+
+# 📝 Licence
+
+ErachainBP server is licensed under the aGPL v3.
+
+# Copyright
+
+(c) 2018-2022 Erachain World PTE LTD
