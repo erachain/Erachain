@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.Refi;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.utils.FileUtils;
@@ -26,7 +27,7 @@ public abstract class DAPPFactory {
 
     static protected Controller contr = Controller.getInstance();
     static protected Crypto crypto = Crypto.getInstance();
-    static final HashMap<Account, Integer> skocks = new HashMap();
+    static final HashMap<Account, Integer> stocks = new HashMap();
     public static JSONObject settingsJSON;
 
     static {
@@ -36,8 +37,9 @@ public abstract class DAPPFactory {
             settingsJSON = new JSONObject();
         }
 
-        ShibaVerseDAPP.setDAPPFactory(skocks);
-        MemoCardsDAPP.setDAPPFactory(skocks);
+        ShibaVerseDAPP.setDAPPFactory(stocks);
+        MemoCardsDAPP.setDAPPFactory(stocks);
+        Refi.setDAPPFactory(stocks);
 
     }
 
@@ -60,39 +62,59 @@ public abstract class DAPPFactory {
                     && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
             ) {
                 Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
-                if (order != null)
+                if (false && order != null)
                     return new LeafFall();
             }
         }
 
-        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
+        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
             return null;
+        }
 
         RSend txSend = (RSend) transaction;
-        if (!txSend.getRecipient().isDAppOwned())
-            return null;
 
-        ///// OLD VERSION
-        if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
-        ) {
-            if (txSend.hasPacket()) {
-
-            } else if (txSend.getAmount().signum() < 0) {
-                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
-            }
+        if (false && BlockChain.TEST_MODE) {
+            Refi dapp = Refi.tryMakeJob(txSend);
+            if (dapp != null)
+                return dapp;
         }
-        //////
+
+        if (!txSend.getRecipient().isDAppOwned()) {
+            ///// OLD VERSION
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
+            ) {
+                if (txSend.hasPacket()) {
+
+                } else if (txSend.getAmount().signum() < 0) {
+                    return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+                }
+            }
+            //////
+
+            return null;
+        }
 
         /////// NEW VERSION
 
-        ///////////////////// CALL DAPPS HERE
-        Integer dappID = skocks.get(txSend.getRecipient());
-        if (dappID == null)
-            return null;
+        ///////////////////// MAKE DAPPS HERE
+        // TRY BY RECIPIENT
+        Integer dappID = stocks.get(txSend.getRecipient());
+        if (dappID == null) {
+            // TODO сюда не дойдет из-за проверки isDAppOwned
+            // TRY BY ASSET
+            if (txSend.hasAmount()) {
+                dappID = stocks.get(txSend.getAsset().getMaker());
+            }
+
+            if (dappID == null)
+                return null;
+        }
 
         String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase() : null;
 
         switch (dappID) {
+            case Refi.ID:
+                return Refi.make(txSend, dataStr);
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.make(txSend, dataStr);
             case MemoCardsDAPP.ID:
@@ -104,7 +126,7 @@ public abstract class DAPPFactory {
     }
 
     static public String getName(Account stock) {
-        Integer dappID = skocks.get(stock);
+        Integer dappID = stocks.get(stock);
         if (dappID == null)
             return null;
 

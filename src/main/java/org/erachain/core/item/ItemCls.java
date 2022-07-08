@@ -932,7 +932,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     @Override
     public int hashCode() {
-        return (int) key + (reference == null ? 0 : Ints.fromByteArray(reference));
+        return (getItemType() << 30) + (int) key + (reference == null ? 0 : Ints.fromByteArray(reference));
     }
 
     @Override

@@ -147,6 +147,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
     public static final int ORDER_ALREADY_COMPLETED = 65;
+    public static final int ORDER_AMOUNT_HAVE_SO_SMALL = 66;
+    public static final int ORDER_AMOUNT_WANT_SO_SMALL = 67;
 
     public static final int INVALID_AWARD = 81;
     public static final int INVALID_MAX_AWARD_COUNT = 82;
@@ -164,6 +166,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int NOT_ENOUGH_ERA_USE_100 = 106;
     public static final int NOT_ENOUGH_ERA_OWN_1000 = 107;
     public static final int NOT_ENOUGH_ERA_USE_1000 = 108;
+    public static final int NOT_ENOUGH_ERA_OWN_10000 = 109;
+    public static final int NOT_ENOUGH_ERA_USE_10000 = 110;
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int INVALID_PERSONALIZY_ANOTHER_PERSON = 118;
@@ -280,9 +284,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
-    public static final int INVALID_TRANSACTION_TYPE = 550;
-    public static final int INVALID_BLOCK_HEIGHT = 599;
     public static final int TELEGRAM_DOES_NOT_EXIST = 541;
+    public static final int INVALID_TRANSACTION_TYPE = 550;
+    public static final int BLOCK_NOT_EXIST = 597;
+    public static final int INVALID_BLOCK_HEIGHT = 598;
     public static final int NOT_YET_RELEASED = 599;
     public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
 
@@ -948,6 +953,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public DAPP getSmartContract() {
         return dApp;
+    }
+
+    public void resetEpochDAPP() {
+        if (dApp != null && dApp.isEpoch()) {
+            typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
+            dApp = null;
+        }
     }
 
     public void makeItemsKeys() {
@@ -1940,13 +1952,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, exLink.toBytes());
         }
 
-        if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
-                typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
-                data = Bytes.concat(data, dApp.toBytes(forDeal));
-            } else {
-                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
-            }
+        if (dApp != null && (forDeal == FOR_DB_RECORD || !dApp.isEpoch())) {
+            typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
+            data = Bytes.concat(data, dApp.toBytes(forDeal));
+        } else {
+            typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
         }
 
         if (forDeal > FOR_PACK) {

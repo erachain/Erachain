@@ -9,6 +9,11 @@ import java.util.Arrays;
 @Setter
 public abstract class ByteableTuple3<F0, F1, F2> implements Byteable<Tuple3<F0, F1, F2>> {
 
+    /**
+     * last element not need set up - it may be varied length
+     *
+     * @return
+     */
     public abstract int[] sizeElements();
 
     private Byteable[] byteables;

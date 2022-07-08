@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 540; // vers 5.7.1 dialog
+    final static int CURRENT_VERSION = 541; // ItemsValuesMap
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -107,6 +107,8 @@ public class DCSet extends DBASet implements Closeable {
     public static final int TIME_WAIT_MAP = DBS_ROCK_DB;
     public static final int TRADES_MAP = DBS_MAP_DB;
     public static final int PAIRS_MAP = DBS_MAP_DB;
+
+    public static final int ITEMS_VALUES_MAP = DBS_MAP_DB;
 
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
@@ -173,6 +175,9 @@ public class DCSet extends DBASet implements Closeable {
     private ItemStatementMap itemStatementMap;
     private ItemPersonMap itemPersonMap;
     private ItemUnionMap itemUnionMap;
+
+    private ItemsValuesMap itemsValuesMap;
+
     private ATMap atMap;
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
@@ -183,6 +188,7 @@ public class DCSet extends DBASet implements Closeable {
 
     private TimeTXDoneMap timeTXDoneMap;
     private TimeTXWaitMap timeTXWaitMap;
+
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -213,12 +219,6 @@ public class DCSet extends DBASet implements Closeable {
                     ACCOUNT_BALANCES
                     , this, database);
 
-            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    FINAL_TX_MAP
-                    , this, database, SIZE_ENABLE_IN_FINAL);
-
-            this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
-
             this.referenceMap = new ReferenceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNTS_REFERENCES
                     , this, database);
@@ -226,10 +226,6 @@ public class DCSet extends DBASet implements Closeable {
             this.blockMap = new BlocksMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     BLOCKS_MAP
                     , this, database);
-
-            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    FINAL_TX_SIGNS_MAP
-                    , this, database, !SIZE_ENABLE_IN_FINAL);
 
             this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
@@ -302,10 +298,23 @@ public class DCSet extends DBASet implements Closeable {
             this.itemStatusMap = new ItemStatusMap(this, database);
             this.itemUnionMap = new ItemUnionMap(this, database);
 
+            this.itemsValuesMap = new ItemsValuesMap(ITEMS_VALUES_MAP, this, database);
+
             this.atMap = new ATMap(this, database);
             this.atStateMap = new ATStateMap(this, database);
 
             this.atTransactionMap = new ATTransactionMap(this, database);
+
+            // IT OPEN AFTER ALL OTHER for make secondary keys and setDCSet
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
+                    FINAL_TX_MAP
+                    , this, database, SIZE_ENABLE_IN_FINAL);
+
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
+                    FINAL_TX_SIGNS_MAP
+                    , this, database, !SIZE_ENABLE_IN_FINAL);
+
+            this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
@@ -450,6 +459,8 @@ public class DCSet extends DBASet implements Closeable {
         this.itemPollMap = new ItemPollMap(parent.itemPollMap, this);
         this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap, this);
         this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap, this);
+
+        this.itemsValuesMap = new ItemsValuesMap(ITEMS_VALUES_MAP, parent.itemsValuesMap, this);
 
         this.atMap = new ATMap(parent.atMap, this);
         this.atStateMap = new ATStateMap(parent.atStateMap, this);
@@ -821,6 +832,9 @@ public class DCSet extends DBASet implements Closeable {
         this.itemPollMap.clear();
         this.itemStatusMap.clear();
         this.itemUnionMap.clear();
+
+        this.itemsValuesMap.clear();
+
         this.atMap.clear();
         this.atStateMap.clear();
         this.atTransactionMap.clear();
@@ -1372,6 +1386,16 @@ public class DCSet extends DBASet implements Closeable {
     public ItemUnionMap getItemUnionMap() {
         return this.itemUnionMap;
     }
+
+    /**
+     * used for save protocoled data of Items. For example - issued persons of person
+     *
+     * @return
+     */
+    public ItemsValuesMap getItemsValuesMap() {
+        return this.itemsValuesMap;
+    }
+
 
     public TimeTXDoneMap getTimeTXDoneMap() {
         return this.timeTXDoneMap;

@@ -551,8 +551,9 @@ public class FPool extends MonitoredThread {
                 break;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-            } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
+                //} catch (Throwable e) {
+                ///java.lang.StackOverflowError at org.mapdb.BTreeMap.lastEntryRecur(BTreeMap.java:1357)
+                //    LOGGER.error(e.getMessage(), e);
             }
 
         }

@@ -869,7 +869,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
         }
 
-        fail("unknow command");
+        fail("unknown command");
         return false;
 
     }
@@ -881,7 +881,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             return random(dcSet, block, (RSend) transaction, false);
         }
 
-        fail("unknow command");
+        fail("unknown command");
         return false;
 
     }
@@ -1055,9 +1055,9 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         return "<html>RARY: <b>" + format2.format(rary) + "</b><br>" + description + "</html>";
     }
 
-    public static void setDAPPFactory(HashMap<Account, Integer> skocks) {
+    public static void setDAPPFactory(HashMap<Account, Integer> stocks) {
         for (Account account : accounts) {
-            skocks.put(account, ID);
+            stocks.put(account, ID);
         }
     }
 

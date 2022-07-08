@@ -40,6 +40,29 @@ public abstract class PagedIndexMap<T, K, U> {
         return (U) mapImpl.get(key);
     }
 
+    /**
+     * if in row byte[] or same
+     *
+     * @param pageRow
+     * @param row
+     * @return
+     */
+    public boolean equalsRow(U pageRow, U row) {
+        return pageRow.equals(row);
+    }
+
+    /**
+     * if in key byte[] or same
+     *
+     * @param pageKey
+     * @param key
+     * @return
+     */
+    public boolean equalsKey(T pageKey, T key) {
+        return pageKey.equals(key);
+    }
+
+
     public List<U> getPageList(K fromSecondaryKey, int offset, int limit, boolean fillFullPage) {
 
         timestamp = System.currentTimeMillis();
@@ -88,7 +111,7 @@ public abstract class PagedIndexMap<T, K, U> {
                         currentRow = pageRow;
                         boolean exist = false;
                         for (U rowHere : rows) {
-                            if (pageRow.equals(rowHere)) {
+                            if (equalsRow(pageRow, rowHere)) {
                                 exist = true;
                                 break;
                             }
@@ -148,7 +171,7 @@ public abstract class PagedIndexMap<T, K, U> {
 
                         boolean exist = false;
                         for (U rowHere : rows) {
-                            if (pageRow.equals(rowHere)) {
+                            if (equalsRow(pageRow, rowHere)) {
                                 exist = true;
                                 break;
                             }
@@ -206,7 +229,7 @@ public abstract class PagedIndexMap<T, K, U> {
                     for (T pageKey : getPageKeysList(fromSecondaryKey, 0, limit - count, false)) {
                         boolean exist = false;
                         for (T keyHere : keys) {
-                            if (pageKey.equals(keyHere)) {
+                            if (equalsKey(pageKey, keyHere)) {
                                 exist = true;
                                 break;
                             }
@@ -250,7 +273,7 @@ public abstract class PagedIndexMap<T, K, U> {
                     for (T pageKey : getPageKeysList(fromSecondaryKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                         boolean exist = false;
                         for (T keyHere : keys) {
-                            if (pageKey.equals(keyHere)) {
+                            if (equalsKey(pageKey, keyHere)) {
                                 exist = true;
                                 break;
                             }

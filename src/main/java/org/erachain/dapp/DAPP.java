@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.Refi;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
@@ -49,7 +50,7 @@ public abstract class DAPP {
     }
 
     public String getHTML(JSONObject langObj) {
-        return "ID: <b>" + id + "</b><br>" + Lang.T("Maker", langObj) + ": <b>" + stock.getAddress() + "</b>";
+        return "ID: <b>" + id + "</b><br>" + Lang.T("Address", langObj) + ": <b>" + stock.getAddress() + "</b>";
     }
 
     public Object[][] getItemsKeys() {
@@ -104,8 +105,8 @@ public abstract class DAPP {
      * @param dcSet
      * @param values
      */
-    public void putState(DCSet dcSet, Long seqNo, Object[] values) {
-        dcSet.getSmartContractState().put(new Fun.Tuple2<>(id, seqNo), values);
+    public void putState(DCSet dcSet, Long dbRef, Object[] values) {
+        dcSet.getSmartContractState().put(new Fun.Tuple2<>(id, dbRef), values);
     }
 
     /**
@@ -118,12 +119,22 @@ public abstract class DAPP {
         return dcSet.getSmartContractState().remove(new Fun.Tuple2<>(id, seqNo));
     }
 
-    public boolean valueSet(DCSet dcSet, Object key, Object value) {
-        return dcSet.getSmartContractValues().set(new Fun.Tuple2(id, key), value);
+    public Object valueGet(DCSet dcSet, String key) {
+        return dcSet.getSmartContractValues().get(new Fun.Tuple2(id, key));
     }
 
-    public void valuePut(DCSet dcSet, Object key, Object value) {
-        dcSet.getSmartContractValues().put(new Fun.Tuple2(id, key), value);
+    public boolean valueSet(DCSet dcSet, String key, Object value) {
+        if (value == null) {
+            return dcSet.getSmartContractValues().remove(new Fun.Tuple2(id, key)) != null;
+        } else
+            return dcSet.getSmartContractValues().set(new Fun.Tuple2(id, key), value);
+    }
+
+    public void valuePut(DCSet dcSet, String key, Object value) {
+        if (value == null) {
+            dcSet.getSmartContractValues().delete(new Fun.Tuple2(id, key));
+        } else
+            dcSet.getSmartContractValues().put(new Fun.Tuple2(id, key), value);
     }
 
     public void valuesDelete(DCSet dcSet, String key) {
@@ -161,6 +172,8 @@ public abstract class DAPP {
                 return ShibaVerseDAPP.Parse(data, position, forDeal);
             case MemoCardsDAPP.ID:
                 return MemoCardsDAPP.Parse(data, position, forDeal);
+            case Refi.ID:
+                return Refi.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);

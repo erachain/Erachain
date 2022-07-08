@@ -471,6 +471,26 @@ public class ChangeOrderTransaction extends Transaction {
             return AMOUNT_SCALE_WRONG;
         }
 
+        // CHECK MIN AMOUNTS
+        if (!BlockChain.EXCHANGE_MIN_AMOUNT_TAB.isEmpty()) {
+            Order updatedOrder = makeUpdatedOrder();
+            BigDecimal minAmount = BlockChain.EXCHANGE_MIN_AMOUNT_TAB.get(updatedOrder.getHaveAssetKey());
+            if (minAmount != null) {
+                if (minAmount.compareTo(updatedOrder.getAmountHave()) > 0) {
+                    errorValue = minAmount.toPlainString();
+                    return ORDER_AMOUNT_HAVE_SO_SMALL;
+                }
+            }
+
+            minAmount = BlockChain.EXCHANGE_MIN_AMOUNT_TAB.get(updatedOrder.getWantAssetKey());
+            if (minAmount != null) {
+                if (minAmount.compareTo(updatedOrder.getAmountWant()) > 0) {
+                    errorValue = minAmount.toPlainString();
+                    return ORDER_AMOUNT_WANT_SO_SMALL;
+                }
+            }
+        }
+
         return super.isValid(forDeal, checkFlags);
     }
 

@@ -346,6 +346,14 @@ public class OnDealClick {
             case Transaction.INVALID_ORDER_CREATOR:
                 mess = "Invalid order creator";
                 break;
+
+            case Transaction.ORDER_AMOUNT_HAVE_SO_SMALL:
+                mess = "Order have amount so small";
+                break;
+            case Transaction.ORDER_AMOUNT_WANT_SO_SMALL:
+                mess = "Order want amount so small";
+                break;
+
             case Transaction.INVALID_PAYMENTS_LENGTH:
                 mess = "Invalid payment length";
                 break;
@@ -423,6 +431,13 @@ public class OnDealClick {
                 break;
             case Transaction.NOT_ENOUGH_ERA_USE_1000:
                 mess = "Need 1000 ERA in USE or more";
+                break;
+
+            case Transaction.NOT_ENOUGH_ERA_OWN_10000:
+                mess = "Need 10000 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_10000:
+                mess = "Need 10000 ERA in USE or more";
                 break;
 
             case Transaction.INVALID_ITEM_KEY:
@@ -556,6 +571,9 @@ public class OnDealClick {
                 mess = "Invalid packet size";
                 break;
 
+            case Transaction.BLOCK_NOT_EXIST:
+                mess = "Block not exist";
+                break;
             case Transaction.INVALID_BLOCK_HEIGHT:
                 mess = "Invalid block height";
                 break;

@@ -297,9 +297,8 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet."
                     },
                     {
-                            "GET blocks/<signature>",
-                            "Returns the block that matches the given signature.",
-                            "Errors: 101 - Invalid signature. 301 - Block does not exist."
+                            "GET blocks/<signature or height>",
+                            "Returns the block that matches the given signature or height.",
                     },
                     {
                             "GET blocks/first",
@@ -327,34 +326,14 @@ public class ApiClient {
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
                     },
                     {
-                            "GET blocks/time",
-                            "Calculates the time it should take for the network to generate the next block.",
-                            ""
-                    },
-                    {
-                            "GET blocks/time/<generatingbalance>",
-                            "Calculates the time it should take for the network to generate blocks when the current generating balance in the network is the specified generating balance.",
-                            ""
-                    },
-                    {
                             "GET blocks/height",
                             "Returns the block height of the last block.",
                             ""
                     },
                     {
-                            "GET blocks/height/<signature>",
-                            "Returns the block height of the block that matches the given signature.",
-                            "Errors: 101 - Invalid signature. 301 - Block does not exist."
-                    },
-                    {
                             "GET blocks/headers/<signature>",
                             "Returns the list oof block headers - for test networ response in controller.Controller.onMessage(GET_SIGNATURES_TYPE).",
                             "Errors: 101 - Invalid signature. 301 - Block does not exist."
-                    },
-                    {
-                            "GET blocks/byheight/<height>",
-                            "Returns the block whith given height.",
-                            "Errors: 301 - Block does not exist."
                     },
                     {
                             "GET blocks/fromheight/<height>",

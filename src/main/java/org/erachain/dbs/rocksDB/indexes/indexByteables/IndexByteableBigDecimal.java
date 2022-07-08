@@ -5,6 +5,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexByteable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.erachain.dbs.rocksDB.RockDBSetts.ROCK_BIG_DECIMAL_LEN;
 
@@ -14,6 +15,15 @@ import static org.erachain.dbs.rocksDB.RockDBSetts.ROCK_BIG_DECIMAL_LEN;
  */
 
 public class IndexByteableBigDecimal implements IndexByteable<BigDecimal, Long> {
+
+    public static final byte[] MIN = new byte[ROCK_BIG_DECIMAL_LEN];
+    public static final byte[] MAX = new byte[ROCK_BIG_DECIMAL_LEN];
+
+    {
+        {
+            Arrays.fill(MAX, (byte) 255);
+        }
+    }
 
     /**
      * result - то что прилетело из уровня создания вторичного ключа - в simpleIndexDB.getBiFunction().apply(key, value);
@@ -69,4 +79,5 @@ public class IndexByteableBigDecimal implements IndexByteable<BigDecimal, Long> 
 
         return shiftForSortBuff;
     }
+
 }

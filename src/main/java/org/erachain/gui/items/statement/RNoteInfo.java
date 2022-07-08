@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statement;
 
+import lombok.SneakyThrows;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
@@ -238,14 +239,13 @@ public class RNoteInfo extends RecDetailsFrame {
                 // TODO Auto-generated method stub
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
 
-                String fileName = arg0.getDescription();
-                if (fileName.startsWith("#T#")) {
+                String fileURL = arg0.getDescription();
+                if (fileURL.startsWith("#T#")) {
                     // TEMPLATE
-                    fileName = "doc" + statement.viewHeightSeq();
+                    fileURL = "doc" + statement.viewHeightSeq();
                     String valuedText = exData.getValuedText();
                     valuedText = Library.to_HTML(valuedText);
-                    //fileName += Library.will_HTML(valuedText) ? ".html" : ".txt";
-                    fileName += ".html";
+                    fileURL += ".html";
 
                     String message = exData.getMessage();
                     if (message != null && !message.isEmpty()) {
@@ -259,7 +259,7 @@ public class RNoteInfo extends RecDetailsFrame {
 
 
                     FileChooser chooser = new FileChooser();
-                    chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
+                    chooser.setDialogTitle(Lang.T("Save File") + ": " + fileURL);
                     //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                     chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                     chooser.setMultiSelectionEnabled(false);
@@ -268,13 +268,13 @@ public class RNoteInfo extends RecDetailsFrame {
 
                     if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
 
-                        String pp = chooser.getSelectedFile().getPath() + File.separatorChar + fileName;
+                        String pp = chooser.getSelectedFile().getPath() + File.separatorChar + fileURL;
 
                         File ff = new File(pp);
                         // if file
                         if (ff.exists() && ff.isFile()) {
                             int aaa = JOptionPane.showConfirmDialog(chooser,
-                                    Lang.T("File") + " " + fileName
+                                    Lang.T("File") + " " + fileURL
                                             + " " + Lang.T("Exists") + "! "
                                             + Lang.T("Overwrite") + "?", Lang.T("Message"),
                                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -294,6 +294,17 @@ public class RNoteInfo extends RecDetailsFrame {
 
                         return;
                     }
+                }
+
+                HashMap<String, Tuple3<byte[], Boolean, byte[]>> items = exData.getFiles();
+                String fileName = new String(Base58.decode(fileURL), StandardCharsets.UTF_8);
+
+                Tuple3<byte[], Boolean, byte[]> fileItem = items.get(fileName);
+                if (fileItem == null) {
+                    JOptionPane.showConfirmDialog(null,
+                            Lang.T("File") + " " + fileName
+                                    + " " + Lang.T("Not found in DOC"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
 
                 FileChooser chooser = new FileChooser();
@@ -324,9 +335,6 @@ public class RNoteInfo extends RecDetailsFrame {
                     }
 
                     try (FileOutputStream fos = new FileOutputStream(pp)) {
-                        ExData exData = statement.getExData();
-                        HashMap<String, Tuple3<byte[], Boolean, byte[]>> items = exData.getFiles();
-                        Tuple3<byte[], Boolean, byte[]> fileItem = items.get(fileName);
                         byte[] buffer = fileItem.c;
                         // if ZIP
                         if (fileItem.b) {
@@ -363,6 +371,7 @@ public class RNoteInfo extends RecDetailsFrame {
 
     }
 
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     private void viewInfo() {
 
@@ -467,7 +476,9 @@ public class RNoteInfo extends RecDetailsFrame {
                     Entry<String, Tuple3<byte[], Boolean, byte[]>> file = it_Files.next();
                     boolean zip = new Boolean(file.getValue().b);
                     String fileName = file.getKey();
-                    resultStr += i++ + ". <a href=" + fileName + ">"
+                    resultStr += i++ + ". <a href="
+                            // for ignore throwns in URLEncoder.encode(q, ...)
+                            + Base58.encode(fileName.getBytes(StandardCharsets.UTF_8)) + ">"
                             + fileName + (zip ? " (" + Lang.T("Zipped") + ")" : "")
                             + "</a>" + " - "
                             + (file.getValue().c.length > 20000 ? (file.getValue().c.length >> 10) + "kB" : file.getValue().c.length + "B") + "<br>";

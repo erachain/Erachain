@@ -88,21 +88,20 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
             balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
                     (key, value) -> {
-                        // Address
-                        byte[] shortAddress = new byte[20];
-                        System.arraycopy(key, 0, shortAddress, 0, 20);
+
+                        byte[] secondaryKey = new byte[Long.BYTES + ROCK_BIG_DECIMAL_LEN + Long.BYTES];
+
                         // ASSET KEY
-                        byte[] assetKeyBytes = new byte[8];
-                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                        System.arraycopy(key, 20, secondaryKey, 0, Long.BYTES);
 
                         byte[] shiftForSortBuff;
                         shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b);
+                        System.arraycopy(shiftForSortBuff, 0, secondaryKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
 
-                        return org.bouncycastle.util.Arrays.concatenate(
-                                assetKeyBytes,
-                                shiftForSortBuff
-                                //shortAddress - он уже есть в главном ключе
-                        );
+                        // Address
+                        System.arraycopy(key, 0, secondaryKey, Long.BYTES + ROCK_BIG_DECIMAL_LEN, Long.BYTES);
+
+                        return secondaryKey;
                     },
                     (result) -> result);
             indexes.add(balanceKeyAssetIndex);
@@ -124,25 +123,41 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
 
-        byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN + Long.BYTES];
+        byte[] shiftForSortBuff;
+        if (fromOwnAmount == null) {
+            // first value
+            return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                    Longs.toByteArray(assetKey), descending, true);
+        }
+
+        boolean addressIs = addressShort != null;
+        byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN + (addressIs ? Long.BYTES : 0)];
+        byte[] toKey = new byte[8 + ROCK_BIG_DECIMAL_LEN];
+
         // ASSET KEY
         System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(assetKey), 0, toKey, 0, Long.BYTES);
 
-        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
-
+        shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
         System.arraycopy(shiftForSortBuff, 0, fromKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
-        System.arraycopy(addressShort, 0, fromKey, Long.BYTES + ROCK_BIG_DECIMAL_LEN, Long.BYTES);
+        System.arraycopy(descending ? IndexByteableBigDecimal.MIN : IndexByteableBigDecimal.MAX, 0, toKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
 
+        if (addressIs)
+            System.arraycopy(addressShort, 0, fromKey, Long.BYTES + ROCK_BIG_DECIMAL_LEN, Long.BYTES);
+
+        // use START|STOP - not FILTER
         return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
-                fromKey, descending, true);
+                fromKey, toKey, descending, true);
     }
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
-        byte[] secondary = new byte[ADDR_KEY2_LEN];
-        System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
-
-        return ((DBRocksDBTable) map).getIndexIteratorFilter(secondary, false, false);
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(makeAddressKKey(account.getShortAddressBytes()), false, false);
     }
 
+    public byte[] makeAddressKKey(byte[] shortAddressBytes) {
+        byte[] secondary = new byte[ADDR_KEY2_LEN];
+        System.arraycopy(shortAddressBytes, 0, secondary, 0, ADDR_KEY2_LEN);
+        return secondary;
+    }
 }

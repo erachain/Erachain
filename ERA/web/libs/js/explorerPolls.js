@@ -9,8 +9,6 @@ function polls(data){
 
     var notDisplayPages = data.notDisplayPages;
     var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
-    //Отображение последнего блока
-    output += lastBlock(data.lastBlock);
     var start = data.start;
 
     if (!notDisplayPages) {

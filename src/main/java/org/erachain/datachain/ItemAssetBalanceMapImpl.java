@@ -25,6 +25,7 @@ import org.mapdb.Fun.Tuple5;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
@@ -251,6 +252,19 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         get(byte[] key) {
 
             return new Tuple2(ItemAssetBalanceMap.getShortAccountFromKey(key), mapImpl.get(key));
+        }
+
+        @Override
+        public boolean equalsRow(Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> pageRow,
+                                 Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> row) {
+            return Arrays.equals(pageRow.a, row.a)
+                    && pageRow.b.equals(row.b);
+
+        }
+
+        @Override
+        public boolean equalsKey(byte[] pageKey, byte[] key) {
+            return Arrays.equals(pageKey, key);
         }
 
         @Override
