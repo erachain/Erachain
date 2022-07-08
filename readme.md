@@ -14,14 +14,14 @@ ErachainBP is a Java application and supported by all operation systems.
 
 ## ⛓ Links
 
-- API - https://gitlab.com/erachain/node-API
-- RPC - https://gitlab.com/erachain/node-RPC
-- JS SDK - https://gitlab.com/erachain/sdk-js
-- PHP SDK - https://gitlab.com/erachain/sdk-php
+- API - https://app.swaggerhub.com/apis-docs/Erachain/era-api
+- RPC - http://datachains.world/static/RPC.html
+- JS SDK - https://github.com/erachain/sdk-js
+- PHP SDK - https://github.com/erachain/sdk-php
 
 ## Documentation
 
-All documentation can be found on <>.
+All documentation can be found on [WIKI](https://wiki.erachain.org/ru/home).
 
 # 🚀️ Clone and Build (Windows)
 
@@ -35,7 +35,7 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 ### Clone code:
 
 1. Use InteliJ IDEA - New > Project from Version Control...
-2. Choose ERA gitlab
+2. Choose ERA github
 3. After load project - import Gradle project
 4. Install Lombok (Settings - Plugins)
 
@@ -100,7 +100,7 @@ platform ([Linux](https://www.scala-sbt.org/1.0/docs/Installing-sbt-on-Linux.htm
 *2. Clone this repo*
 
 ```bash
-git clone https://gitlab.com/erachain/erachain-public
+git clone https://github.com/erachain/Erachain
 ```
 
 *3. Compile and run tests*
@@ -168,8 +168,8 @@ Disable journaling on NTFS command line: fsutil usn deletejournal /d c:
 
 # 🤝 Contributing
 
-ErachainBP is an open source project and we are very happy to accept community contributions. Please refer
-to [Contributing to GitLab page](https://) for more details.
+Erachain is an open source project and we are very happy to accept community contributions. Please refer
+to [Contributing to GitHub page](https://github.com/erachain/Erachain) for more details.
 
 For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests
 as appropriate.
