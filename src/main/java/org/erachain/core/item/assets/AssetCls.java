@@ -2483,7 +2483,7 @@ public abstract class AssetCls extends ItemCls {
                             assetRoyalty, false, false, false);
                     if (!asOrphan && block != null)
                         block.addCalculated(dexAward.getAccount(), assetWantKey, assetRoyalty,
-                                "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+                                "Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
                 }
             }
         }
@@ -2556,7 +2556,7 @@ public abstract class AssetCls extends ItemCls {
             long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).unscaledValue().longValue();
             Transaction.process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, inviterRoyaltyLong, inviter, asOrphan,
                     assetWant, block,
-                    "NFT Royalty referral bonus " + "@" + Transaction.viewDBRef(orderID),
+                    "Royalty referral bonus " + "@" + Transaction.viewDBRef(orderID),
                     orderID, timestamp);
         }
 
