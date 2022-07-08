@@ -169,7 +169,7 @@ Disable journaling on NTFS command line: fsutil usn deletejournal /d c:
 # 🤝 Contributing
 
 Erachain is an open source project and we are very happy to accept community contributions. Please refer
-to [Contributing to GitHub page](https://github.com/erachain/Erachain) for more details.
+to [Contributing to GitHub page](https://github.com/erachain/Erachain/blob/master/CONTRIBUTING.md) for more details.
 
 For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests
 as appropriate.
