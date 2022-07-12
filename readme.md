@@ -269,7 +269,3 @@ us <info@erachain.org>
 # 📝 Licence
 
 ErachainBP server is licensed under the aGPL v3.
-
-# Copyright
-
-(c) 2018-2022 Erachain World PTE LTD
