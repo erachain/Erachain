@@ -311,8 +311,6 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
         jPanel3 = new JPanel();
         jButtonViewResult = new JButton();
         jCheckBoxAccrualsUse = new JCheckBox();
-        JLabel jLabelAmount = new JLabel(Lang.T("Amount"));
-        jTextFieldAmount = new JTextField("1");
         jButtonCalcCompu = new JButton();
 
         GridBagLayout jPanelLayout = new GridBagLayout();
@@ -395,12 +393,6 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
         fieldGBC.gridy = gridy;
         jComboBoxAccrualAction.setToolTipText(Lang.T("ExPayListPanel.jComboBoxAccrualAction"));
         jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
-
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabelAmount, labelGBC);
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(jTextFieldAmount, fieldGBC);
-        jTextFieldAmount.setToolTipText(Lang.T("ExPayListPanel.jTextFieldAmount"));
 
         /////////////////////// BUTTONS
 
@@ -494,7 +486,6 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
     private JLabel jLabelBalancePosition;
     public JPanel jPanelMain;
     private JPanel jPanel3;
-    private JTextField jTextFieldAmount;
 
     private MTable jTableAddresses;
     private JScrollPane jScrollPaneAccruals = new JScrollPane();
