@@ -4202,21 +4202,6 @@ public class Controller extends Observable {
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, info));
 
-
-                if (false) {
-                    // old version
-                    String licenseFile = "Erachain Licence Agreement (genesis).txt";
-                    File f = new File(licenseFile);
-                    if (!f.exists()) {
-
-                        LOGGER.error("License file not found: " + licenseFile);
-
-                        //FORCE SHUTDOWN
-                        System.exit(3);
-
-                    }
-                }
-
                 //STARTING NETWORK/BLOCKCHAIN/RPC
 
                 Controller.getInstance().start();
