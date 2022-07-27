@@ -1,7 +1,5 @@
 package org.erachain.core.block;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -24,7 +22,6 @@ import org.erachain.settings.Settings;
 import org.json.simple.JSONArray;
 import org.mapdb.Fun.Tuple2;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -559,29 +556,6 @@ public class GenesisBlock extends Block {
             case (int) TemplateCls.LICENSE_KEY:
                 if (true)
                     return null;
-
-                // OLD version
-                String license = "";
-                if (!(BlockChain.TESTS_VERS != 0 && (BlockChain.CLONE_MODE || BlockChain.TEST_MODE))) {
-                    try {
-                        //File file = new File("License Erachain.txt");
-                        File file = new File("Erachain Licence Agreement (genesis).txt");
-                        //READ SETTINS JSON FILE
-                        List<String> lines = Files.readLines(file, Charsets.UTF_8);
-
-                        for (String line : lines) {
-                            license += line + "\n";
-                        }
-                        //file.close();
-                    } catch (Exception e) {
-                        return null;
-                    }
-                }
-                return new Template(itemAppData, CREATOR, "Пользовательское соглашение на использование данного программного продукта"
-                        //+ " \"" + Controller.APP_NAME + "\"", icon, image,
-                        + " \"ERM4\"", icon, image,
-                        license
-                );
             case (int) TemplateCls.MARRIAGE_KEY:
                 return new Template(itemAppData, CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
             case (int) TemplateCls.UNMARRIAGE_KEY:
