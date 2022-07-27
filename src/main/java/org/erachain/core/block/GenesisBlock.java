@@ -562,7 +562,7 @@ public class GenesisBlock extends Block {
             case (int) TemplateCls.HIRING_KEY:
                 return new Template(itemAppData, CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
             case (int) TemplateCls.UNHIRING_KEY:
-                return new Template(itemAppData, CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
+                return new Template(itemAppData, CREATOR, "Заявление об увольнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
         }
         return new Template(itemAppData, CREATOR, "empty", icon, image, "empty");
     }
