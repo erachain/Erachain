@@ -554,7 +554,6 @@ public class GenesisBlock extends Block {
     public static Template makeTemplate(int key) {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
-                if (true)
                     return null;
             case (int) TemplateCls.MARRIAGE_KEY:
                 return new Template(itemAppData, CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
