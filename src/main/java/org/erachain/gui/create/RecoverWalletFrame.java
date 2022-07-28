@@ -230,17 +230,13 @@ public class RecoverWalletFrame extends JFrame {
             seed = null;
         }
 
-        if (seed == null || seed.length < Crypto.HASH_LENGTH - 3) {
+        if (seed == null || seed.length < Crypto.HASH_LENGTH - 3 || seed.length > Crypto.HASH_LENGTH) {
             //INVALID SEED
             String message = Lang.T("Invalid or incorrect seed!") + " - " + (seed == null ? "NULL" : "byte[" + seed.length + "]");
             JOptionPane.showMessageDialog(new JFrame(), message, Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
-        } else if (seed.length > 34) {
-            // 64 bytes - from mobile
-            return this.wallet.importPrivateKey(seed);
         }
 
-        if (seed.length > Crypto.HASH_LENGTH
         String password = this.passwordTxt.getText();
         if (password.length() == 0) {
             //PASSWORD CANNOT BE EMPTY

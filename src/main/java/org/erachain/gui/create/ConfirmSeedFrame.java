@@ -3,6 +3,7 @@ package org.erachain.gui.create;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.slf4j.Logger;
@@ -222,12 +223,12 @@ public class ConfirmSeedFrame extends JFrame {
 
         byte[] confirm;
         try {
-            confirm = Base58.decode(this.seedTxt.getText().trim());
+            confirm = Base58.decode(this.seedTxt.getText().trim(), Crypto.HASH_LENGTH);
         } catch (Exception e) {
             confirm = null;
         }
 
-        if (seed == null || !Arrays.equals(seed, confirm) || seed.length != 32) {
+        if (seed == null || !Arrays.equals(seed, confirm) || seed.length != Crypto.HASH_LENGTH) {
             //INVALID SEED
             String message = Lang.T("Invalid or incorrect seed!");
             JOptionPane.showMessageDialog(new JFrame(), message, Lang.T("Invalid seed"), JOptionPane.ERROR_MESSAGE);
