@@ -100,8 +100,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.0";
-    public static String buildTime = "2022-07-12 12:00:00 UTC";
+    public static String version = "6.0.01";
+    public static String buildTime = "2022-07-27 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -4201,19 +4201,6 @@ public class Controller extends Observable {
 
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, info));
-
-
-                String licenseFile = "Erachain Licence Agreement (genesis).txt";
-                File f = new File(licenseFile);
-                if (!f.exists()) {
-
-                    LOGGER.error("License file not found: " + licenseFile);
-
-                    //FORCE SHUTDOWN
-                    System.exit(3);
-
-                }
-
 
                 //STARTING NETWORK/BLOCKCHAIN/RPC
 
