@@ -143,6 +143,7 @@ public class PairsController {
      * @param currentPair
      */
     public static TradePair reCalc(AssetCls asset1, AssetCls asset2, TradePair currentPair) {
+
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
         long key1 = asset1.getKey();
         long key2 = asset2.getKey();
@@ -162,7 +163,7 @@ public class PairsController {
         boolean reversed;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
-            if (iterator.hasNext()) {
+            if (iterator != null && iterator.hasNext()) {
                 Trade lastTrade = null;
                 while (iterator.hasNext()) {
                     trade = tradesMap.get(iterator.next());
@@ -244,6 +245,7 @@ public class PairsController {
      * @return
      */
     public static TradePair reCalcAndUpdate(AssetCls asset1, AssetCls asset2, PairMap pairMap, int cacheTimeMin) {
+
         TradePair tradePairOld = pairMap.get(asset1.getKey(), asset2.getKey());
         if (tradePairOld != null && System.currentTimeMillis() - tradePairOld.updateTime < cacheTimeMin * 60000) {
             return tradePairOld;
@@ -261,6 +263,9 @@ public class PairsController {
     }
 
     public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return;
+
         TradeMapImpl tradesMap = dcSet.getTradeMap();
         PairMapImpl pairMap = dlSet.getPairMap();
         int foundDepth = days * 24 * 3600000;
