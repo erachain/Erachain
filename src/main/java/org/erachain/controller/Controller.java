@@ -1969,11 +1969,11 @@ public class Controller extends Observable {
         // Settings.BLOCK_MAX_SIGNATURES;
         int checkPointHeight = BlockChain.getCheckPoint(dcSet, true);
 
-        Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
-
         boolean isUpToDate;
         // WHILE NOT UPTODATE
         do {
+
+            Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
 
             // NOTIFY
             this.setChanged();
@@ -2006,8 +2006,9 @@ public class Controller extends Observable {
                     || peerHWdata != null) {
                 peer = peerHW.c;
                 if (peer != null) {
-                    info = "update from MaxHeightPeer:" + peer + " WH: "
-                            + peer.getHWeight(true);
+                    Tuple2<Integer, Long> peerCurrHW = peer.getHWeight(true);
+                    info = "update from MaxHeightPeer:" + peer + " HW: "
+                            + peerCurrHW.a + ":" + peerCurrHW.b + ", my Height: " + myHWeight.a;
                     LOGGER.info(info);
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T(info)));
