@@ -13,6 +13,7 @@ import org.erachain.dbs.mapDB.BlocksSuitMapDB;
 import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
+import org.jetbrains.annotations.NotNull;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -243,20 +244,22 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         delete(height);
 
-        if (BlockChain.CHECK_BUGS > 5 && !BlockChain.ERA_COMPU_ALL_UP && BlockChain.ALL_VALID_BEFORE > height) {
+        if (BlockChain.CHECK_BUGS > 5 && !BlockChain.ERA_COMPU_ALL_UP && BlockChain.ALL_VALID_BEFORE < height) {
             Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
             if (lastPoint == null) {
-                if (lastPoint.a > height) {
-                    LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
-                    Long error = null;
-                    error++;
-                }
+                LOGGER.error("NOT VALID forging POINTS: lastPoint == null");
+                Long error = null;
+                error++;
+            } else if (lastPoint.a > height) {
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
+                Long error = null;
+                error++;
             }
         }
 
     }
 
-    public void deleteAndProcess(Block block) {
+    public void deleteAndProcess(@NotNull Block block) {
         deleteAndProcess(block.getSignature(), block.getReference(), block.getCreator(), block.heightBlock);
     }
 
