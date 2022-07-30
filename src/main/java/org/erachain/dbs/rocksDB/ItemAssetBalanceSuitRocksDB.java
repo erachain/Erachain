@@ -152,6 +152,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
+        // тут в первичном ключе есть такие данные, поэтому даже с -opi сработает
+        // if (addressKeySet == null)
+        //    return null;
+
         return ((DBRocksDBTable) map).getIndexIteratorFilter(makeAddressKKey(account.getShortAddressBytes()), false, false);
     }
 

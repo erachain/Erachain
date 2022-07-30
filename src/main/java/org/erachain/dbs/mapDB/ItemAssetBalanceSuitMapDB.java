@@ -23,6 +23,9 @@ import java.util.NavigableSet;
 
 // TODO SOFT HARD TRUE
 
+/**
+ * key - Bytes.concat(address, Longs.toByteArray(assetKey))
+ */
 @Slf4j
 public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -36,8 +39,9 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Deprecated
     protected NavigableSet<Tuple2<Tuple2<Long, BigDecimal>, byte[]>> assetKeySet_deprecated;
-    // должно шутрее работать так как не весь первичный ключ берем а только Адрес из него сжатый до 8 байт
+    // должно шустрее работать так как не весь первичный ключ берем а только Адрес из него сжатый до 8 байт
     protected NavigableMap<Tuple3<Long, BigDecimal, Long>, byte[]> assetKeyMap;
+    // так как основной ключ - HashMap, то для поиска всех активов для заданного счета - нужен TreeMap - но не для -opi ключа
     protected NavigableSet addressKeySet;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database, DBTab cover) {
@@ -52,22 +56,22 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     public void openMap() {
 
         //OPEN MAP
-        BTreeMap<byte[], Tuple5<
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> treeMap;
-        HTreeMap<byte[], Tuple5<
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> hashMap;
 
         if (true) {
-            hashMap = database.createHashMap("balances")
+            HTreeMap<byte[], Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> hashMap
+                    = database.createHashMap("balances")
                     .keySerializer(SerializerBase.BYTE_ARRAY)
                     .hasher(Hasher.BYTE_ARRAY)
                     .makeOrGet();
             map = hashMap;
         } else {
 
-            treeMap = database.createTreeMap("balances")
+            BTreeMap<byte[], Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> treeMap
+                    = database.createTreeMap("balances")
                     //.keySerializer(BTreeKeySerializer.TUPLE2)
                     .keySerializer(BTreeKeySerializer.BASIC)
                     //.keySerializer(new BTreeKeySerializer.Tuple2KeySerializer(
@@ -95,25 +99,28 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
                         //.comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, UnsignedBytes.lexicographicalComparator()))
                         .makeOrGet();
 
-                Bind.secondaryKey(hashMap, this.assetKeySet_deprecated, new Fun.Function2<Tuple2<Long, BigDecimal>,
-                        byte[],
-                        Tuple5<
+                Bind.secondaryKey((Bind.MapWithModificationListener<byte[], Tuple5<
                                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                        () {
-                    @Override
-                    public Tuple2<Long, BigDecimal>
-                    run(byte[] key, Tuple5<
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) map,
+                        this.assetKeySet_deprecated, new Fun.Function2<Tuple2<Long, BigDecimal>,
+                                byte[],
+                                Tuple5<
+                                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                                () {
+                            @Override
+                            public Tuple2<Long, BigDecimal>
+                            run(byte[] key, Tuple5<
+                                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                        // ASSET KEY
-                        byte[] assetKeyBytes = new byte[8];
-                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                                // ASSET KEY
+                                byte[] assetKeyBytes = new byte[8];
+                                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                        return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b);
-                    }
-                });
+                                return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b);
+                            }
+                        });
             } else {
 
 
@@ -124,26 +131,29 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
                         .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.COMPARATOR))
                         .makeOrGet();
 
-                Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, Long>,
-                        byte[],
-                        Tuple5<
+                Bind.secondaryKey((Bind.MapWithModificationListener<byte[], Tuple5<
                                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                        () {
-                    @Override
-                    public Tuple3<Long, BigDecimal, Long>
-                    run(byte[] key, Tuple5<
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) map,
+                        this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, Long>,
+                                byte[],
+                                Tuple5<
+                                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                                () {
+                            @Override
+                            public Tuple3<Long, BigDecimal, Long>
+                            run(byte[] key, Tuple5<
+                                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                        // ASSET KEY
-                        byte[] assetKeyBytes = new byte[8];
-                        // get ASSET KEY and copy it
-                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                                // ASSET KEY
+                                byte[] assetKeyBytes = new byte[8];
+                                // get ASSET KEY and copy it
+                                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                        return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));
-                    }
-                });
+                                return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));
+                            }
+                        });
             }
 
         }
@@ -157,23 +167,26 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(hashMap, this.addressKeySet, new Fun.Function2<byte[],
-                byte[],
-                Tuple5<
+        Bind.secondaryKey((Bind.MapWithModificationListener<byte[], Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                () {
-            @Override
-            public byte[]
-            run(byte[] key, Tuple5 value) {
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) map,
+                this.addressKeySet, new Fun.Function2<byte[],
+                        byte[],
+                        Tuple5<
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        () {
+                    @Override
+                    public byte[]
+                    run(byte[] key, Tuple5 value) {
 
-                // first 20 bytes - short address
-                byte[] secondary = new byte[ADDR_KEY2_LEN];
-                System.arraycopy(key, 0, secondary, 0, ADDR_KEY2_LEN);
-                return secondary;
+                        // first 20 bytes - short address
+                        byte[] secondary = new byte[ADDR_KEY2_LEN];
+                        System.arraycopy(key, 0, secondary, 0, ADDR_KEY2_LEN);
+                        return secondary;
 
-            }
-        });
+                    }
+                });
 
     }
 
@@ -202,6 +215,9 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
+        if (addressKeySet == null)
+            return null;
+
         byte[] secondary = new byte[ADDR_KEY2_LEN];
         System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
 
