@@ -205,6 +205,9 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
         byte[] key;
         try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account)) {
+            if (iterator == null)
+                return list;
+
             while (iterator.hasNext()) {
                 key = iterator.next();
                 list.add(new Tuple2<>(key, map.get(key)));
