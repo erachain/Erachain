@@ -332,6 +332,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             jTextField_Amount.setVisible(false);
             jLabel_Amount.setVisible(false);
             jLabel_Amount.setText("1"); // for check
+            amount = BigDecimal.ONE;
         }
 
         if (recipient != null) {
@@ -552,7 +553,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             return false;
         }
 
-        if (amount.equals(new BigDecimal("0.0"))) {
+        if (amount.signum() == 0) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.T("Amount must be greater 0.0"), Lang.T("Error") + ":  " + Lang.T("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
