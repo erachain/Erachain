@@ -457,7 +457,7 @@ public class Refi extends EpochDAPPjson {
 
     }
 
-    //////////////////// ADMIN PROCCESS
+    //////////////////// ADMIN PROCESS
 
     /// INIT
     private boolean init(DCSet dcSet, Block block, Transaction commandTX, boolean asOrphan) {

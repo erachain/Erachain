@@ -619,7 +619,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         }
     }
 
-    //////////////////// ADMIN PROCCESS
+    //////////////////// ADMIN PROCESS
 
     /**
      * Example of command: ["set price", {"1001": {"1": 0.1, "18":"0.01"}}]
