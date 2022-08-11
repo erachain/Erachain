@@ -42,6 +42,8 @@ public abstract class EpochDAPPjson extends EpochDAPP {
             } else
                 command = dataStr;
 
+            command = command.toUpperCase();
+
         } else
             command = "";
 
