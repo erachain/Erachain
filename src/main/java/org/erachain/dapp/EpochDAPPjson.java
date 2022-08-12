@@ -43,7 +43,7 @@ public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
             } else
                 command = dataStr;
 
-            command = command.toUpperCase();
+            command = command.toLowerCase();
 
         } else
             command = "";

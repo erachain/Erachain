@@ -1297,28 +1297,28 @@ public class Block implements Closeable, ExplorerJsonLine {
     public int isValidHead(DCSet dcSet) {
 
         if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
+            LOGGER.warn("*** Block[" + this.heightBlock + "] - Max count reached");
             return INVALID_MAX_COUNT;
         }
 
         //CHECK IF PARENT EXISTS
         if (this.heightBlock < 2 || this.reference == null) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].reference invalid");
+            LOGGER.warn("*** Block[" + this.heightBlock + "].reference invalid");
             return INVALID_REFERENCE;
         }
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].reference from fork");
+            LOGGER.warn("*** Block[" + this.heightBlock + "].reference from fork");
             return INVALID_BRANCH;
         }
 
         if (transactionCount > BlockChain.MAX_BLOCK_SIZE) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
+            LOGGER.warn("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
             return INVALID_MAX_COUNT;
         }
         if (rawTransactionsLength > BlockChain.MAX_BLOCK_SIZE_BYTES) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
+            LOGGER.warn("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
             return INVALID_MAX_COUNT;
         }
 
@@ -1331,19 +1331,19 @@ public class Block implements Closeable, ExplorerJsonLine {
         // свой блок собирается аккурат мо моему NTP.getTime() и поэтому нет смысла вносить большие задержки от смещения мирового
         // однако если блок прилетел из-вне то смещения мировые могут его сделать невалидными и норм
         if (blockTime - 100 > thisTimestamp) {
-            LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
+            LOGGER.warn("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
                     + " \n Block time: " + new Timestamp(blockTime) + " -- NTP: " + new Timestamp(thisTimestamp));
             return INVALID_BLOCK_TIME;
         }
 
         //CHECK IF VERSION IS CORRECT
         if (this.version != 1) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].version invalid");
+            LOGGER.warn("*** Block[" + this.heightBlock + "].version invalid");
             return INVALID_BLOCK_VERSION;
         }
         if (this.version < 2 && this.atBytes != null && this.atBytes.length > 0) // || this.atFees != 0))
         {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].version AT invalid");
+            LOGGER.warn("*** Block[" + this.heightBlock + "].version AT invalid");
             return INVALID_BLOCK_VERSION;
         }
 
@@ -1361,9 +1361,9 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
             Tuple3<Integer, Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
-            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
+            LOGGER.warn("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
                     + " Creator: " + this.creator.getAddress());
-            LOGGER.debug("*** forging Value: " + this.forgingValue
+            LOGGER.warn("*** forging Value: " + this.forgingValue
                     + " creator DataPoint: " + creator.getForgingData(dcSet, forgingPoint == null ? heightBlock : forgingPoint.a)
                     + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return INVALID_BLOCK_WIN;
@@ -1371,7 +1371,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
         if (parentBlockHead == null) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] not found Parent HEAD OR my BlocksHeadsMap was broken");
+            LOGGER.warn("*** Block[" + this.heightBlock + "] not found Parent HEAD OR my BlocksHeadsMap was broken");
             return INVALID_REFERENCE;
         }
 
@@ -1393,15 +1393,15 @@ public class Block implements Closeable, ExplorerJsonLine {
                 targetedWinValue = (int) currentTarget >> 1;
             } else {
                 //targetedWinValue = this.calcWinValueTargeted(dcSet);
-                LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
+                LOGGER.warn("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
                 return INVALID_BLOCK_WIN;
             }
         }
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
         if (this.target == 0) {
             BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
-            LOGGER.debug("*** Block[" + this.heightBlock + "] TARGET = 0");
-            LOGGER.debug("*** currentTarget: " + currentTarget);
+            LOGGER.warn("*** Block[" + this.heightBlock + "] TARGET = 0");
+            LOGGER.warn("*** currentTarget: " + currentTarget);
             return INVALID_BLOCK_WIN;
         }
 
@@ -1417,7 +1417,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         if (dcSet.getBlockSignsMap().contains(signature)) {
-            LOGGER.debug("*** Block[" + Base58.encode(signature) + "] already exist");
+            LOGGER.warn("*** Block[" + Base58.encode(signature) + "] already exist");
             return INVALID_BRANCH;
         }
 
@@ -1535,7 +1535,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     //CHECK IF NOT GENESIS TRANSACTION
                     if (transaction.getCreator() == null) {
                         // ALL GENESIS transaction
-                        LOGGER.debug("*** Block[" + this.heightBlock
+                        LOGGER.warn("*** Block[" + this.heightBlock
                                 + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
                                 + transaction + "]"
                                 + "creator is Null!"
@@ -1565,7 +1565,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         if (!transaction.isSignatureValid(dcSetPlace)
                                 && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //
-                            LOGGER.debug("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
+                            LOGGER.warn("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
                                     + ": " + transaction);
                             return INVALID_BLOCK_VERSION;
                         }
@@ -1575,7 +1575,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     if ((BlockChain.TEST_MODE || BlockChain.CLONE_MODE || heightBlock > 278989) &&
                             transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
-                        LOGGER.debug("*** timestamp Overhead!!! " + this.heightBlock + "-" + seqNo
+                        LOGGER.warn("*** timestamp Overhead!!! " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction
                                 + " for diff: " + (transaction.getTimestamp() - timestampEnd)
                         );
@@ -1591,7 +1591,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                             != Transaction.VALIDATE_OK
                             && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
-                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                        LOGGER.warn("*** " + this.heightBlock + "-" + seqNo
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
                                 + (transaction.errorValue == null ? "" : " {" + transaction.errorValue + "}")
                                 + ": " + transaction);
@@ -1730,7 +1730,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
+                LOGGER.warn("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
                         + " transactionCount: " + transactionCount
                         + (atBytesLength > 0 ? " atBytes: " + atBytesLength : ""));
                 return INVALID_BLOCK_VERSION;
