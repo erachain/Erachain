@@ -906,12 +906,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     }
 
     @Override
-    public void orphan(DCSet dcSet, Transaction transaction) {
-
-        if (status.startsWith("error")) {
-            // not processed
-            return;
-        }
+    public void orphanBody(DCSet dcSet, Transaction transaction) {
 
         if (isAdminCommand(transaction)) {
             orphanAdminCommands(dcSet, (RSend) transaction,
