@@ -25,6 +25,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.dapp.DAPP;
 import org.erachain.dapp.DAPPFactory;
+import org.erachain.dapp.DAPPTimed;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -2724,10 +2725,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
-        if (dApp != null) {
-            dApp.processByTime(dcSet, block, this);
-            // update status in DB
-
+        if (dApp != null && dApp instanceof DAPPTimed) {
+            ((DAPPTimed) dApp).processByTime(dcSet, block, this);
         }
     }
 
@@ -2801,8 +2800,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphanByTime(Block block) {
-        if (dApp != null)
-            dApp.orphanByTime(dcSet, block, this);
+        if (dApp != null && dApp instanceof DAPPTimed)
+            ((DAPPTimed) dApp).orphanByTime(dcSet, block, this);
     }
 
     public Transaction copy() {

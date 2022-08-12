@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 import java.nio.charset.StandardCharsets;
 
-public abstract class EpochDAPPjson extends EpochDAPP {
+public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
 
     protected String command;
     protected String dataStr;
@@ -138,6 +138,10 @@ public abstract class EpochDAPPjson extends EpochDAPP {
 
         if (status.startsWith("fail")) {
             // not processed
+            return;
+        } else if (status.startsWith("wait")) {
+            /// WAIT RANDOM FROM FUTURE
+            dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
             return;
         }
 

@@ -194,10 +194,10 @@ public abstract class DAPP {
 
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
 
-    abstract public boolean processByTime(DCSet dcSet, Block block, Transaction transaction);
+    //abstract public boolean processByTime(DCSet dcSet, Block block, Transaction transaction);
 
     abstract public void orphan(DCSet dcSet, Transaction commandTX);
 
-    abstract public void orphanByTime(DCSet dcSet, Block block, Transaction transaction);
+    //abstract public void orphanByTime(DCSet dcSet, Block block, Transaction transaction);
 
 }

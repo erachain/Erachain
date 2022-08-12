@@ -889,12 +889,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     @Override
     public void orphanBody(DCSet dcSet, Transaction commandTX) {
 
-        if (status.startsWith("wait")) {
-            /// WAIT RANDOM FROM FUTURE
-            dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
-
-            /// COMMANDS
-        } else if (COMMAND_BUY.equals(command)) {
+        /// COMMANDS
+        if (COMMAND_BUY.equals(command)) {
             shopBuy(dcSet, null, (RSend) commandTX, true);
 
             /// ADMIN COMMANDS
