@@ -828,7 +828,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 || asset.isAnonimDenied())
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
         ) {
-            if (!recipient.isPerson(dcSet, height)
+            if (!recipient.isDAppOwned() && !recipient.isPerson(dcSet, height)
                     && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
 
                 boolean recipient_admin = false;
