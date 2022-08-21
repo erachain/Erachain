@@ -2194,7 +2194,7 @@ public class Controller extends Observable {
     }
 
     // use license KEY
-    public boolean createWallet(long licenseKey, byte[] seed, String password, int amount, String path) {
+    public boolean createWallet(Long licenseKey, byte[] seed, String password, int amount, String path) {
 
         if (noUseWallet)
             return true;
@@ -2202,23 +2202,17 @@ public class Controller extends Observable {
         // IF NEW WALLET CREADED
         if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
-            this.setWalletLicense(licenseKey);
+
+            if (licenseKey != null)
+                this.setWalletLicense(licenseKey);
+
             return true;
         } else
             return false;
     }
 
     public boolean recoverWallet(byte[] seed, String password, int amount, String path) {
-
-        if (noUseWallet)
-            return true;
-
-        if (this.wallet.create(seed, password, amount, false, path,
-                this.dcSetWithObserver, this.dynamicGUI)) {
-
-            return true;
-        } else
-            return false;
+        return createWallet(Controller.getInstance().getWalletLicense(), seed, password, amount, path);
     }
 
     public long getWalletLicense() {
