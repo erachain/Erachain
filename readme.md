@@ -161,15 +161,20 @@ Unzip the archive and navigate to the folder.
 
 Use the screen program to create a new session
 
-``screen``
-
-Create a new screen session: ``Ctrl+a+c``
+``screen -S erachain``
 
 Run a full Erachain node. Use the specified parameters:
 
 ``java -jar erachain.jar -pass=123456789 -seed=1:new:123456789 -nogui -rpc=on -rpcallowed=127.0.0.1``
 
-Switch to the second screen session: ``Ctrl+a``
+If necessary, the values of the following parameters can be changed:
+- The **-pass** parameter contains the password required to unlock the wallet. Replace 123456789 with the value you wish.
+- The **-seed** parameter contains information about the seed and is divided into sub-parameters:
+  - The **first sub-parameter** is responsible for the number of accounts to be created.
+  - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed. 
+  - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
+
+Collapse the erachain session:  ``Ctrl+A+D``
 
 Run a full Erachain node in command line mode:
 
