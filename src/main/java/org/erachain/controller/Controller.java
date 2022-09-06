@@ -1052,7 +1052,7 @@ public class Controller extends Observable {
         this.isStopping = true;
 
         if (transactionsPool == null) {
-            // иногла крах запуска - не инициализирует даже трнзакции и выход после этого - просто выход и все
+            // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
             LOGGER.info("Core craching... Please clear databases and restart");
             System.exit(-1);
         }
