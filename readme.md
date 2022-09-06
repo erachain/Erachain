@@ -138,34 +138,63 @@ sudo dpkg -i node/target/*.deb
 
 # 🔧 Launching a node.
 
-## Windows, Mac and Linux
+## Running an Erachain Node on Linux (Ubuntu 20.04)
 
-Run erachain.jar file.
+Connect to server via SSH.  
+Install the necessary packages to run a full node.
 
-If your node will only used for forging then run it with the keys:
--nodatawallet -pass=[PASSWORD]  
-Startup key description in z_START_EXAMPLES\readme.txt
+``sudo apt install screen``
 
-## Local network
+``sudo apt install unzip``
 
-If you have turned on searching for nodes in local network and have restarted the node and no local nodes are found, you
-have to add them explicitly to peers.json file (or peer-test.json or peers-demo.json or clonePEERS.json)
+``sudo apt -y install openjdk-8-jre``
 
-## Test Network (TestNet)
+Download the full node archive
 
-See readme in /z_START_EXAMPLES
+``wget https://github.com/erachain/Erachain/releases/latest/download/Erachain.zip``
 
-## Demo Network (DemoNet)
+Unzip the archive and navigate to the folder.
 
-see readme in /z_START_EXAMPLES
+``unzip Erachain``
 
-## Clonechains (for testers)
+``cd Erachain``
 
-see readme in /z_GENESIS_EXAMPLES
+Use the screen program to create a new session
 
-### Disable journaling on disk system
+``screen -S erachain``
 
-Disable journaling on NTFS command line: fsutil usn deletejournal /d c:
+Run a full Erachain node. Use the specified parameters:
+
+``java -jar erachain.jar -pass=123456789 -seed=1:new:123456789 -nogui -rpc=on -rpcallowed=127.0.0.1``
+
+If necessary, the values of the following parameters can be changed:
+- The **-pass** parameter contains the password required to unlock the wallet. Replace 123456789 with the value you wish.
+- The **-seed** parameter contains information about the seed and is divided into sub-parameters:
+  - The **first sub-parameter** is responsible for the number of accounts to be created.
+  - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed. 
+  - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
+
+Collapse the erachain session:  ``Ctrl+A+D``
+
+Run a full Erachain node in command line mode:
+
+``java -jar erachain.jar -cli``
+
+Use this command to unlock the wallet:
+
+``post wallet/unlock 123456789``
+
+To find out the received address, enter the following:
+
+``get addresses``
+
+Also, be sure to save seed. You can use it to log in to your web wallet:
+
+``get wallet/seed``
+
+If you need to restart the machine and then go to the already created wallet, change the startup line a little, because the account information is already saved.
+
+``java -jar erachain.jar -pass=123456789 -nogui -rpc=on -rpcallowed=127.0.0.1``
 
 # 🤝 Contributing
 
