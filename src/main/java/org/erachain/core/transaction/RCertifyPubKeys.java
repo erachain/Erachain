@@ -532,7 +532,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 break;
             }
         }
-        checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
+
         int result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
