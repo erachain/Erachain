@@ -3,12 +3,13 @@ import org.ajoberstar.grgit.Grgit
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'org.ajoberstar:grgit:1.7.2'
+        classpath 'io.github.fvarrui:javapackager:1.6.7'
     }
 }
-
 
 plugins {
     id 'java'
@@ -17,6 +18,8 @@ plugins {
     //    id 'org.springframework.boot' version '2.0.5.RELEASE'
     id 'io.franzbecker.gradle-lombok' version '1.14'
 }
+apply plugin: 'io.github.fvarrui.javapackager.plugin'
+
 
 lombok {
     version = '1.18.4'
@@ -223,3 +226,38 @@ task CreateZip(type: Zip) {
 
 //build.dependsOn(copyToLib)
 
+task packageApp(type: io.github.fvarrui.javapackager.gradle.PackageTask, dependsOn: build) {
+    displayName 'Erachain'
+    version versionEra
+    organizationName 'ERACHAIN WORLD PTE LTD'
+    organizationUrl 'erachain.org'
+    organizationEmail 'info@erachain.org'
+
+    mainClass 'org.erachain.Start'
+    platform 'mac'
+    runnableJar file('build/libs/Erachain/erachain.jar')
+    bundleJre true
+    jrePath file('/Users/grigoreo/zulu-8.jre/')
+    additionalResources = file('build/libs/Erachain/').listFiles()
+    copyDependencies false
+
+    macConfig {
+        appId = 'org.erachain.app'
+        generatePkg = false
+        macStartup = 'ARM64'
+        relocateJar = false
+        icnsFile = file('build/libs/Erachain/images/erachain.icns')
+        infoPlist.bundlePackageType = 'APPL'
+
+        backgroundImage = file('build/libs/Erachain/images/installer.png')
+        windowWidth = 500
+        windowHeight = 360
+        iconSize = 100
+        iconX = 64
+        iconY = 140
+        appsLinkIconX = 352
+        appsLinkIconY = 140
+        volumeName = 'Erachain'
+        volumeIcon = file('build/libs/Erachain/images/erachain.icns')
+    }
+}

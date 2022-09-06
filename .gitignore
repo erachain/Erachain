@@ -25,3 +25,6 @@ gui_settings.json
 /ERA/wallet*/
 /ERA/telegram/
 *.log
+
+# mac
+*.DS_Store
