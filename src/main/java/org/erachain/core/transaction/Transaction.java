@@ -172,7 +172,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int INVALID_PERSONALIZY_ANOTHER_PERSON = 118;
-    public static final int PUB_KEY_NOT_PERSONALIZED = 119;
 
     public static final int INVALID_ISSUE_PROHIBITED = 150;
     public static final int INVALID_NAME_LENGTH_MIN = 151;
