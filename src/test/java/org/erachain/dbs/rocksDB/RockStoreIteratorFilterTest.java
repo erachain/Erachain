@@ -51,7 +51,7 @@ public class RockStoreIteratorFilterTest {
         gb = new GenesisBlock();
 
         try {
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

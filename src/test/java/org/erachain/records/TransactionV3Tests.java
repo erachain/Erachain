@@ -68,7 +68,7 @@ public class TransactionV3Tests {
         db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
-            gb.process(db);
+            gb.process(db, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -147,7 +147,7 @@ public class TransactionV3Tests {
 
         GenesisBlock genesisBlock = new GenesisBlock();
         try {
-            genesisBlock.process(db);
+            genesisBlock.process(db, false);
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();

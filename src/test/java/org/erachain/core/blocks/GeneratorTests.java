@@ -215,7 +215,7 @@ public class GeneratorTests {
 
             //PROCESS NEW BLOCK
             try {
-                newBlock.process(dcSet);
+                newBlock.process(dcSet, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -429,7 +429,7 @@ public class GeneratorTests {
 
             //PROCESS NEW BLOCK
             try {
-                newBlock.process(dcSet);
+                newBlock.process(dcSet, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -638,7 +638,7 @@ public class GeneratorTests {
         //PROCESS GENESISBLOCK
         GenesisBlock genesisBlock = new GenesisBlock();
         try {
-            genesisBlock.process(dcSet);
+            genesisBlock.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -767,7 +767,7 @@ public class GeneratorTests {
                 1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
         try {
-            newBlock.process(dcSet);
+            newBlock.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -21,7 +21,7 @@ public class ShibaVerseDAPPTest {
         dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
         gb = new GenesisBlock();
         try {
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
 
         }

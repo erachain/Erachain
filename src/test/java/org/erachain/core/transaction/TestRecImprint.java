@@ -65,7 +65,7 @@ public class TestRecImprint {
         dcSet = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

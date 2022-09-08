@@ -41,6 +41,7 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.dapp.DAPP;
 import org.erachain.database.DLSet;
+import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.TransactionMap;
@@ -178,6 +179,7 @@ public class Controller extends Observable {
     public boolean onlyProtocolIndexing;
     public boolean compactDConStart;
     public boolean inMemoryDC;
+    public boolean reBuildChain;
 
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
@@ -319,6 +321,7 @@ public class Controller extends Observable {
     public DLSet getDLSet() {
         return this.dlSet;
     }
+
     public DCSet getDCSet() {
         return this.dcSet;
     }
@@ -408,7 +411,6 @@ public class Controller extends Observable {
     }
 
     /**
-     *
      * @return
      */
     public JSONObject getBenchmarks() {
@@ -565,10 +567,10 @@ public class Controller extends Observable {
             }
         }
 
-        if (!error && !backUped && Settings.getInstance().getbacUpEnabled()) {
+        if (!error && !backUped && Settings.getInstance().getbackUpEnabled()) {
             // если нет ошибок и не было восстановления и нужно делать копии то сделаем
 
-            if (useGui && Settings.getInstance().getbacUpAskToStart()) {
+            if (useGui && Settings.getInstance().getbackUpAskToStart()) {
                 // ask dialog
                 int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
                         Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
@@ -636,7 +638,7 @@ public class Controller extends Observable {
             try {
                 this.dlSet.close();
             } catch (Exception e2) {
-                
+
             }
             reCreateDB();
             LOGGER.error("Error during startup detected trying to recreate DataLocale...");
@@ -650,39 +652,44 @@ public class Controller extends Observable {
             ////LOGGER.error(e.getMessage(), e);
         }
 
+        if (reBuildChain && !Settings.simpleTestNet) {
+            reBuilChain();
+        }
+
         if (dcSet == null) {
             // OPENING DATABASES
-            try {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
-                LOGGER.info("Try Open DataChain");
-                if (Settings.simpleTestNet) {
-                    // -testnet
-                    reCreateDC(inMemoryDC);
-                } else {
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
+            LOGGER.info("Try Open DataChain");
+            if (Settings.simpleTestNet) {
+                // -testnet
+                reCreateDC(inMemoryDC);
+            } else {
+                try {
                     this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+                } catch (Throwable e) {
+                    // Error open DB
+                    error = 1;
+                    LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+                    LOGGER.error(e.getMessage(), e);
+                    try {
+                        reCreateDC(inMemoryDC);
+                    } catch (Throwable e1) {
+                        LOGGER.error(e1.getMessage(), e1);
+                        stopAndExit(5);
+                    }
                 }
+
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
                 LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
-            } catch (Throwable e) {
-                // Error open DB
-                error = 1;
-                LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-                LOGGER.error(e.getMessage(), e);
-                try {
-                    reCreateDC(inMemoryDC);
-                } catch (Throwable e1) {
-                    LOGGER.error(e1.getMessage(), e1);
-                    stopAndExit(5);
-                }
             }
         }
 
 
-        if (error == 0 && useGui && Settings.getInstance().getbacUpEnabled()) {
+        if (error == 0 && useGui && Settings.getInstance().getbackUpEnabled()) {
 
-            if (Settings.getInstance().getbacUpAskToStart()) {
+            if (Settings.getInstance().getbackUpAskToStart()) {
                 // ask dialog
                 int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
                         Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
@@ -720,6 +727,18 @@ public class Controller extends Observable {
 
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
+        if (reBuildChain && !Settings.simpleTestNet) {
+            reBuilChainProcess();
+
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+            LOGGER.info("Closing database");
+            this.dcSet.close();
+            this.dlSet.close();
+
+            LOGGER.info("Rebuilding is ended. Please restart without -rechain parameter!");
+            System.exit(0);
+        }
 
         // CREATE TRANSACTIONS POOL
         this.transactionsPool = new TransactionsPool(this, blockChain, dcSet);
@@ -976,6 +995,76 @@ public class Controller extends Observable {
         return this.dlSet;
     }
 
+    private void reBuilChain() {
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
+        LOGGER.info("Start rebuilding the chain database");
+
+        File dataDir = new File(Settings.getInstance().getDataChainPath());
+        File dataBackDir = new File(dataDir.getPath() + "TMP");
+
+        if (dataDir.exists()) {
+            try {
+                FileUtils.moveDirectory(dataDir, dataBackDir);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+                System.exit(-11);
+            }
+        } else {
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "The chain database not exist: " + dataDir.getName()));
+            LOGGER.info("The chain database not exist: " + dataDir.getName());
+            System.exit(-12);
+        }
+
+    }
+
+    private void reBuilChainProcess() {
+
+        File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
+
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database. Please do not turn off the program!!"));
+        LOGGER.info("Start rebuilding the chain database. Please do not turn off the program!!");
+
+        // OPEN BACKUP CHaIN
+        DCSet dcSetBackUp = new DCSet(dataBackFile, false, false, false, databaseSystem);
+
+        BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
+        BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
+        Block block = blocksMapOld.get(2);
+        if (block.isValid(this.dcSet, true) > 0) {
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
+            LOGGER.info("Wrong GENESIS block");
+            System.exit(-14);
+        }
+
+        int count = 0;
+        for (int i = 3; i < blocksMapOld.size(); ++i) {
+            block = blocksMapOld.get(i);
+            if (false && block.isValid(this.dcSet, true) > 0) {
+                break;
+            }
+            try {
+                block.process(dcSet, true);
+            } catch (Throwable e) {
+                LOGGER.error(e.getMessage(), e);
+                System.exit(-15);
+            }
+            count += 1 + (block.getTransactionCount() >> 3);
+            if (count > 10000) {
+                count = 0;
+                dcSet.flush(0, true, false);
+                LOGGER.info("Rebuilds block " + i);
+            }
+
+            if (i > 100000)
+                break;
+        }
+    }
+
+
     private void createDataCheckpoint() {
         if (!this.dcSet.getBlockMap().isProcessing()) {
             // && Settings.getInstance().isCheckpointingEnabled()) {
@@ -1006,7 +1095,7 @@ public class Controller extends Observable {
     }
 
     private File getDataBakDir(File dataDir) {
-        return new File(dataDir.getParent(), Settings.getInstance().getDataChainPath() + "Bak");
+        return new File(dataDir.getParent(), Settings.getInstance().getDataChainPath() + "Back");
     }
 
     public ApiService getRPCService() {
@@ -1060,16 +1149,12 @@ public class Controller extends Observable {
         if (this.connectTimer != null)
             this.connectTimer.cancel();
 
-        try {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
-            // STOP MESSAGE PROCESSOR
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
 
+        // STOP MESSAGE PROCESSOR
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
         if (this.network != null) {
             LOGGER.info("Stopping message processor");
             this.network.stop();
@@ -2768,7 +2853,7 @@ public class Controller extends Observable {
                 return false;
             }
 
-            // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+            // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сливе из форка не создадутся
             if (onlyProtocolIndexing) {
                 // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
                 newBlock.setValidatedForkDB(forked);
@@ -3991,6 +4076,11 @@ public class Controller extends Observable {
 
             if (arg.toLowerCase().equals("-compactdc")) {
                 compactDConStart = true;
+                continue;
+            }
+
+            if (arg.toLowerCase().equals("-rechain")) {
+                reBuildChain = true;
                 continue;
             }
 

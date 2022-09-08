@@ -50,6 +50,8 @@ public class DCSet extends DBASet implements Closeable {
      */
     public String makedIn = "--";
 
+    public static final String DATA_FILE = "chain.dat";
+
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
             << (Controller.getInstance().databaseSystem == DBS_MAP_DB ? 1 : 3);
     // если все на Рокс перевели то меньше надо ставить
@@ -335,6 +337,10 @@ public class DCSet extends DBASet implements Closeable {
         }
         uses--;
 
+    }
+
+    public DCSet(File dbFile, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
+        this(dbFile, DCSet.makeFileDB(dbFile), withObserver, dynamicGUI, inMemory, defaultDBS);
     }
 
     /**
@@ -649,7 +655,7 @@ public class DCSet extends DBASet implements Closeable {
     public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
 
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
+        File dbFile = new File(Settings.getInstance().getDataChainPath(), DATA_FILE);
 
         DB database = null;
         try {
@@ -666,15 +672,22 @@ public class DCSet extends DBASet implements Closeable {
         }
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
-            database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
-            try {
-                Files.walkFileTree(dbFile.getParentFile().toPath(),
-                        new SimpleFileVisitorForRecursiveFolderDeletion());
-            } catch (Throwable e) {
-                logger.error(e.getMessage(), e);
+            if (true) {
+                logger.warn("Chain database has New Version: " + CURRENT_VERSION);
+                logger.warn("Please rebuild chain local by use '-rechain' parameter for start program (quick case) or delete folder " + dbFile.getParentFile().toPath() + " for full synchronize chain from network (slow case).");
+                System.exit(-22);
+            } else {
+                // OLD version
+                database.close();
+                logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
+                try {
+                    Files.walkFileTree(dbFile.getParentFile().toPath(),
+                            new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (Throwable e) {
+                    logger.error(e.getMessage(), e);
+                }
+                database = makeFileDB(dbFile);
             }
-            database = makeFileDB(dbFile);
 
         }
 
@@ -720,8 +733,9 @@ public class DCSet extends DBASet implements Closeable {
         return instance;
     }
 
-    public static DCSet createEmptyHardDatabaseSet(DB database, int defaultDBS) {
-        instance = new DCSet(null, database, false, false, true, defaultDBS);
+    public static DCSet createEmptyHardDatabaseSet(File dbFile, boolean dcSetWithObserver, boolean dynamicGUI, int defaultDBS) {
+        DB database = makeFileDB(dbFile);
+        instance = new DCSet(dbFile, database, dcSetWithObserver, dynamicGUI, false, defaultDBS);
         return instance;
     }
 
@@ -1879,7 +1893,7 @@ public class DCSet extends DBASet implements Closeable {
                 System.gc();
             }
 
-            logger.debug("%%%%%%%%%%%%%%%%%%%%%%%%  commit time: "
+            logger.info("%%%%%%%%%%%%%%%%%%%%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) + " ms");
 
             pointFlush = System.currentTimeMillis();

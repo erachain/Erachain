@@ -81,7 +81,7 @@ public class BlockExplorerTest {
         do {
 
             try {
-                block.process(databaseSet);
+                block.process(databaseSet, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

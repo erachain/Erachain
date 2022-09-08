@@ -1425,6 +1425,19 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     /**
+     * Тут нужно откатить исполнение транзакций - если база не ФОРК
+     * - так как они уже закатались в саму базу основную и был выход посреди блока
+     *
+     * @param dcSetPlace
+     * @param seqNo
+     */
+    private void unProcessTXs(DCSet dcSetPlace, int seqNo) {
+        if (dcSetPlace.isFork() || seqNo == 0)
+            return;
+        // TODO обработать откат транзакций
+    }
+
+    /**
      * проверка блока с возможностью исполнения. При этом с заданной базой где делать форк.
      * Если проверка одного блока то в памяти можно делать форк
      *
@@ -1524,8 +1537,13 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             int seqNo = 0;
             for (Transaction transaction : this.transactions) {
-                if (cnt.isOnStopping())
+                if (cnt.isOnStopping()) {
+                    if (andProcess) {
+                        // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                        unProcessTXs(dcSetPlace, seqNo - 1);
+                    }
                     return INVALID_BRANCH;
+                }
 
                 seqNo++;
                 transactionSignature = transaction.getSignature();
@@ -1540,6 +1558,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                                 + transaction + "]"
                                 + "creator is Null!"
                         );
+                        if (andProcess) {
+                            // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                            unProcessTXs(dcSetPlace, seqNo - 1);
+                        }
                         return INVALID_BLOCK_VERSION;
                     }
 
@@ -1567,6 +1589,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                             //
                             LOGGER.warn("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
                                     + ": " + transaction);
+                            if (andProcess) {
+                                // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                                unProcessTXs(dcSetPlace, seqNo - 1);
+                            }
                             return INVALID_BLOCK_VERSION;
                         }
                     }
@@ -1579,6 +1605,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                                 + ":" + transaction
                                 + " for diff: " + (transaction.getTimestamp() - timestampEnd)
                         );
+                        if (andProcess) {
+                            // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                            unProcessTXs(dcSetPlace, seqNo - 1);
+                        }
                         return INVALID_BLOCK_VERSION;
                     }
 
@@ -1595,6 +1625,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
                                 + (transaction.errorValue == null ? "" : " {" + transaction.errorValue + "}")
                                 + ": " + transaction);
+                        if (andProcess) {
+                            // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                            unProcessTXs(dcSetPlace, seqNo - 1);
+                        }
                         return INVALID_BLOCK_VERSION;
                     }
 
@@ -1602,8 +1636,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                     try {
                         transaction.process(this, Transaction.FOR_NETWORK);
                     } catch (Exception e) {
-                        if (cnt.isOnStopping())
+                        if (andProcess) {
+                            // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                            unProcessTXs(dcSetPlace, seqNo);
+                        }
+                        if (cnt.isOnStopping()) {
                             return INVALID_BRANCH;
+                        }
 
                         LOGGER.error("*** " + e.getMessage() + "!!! " + this.heightBlock + "-" + seqNo
                                 + ": " + transaction, e);
@@ -1633,8 +1672,11 @@ public class Block implements Closeable, ExplorerJsonLine {
                     if (processTimingLocalDiff < 999999999999l)
                         timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
 
-                    if (cnt.isOnStopping())
+                    if (cnt.isOnStopping()) {
+                        // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                        unProcessTXs(dcSetPlace, seqNo);
                         return INVALID_BRANCH;
+                    }
 
                     ///logger.debug("[" + seqNo + "] try finalMap.set" );
                     processTimingLocal = System.nanoTime();
@@ -1733,6 +1775,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 LOGGER.warn("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
                         + " transactionCount: " + transactionCount
                         + (atBytesLength > 0 ? " atBytes: " + atBytesLength : ""));
+                if (andProcess) {
+                    // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                    unProcessTXs(dcSetPlace, seqNo);
+                }
                 return INVALID_BLOCK_VERSION;
             }
 
@@ -1744,6 +1790,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 this.process_after(cnt, dcSetPlace);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
+                if (andProcess) {
+                    // TODO - нужно откат уже отпроцессенных транзакций делать при выходе!!!
+                    unProcessTXs(dcSetPlace, -1);
+                }
                 return INVALID_BLOCK_VERSION;
             }
 
@@ -2261,7 +2311,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     // TODO - make it trownable
-    public void process(DCSet dcSet) throws Exception {
+    public void process(DCSet dcSet, boolean notLog) throws Exception {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
@@ -2314,9 +2364,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             int seqNo = 0;
             for (Transaction transaction : this.transactions) {
 
-                if (cnt.isOnStopping())
-                    throw new Exception("on stoping");
-
                 ++seqNo;
 
                 //logger.debug("[" + seqNo + "] record is process" );
@@ -2356,9 +2403,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
 
-                if (cnt.isOnStopping())
-                    throw new Exception("on stoping");
-
                 timerStart = System.currentTimeMillis();
                 // добавляем после процессинга, когда в транзакции новые данные наросли
                 finalMap.put(key, transaction);
@@ -2375,9 +2419,10 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             }
 
-            LOGGER.debug("timerProcess: " + timerProcess + "  timerRefsMap_set: " + timerRefsMap_set
-                    + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
-                    + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
+            if (!notLog)
+                LOGGER.debug("timerProcess: " + timerProcess + "  timerRefsMap_set: " + timerRefsMap_set
+                        + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
+                        + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
         }
 
@@ -2385,17 +2430,20 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
-        LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+        if (!notLog)
+            LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
         dcSet.getBlockMap().putAndProcess(this);
-        LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+        if (!notLog)
+            LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         long tickets = System.currentTimeMillis() - start;
         if (transactionCount > 0 && tickets > 10) {
-            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
-                    + " ms, TXs= " + this.transactionCount
-                    + (transactionCount == 0 ? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
+            if (!notLog)
+                LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
+                        + " ms, TXs= " + this.transactionCount
+                        + (transactionCount == 0 ? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
         }
 
     }
@@ -2557,9 +2605,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         Long dbRef;
         try (IteratorCloseable<Long> iterator = finalMap.getOneBlockIterator(height, true)) {
             while (iterator.hasNext()) {
-                if (cnt.isOnStopping()) {
-                    throw new Exception("on stoping");
-                }
 
                 dbRef = iterator.next();
 

@@ -120,7 +120,7 @@ public class RCertifyPubKeysTest {
         dbPS = dcSet.getPersonStatusMap();
 
         try {
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
