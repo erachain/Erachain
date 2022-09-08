@@ -603,7 +603,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         return true;
     }
 
-    //////////////////// ADMIN PROCCESS
+    //////////////////// ADMIN PROCESS
 
     /**
      * Example of command: ["set price", {"1001": {"1": 0.1, "18":"0.01"}}]
@@ -887,19 +887,10 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     }
 
     @Override
-    public void orphan(DCSet dcSet, Transaction commandTX) {
+    public void orphanBody(DCSet dcSet, Transaction commandTX) {
 
-        if (status.startsWith("fail")) {
-            // not processed
-            return;
-        }
-
-        if (status.startsWith("wait")) {
-            /// WAIT RANDOM FROM FUTURE
-            dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
-
-            /// COMMANDS
-        } else if (COMMAND_BUY.equals(command)) {
+        /// COMMANDS
+        if (COMMAND_BUY.equals(command)) {
             shopBuy(dcSet, null, (RSend) commandTX, true);
 
             /// ADMIN COMMANDS

@@ -6,6 +6,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.epoch.EpochDAPP;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,7 +15,7 @@ import org.json.simple.parser.ParseException;
 
 import java.nio.charset.StandardCharsets;
 
-public abstract class EpochDAPPjson extends EpochDAPP {
+public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
 
     protected String command;
     protected String dataStr;
@@ -41,6 +42,8 @@ public abstract class EpochDAPPjson extends EpochDAPP {
 
             } else
                 command = dataStr;
+
+            command = command.toLowerCase();
 
         } else
             command = "";
@@ -114,6 +117,35 @@ public abstract class EpochDAPPjson extends EpochDAPP {
      */
     protected void fail(String mess) {
         status = "fail: " + mess;
+    }
+
+    /**
+     * For use FAIL status
+     *
+     * @param dcSet
+     * @param transaction
+     */
+    abstract public void orphanBody(DCSet dcSet, Transaction transaction);
+
+    /**
+     * Use FAIL status
+     *
+     * @param dcSet
+     * @param commandTX
+     */
+    @Override
+    public void orphan(DCSet dcSet, Transaction commandTX) {
+
+        if (status.startsWith("fail")) {
+            // not processed
+            return;
+        } else if (status.startsWith("wait")) {
+            /// WAIT RANDOM FROM FUTURE
+            dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
+            return;
+        }
+
+        orphanBody(dcSet, commandTX);
     }
 
 }

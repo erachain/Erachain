@@ -80,8 +80,10 @@ public class TableModelMakerPersons extends TimerTableModelCls<PersonCls> {
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
 
         for (String address : addresses.keySet()) {
-            myIssuePersons.addAll(transactionFinalMap.getTransactionsByAddressAndType(Account.makeShortBytes(address),
-                    Transaction.ISSUE_PERSON_TRANSACTION, 0, 0));
+            List<Transaction> recs = transactionFinalMap.getTransactionsByAddressAndType(Account.makeShortBytes(address),
+                    Transaction.ISSUE_PERSON_TRANSACTION, 0, 0);
+            if (recs != null)
+                myIssuePersons.addAll(recs);
         }
 
         for (Transaction myIssuePerson : myIssuePersons) {

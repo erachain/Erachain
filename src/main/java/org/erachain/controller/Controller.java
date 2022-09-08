@@ -100,8 +100,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.0.01";
-    public static String buildTime = "2022-07-27 12:00:00 UTC";
+    public static String version = "6.1.01";
+    public static String buildTime = "2022-09-06 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1050,6 +1050,12 @@ public class Controller extends Observable {
         if (this.isStopping)
             return;
         this.isStopping = true;
+
+        if (transactionsPool == null) {
+            // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
+            LOGGER.info("Core craching... Please clear databases and restart");
+            System.exit(-1);
+        }
 
         if (this.connectTimer != null)
             this.connectTimer.cancel();
@@ -2194,7 +2200,7 @@ public class Controller extends Observable {
     }
 
     // use license KEY
-    public boolean createWallet(long licenseKey, byte[] seed, String password, int amount, String path) {
+    public boolean createWallet(Long licenseKey, byte[] seed, String password, int amount, String path) {
 
         if (noUseWallet)
             return true;
@@ -2202,23 +2208,17 @@ public class Controller extends Observable {
         // IF NEW WALLET CREADED
         if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
-            this.setWalletLicense(licenseKey);
+
+            if (licenseKey != null)
+                this.setWalletLicense(licenseKey);
+
             return true;
         } else
             return false;
     }
 
     public boolean recoverWallet(byte[] seed, String password, int amount, String path) {
-
-        if (noUseWallet)
-            return true;
-
-        if (this.wallet.create(seed, password, amount, false, path,
-                this.dcSetWithObserver, this.dynamicGUI)) {
-
-            return true;
-        } else
-            return false;
+        return createWallet(Controller.getInstance().getWalletLicense(), seed, password, amount, path);
     }
 
     public long getWalletLicense() {

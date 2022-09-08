@@ -2,6 +2,7 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.utils.APIUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -95,20 +96,24 @@ public class WalletResource {
         return String.valueOf(Controller.getInstance().lockWallet());
     }
 
+    /**
+     * POST wallet {"seed":"6iqp9e", "password":"1",  "amount":5, "dir":<wallet dir>}
+     *
+     * @param x
+     * @return
+     */
     @POST
     @Consumes(MediaType.WILDCARD)
     public String createWallet(String x) {
         try {
             //READ JSON
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+
+            APIUtils.askAPICallAllowed(null, "POST wallet " + x, request, true);
+
             String password = (String) jsonObject.get("password");
-
-            password = null;
-            APIUtils.askAPICallAllowed(password, "POST wallet " + x, request, true);
-
-            boolean recover = (boolean) jsonObject.get("recover");
             String seed = (String) jsonObject.get("seed");
-            int amount = ((Long) jsonObject.get("amount")).intValue();
+            int amount = ((Long) jsonObject.getOrDefault("amount", 1L)).intValue();
             String path = (String) jsonObject.get("dir");
 
             //CHECK IF WALLET EXISTS
@@ -119,7 +124,7 @@ public class WalletResource {
             //DECODE SEED
             byte[] seedBytes;
             try {
-                seedBytes = Base58.decode(seed);
+                seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
             } catch (Exception e) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_INVALID_SEED);
             }
@@ -135,11 +140,8 @@ public class WalletResource {
             }
 
             //CREATE WALLET
-            if (recover) {
-                return String.valueOf(Controller.getInstance().recoverWallet(seedBytes, password, amount, path));
-            } else {
-                return String.valueOf(Controller.getInstance().createWallet(Controller.getInstance().getWalletLicense(), seedBytes, password, amount, path));
-            }
+            return String.valueOf(Controller.getInstance().recoverWallet(seedBytes, password, amount, path));
+
         } catch (NullPointerException | ClassCastException e) {
             LOGGER.error(e.getMessage());
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
