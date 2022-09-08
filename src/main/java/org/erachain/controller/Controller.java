@@ -1043,6 +1043,14 @@ public class Controller extends Observable {
         int count = 0;
         for (int i = 3; i < blocksMapOld.size(); ++i) {
             block = blocksMapOld.get(i);
+
+            // need for calculate WIN Value
+            int invalid = block.isValidHead(dcSet);
+            if (invalid > 0) {
+                LOGGER.info("Block[" + i + "] invalid: " + invalid);
+                break;
+            }
+
             if (false && block.isValid(this.dcSet, true) > 0) {
                 break;
             }
@@ -1059,8 +1067,12 @@ public class Controller extends Observable {
                 LOGGER.info("Rebuilds block " + i);
             }
 
-            if (i > 100000)
-                break;
+            if (isStopping) {
+                LOGGER.info("Closing rechain...");
+                dcSet.close();
+                LOGGER.info("Closing done");
+                return;
+            }
         }
     }
 
