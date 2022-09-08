@@ -376,7 +376,7 @@ public class ApiClient {
                             "Errors: 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "GET addresses/makepairbyseed/{seed}",
+                            "POST addresses/makepairbyseed",
                             "Make a account pair by address seed (32 bytes in Base58) and returns private key and public key. Without inserting it into the wallet.",
                             "Errors: - wrong seed."
                     },

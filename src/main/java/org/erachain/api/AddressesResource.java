@@ -313,8 +313,8 @@ public class AddressesResource {
     }
 
     @POST
-    @Path("makepairbyseed/{seed}")
-    public String makePair(@PathParam("seed") String seed) {
+    @Path("makepairbyseed")
+    public String makePair(String seed) {
 
         // DECODE SEED
         byte[] seedBytes;
