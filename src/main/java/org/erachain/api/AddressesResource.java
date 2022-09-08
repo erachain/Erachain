@@ -312,7 +312,7 @@ public class AddressesResource {
         }
     }
 
-    @GET
+    @POST
     @Path("makepairbyseed/{seed}")
     public String makePair(@PathParam("seed") String seed) {
 
