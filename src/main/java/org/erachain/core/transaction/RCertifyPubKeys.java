@@ -523,12 +523,16 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return VALIDATE_OK;
         }
 
+        // ALL Persons by ADMINS
+        boolean creator_admin = false;
         for (String admin : BlockChain.GENESIS_ADMINS) {
             if (creator.equals(admin)) {
+                creator_admin = true;
                 checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
                 break;
             }
         }
+
         int result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
@@ -536,18 +540,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return result;
 
         ///// CREATOR
-        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
-                && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
-            boolean creator_admin = false;
-            // ALL Persons by ADMINS
-            for (String admin : BlockChain.GENESIS_ADMINS) {
-                if (this.creator.equals(admin)) {
-                    creator_admin = true;
-                    break;
-                }
-            }
-            if (!creator_admin)
+        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE) {
+            if (!creator_admin && creatorPersonDuration == null) {
                 return CREATOR_NOT_PERSONALIZED;
+            }
         }
 
         //////// PERSON
@@ -559,6 +555,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return Transaction.ITEM_PERSON_IS_DEAD;
 
         if (certifiedPublicKeys.size() > 3) {
+            errorValue = "list size > 3";
             return INVALID_PUBLIC_KEY;
         }
 
@@ -566,22 +563,35 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         for (PublicKeyAccount publicAccount : this.certifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
             if (!publicAccount.isValid()) {
+                errorValue = publicAccount.getBase58();
                 return INVALID_PUBLIC_KEY;
             }
 
+            if (creator_admin || (checkFlags & NOT_VALIDATE_FLAG_PERSONAL) != 0L || BlockChain.ANONIM_SERT_USE)
+                continue;
+
             Tuple4<Long, Integer, Integer, Integer> personDuration = publicAccount.getPersonDuration(dcSet);
 
-            if (personDuration != null) {
-                // если этот ключ уже удостоверен, то его изменять может только сам владелец
-                // снять удостоверение ключа может только сам владелец
-                // или продлить только сам владелец может
-                if (!personDuration.a.equals(this.key)) {
-                    return INVALID_PERSONALIZY_ANOTHER_PERSON;
-                }
-            } else {
+            if (personDuration == null) {
                 if (this.add_day < 0) {
                     // нельзя снять удостоверение со счета который еще не удостоверен
-                    return PUB_KEY_NOT_PERSONALIZED;
+                    errorValue = "add_day < 0";
+                    return CREATOR_NOT_PERSONALIZED;
+
+                } else if (creatorPersonDuration == null || !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
+                    // нельзя удостоверять других тому у кого уже свой ключ просрочен
+                    return CREATOR_NOT_PERSONALIZED;
+                }
+            } else {
+                if (!personDuration.a.equals(this.key)) {
+                    // переудостоверить можно только на туже персону что и раньше
+                    return INVALID_PERSONALIZY_ANOTHER_PERSON;
+                } else if (!this.creator.isPerson(dcSet, height, creatorPersonDuration)
+                        && !this.key.equals(creatorPersonDuration.a)) {
+                    // если этот ключ уже удостоверен, то его изменять может только сам владелец
+                    // снять удостоверение ключа может только сам владелец
+                    // или продлить только сам владелец может
+                    return CREATOR_NOT_PERSONALIZED;
                 }
             }
         }

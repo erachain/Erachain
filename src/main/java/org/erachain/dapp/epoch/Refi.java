@@ -457,7 +457,7 @@ public class Refi extends EpochDAPPjson {
 
     }
 
-    //////////////////// ADMIN PROCCESS
+    //////////////////// ADMIN PROCESS
 
     /// INIT
     private boolean init(DCSet dcSet, Block block, Transaction commandTX, boolean asOrphan) {
@@ -548,7 +548,7 @@ public class Refi extends EpochDAPPjson {
     }
 
     @Override
-    public void orphan(DCSet dcSet, Transaction commandTX) {
+    public void orphanBody(DCSet dcSet, Transaction commandTX) {
 
         /// COMMANDS
         if (COMMAND_JOB.equals(command))

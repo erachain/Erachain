@@ -1395,7 +1395,7 @@ public class API {
     public Response getPublicKey(@PathParam("address") String address) {
 
         // CHECK IF VALID ADDRESS
-        if (PublicKeyAccount.isValidPublicKey(address)) {
+        if (!PublicKeyAccount.isValidPublicKey(address)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.INVALID_ADDRESS);
 

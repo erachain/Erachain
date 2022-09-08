@@ -471,10 +471,6 @@ public class OnDealClick {
             case Transaction.INVALID_PERSONALIZY_ANOTHER_PERSON:
                 mess = "Public Key already certified to another Person";
                 break;
-            case Transaction.PUB_KEY_NOT_PERSONALIZED:
-                mess = "Public Key is not personalized";
-                break;
-
             case Transaction.RECEIVER_NOT_PERSONALIZED:
                 mess = "Receiver Account is not personalized";
                 break;

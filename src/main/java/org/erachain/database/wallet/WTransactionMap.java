@@ -117,6 +117,9 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                 new Fun.Function2<Tuple2<Integer, Long>[], Tuple2<Long, Integer>, Transaction>() {
                     @Override
                     public Tuple2<Integer, Long>[] run(Tuple2<Long, Integer> key, Transaction value) {
+                        if (value == null) // if DATACHAIN was selected other - in Wallet TXs with null
+                            return null;
+
                         value.setDC(DCSet.getInstance(), true);
                         Object[][] itemKeys = value.getItemsKeys();
                         if (itemKeys == null)

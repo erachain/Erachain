@@ -312,6 +312,61 @@ public class AddressesResource {
         }
     }
 
+    @POST
+    @Path("makepairbyseed")
+    public String makePair(String seed) {
+
+        // DECODE SEED
+        byte[] seedBytes;
+        try {
+            seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+        }
+
+        // CHECK SEED LENGTH
+        if (seedBytes == null || seedBytes.length != 32) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+
+        }
+
+        // CREATE ACCOUNT
+        PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
+        JSONObject json = new JSONObject();
+        json.put("pubKey", Base58.encode(account.getPublicKey()));
+        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        json.put("seed", Base58.encode(account.getSeed()));
+        json.put("address", account.getAddress());
+        return json.toJSONString();
+
+    }
+
+    /**
+     * Make address pair by text phrase without insert in wallet
+     *
+     * @param phrase
+     * @return
+     */
+    @POST
+    @Path("makepairbyphrase")
+    public String makePairByPhrase(String phrase) {
+
+        // MAKE SEED
+        byte[] seedBytes = Crypto.getInstance().digest(phrase.getBytes(StandardCharsets.UTF_8));
+
+        // CREATE ACCOUNT
+        PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
+        JSONObject json = new JSONObject();
+        json.put("pubKey", Base58.encode(account.getPublicKey()));
+        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        json.put("seed", Base58.encode(account.getSeed()));
+        json.put("address", account.getAddress());
+        return json.toJSONString();
+
+    }
+
     @GET
     @Path("/generatingbalance/{address}")
     public String getGeneratingBalanceOfAddress(

@@ -111,7 +111,7 @@ public abstract class DAPPFactory {
                 return null;
         }
 
-        String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase() : null;
+        String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8) : null;
 
         switch (dappID) {
             case Refi.ID:
