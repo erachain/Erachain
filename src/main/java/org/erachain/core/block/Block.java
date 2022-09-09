@@ -1568,7 +1568,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     boolean isSignatureValid = false;
                     // TRY QUICK check SIGNATURE by FIND in POOL
                     try {
-                        if (txMemPool.contains(transactionSignature)) {
+                        if (txMemPool != null && txMemPool.contains(transactionSignature)) {
                             if (isSignatureValid = transaction.trueEquals(txMemPool.get(transactionSignature))) {
                                 // если транзакция была в пуле ожидания - она уже проверена на Дубль
                                 transaction.checkedByPool = true;
@@ -1667,7 +1667,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     //SET PARENT
                     //REMOVE FROM UNCONFIRMED DATABASE
                     processTimingLocal = System.nanoTime();
-                    txMemPool.offerMessage(transactionSignature);
+                    if (txMemPool != null)
+                        txMemPool.offerMessage(transactionSignature);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
                         timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;

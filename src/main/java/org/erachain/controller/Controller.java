@@ -136,6 +136,7 @@ public class Controller extends Observable {
     private int status;
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
+    private Thread reBuildChainThread;
     public Network network;
     private ApiService rpcService;
     private WebService webService;
@@ -728,16 +729,28 @@ public class Controller extends Observable {
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
         if (reBuildChain && !Settings.simpleTestNet) {
-            reBuilChainProcess();
+            // CLOSE ON CTRL-C and UNEXPECTED SHUTDOWN
+            Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
+                @Override
+                public void run() {
+                    isStopping = true;
+                    setChanged();
+                    notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+                    LOGGER.info("Closing database");
+                    dcSet.close();
+                    dlSet.close();
 
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-            LOGGER.info("Closing database");
-            this.dcSet.close();
-            this.dlSet.close();
+                    LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
+                }
+            });
 
-            LOGGER.info("Rebuilding is ended. Please restart without -rechain parameter!");
-            System.exit(0);
+            reBuildChainThread = new Thread(() -> {
+                reBuilChainProcess();
+            });
+            reBuildChainThread.start();
+
+            return;
+
         }
 
         // CREATE TRANSACTIONS POOL
@@ -1004,11 +1017,17 @@ public class Controller extends Observable {
         File dataBackDir = new File(dataDir.getPath() + "TMP");
 
         if (dataDir.exists()) {
-            try {
-                FileUtils.moveDirectory(dataDir, dataBackDir);
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-                System.exit(-11);
+            if (dataBackDir.exists()) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Continue rebuilding chain from: " + dataBackDir.getName()));
+                LOGGER.info("Continue rebuilding chain from: " + dataBackDir.getName());
+            } else {
+                try {
+                    FileUtils.moveDirectory(dataDir, dataBackDir);
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                    System.exit(-11);
+                }
             }
         } else {
             this.setChanged();
@@ -1032,7 +1051,12 @@ public class Controller extends Observable {
 
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
         BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
-        Block block = blocksMapOld.get(2);
+        int startHeight = blocksMap.size() + 1;
+        if (startHeight > 2) {
+            LOGGER.info("Restart rebuild chain from block " + startHeight);
+        }
+
+        Block block = blocksMapOld.get(startHeight);
         if (block.isValid(this.dcSet, true) > 0) {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
@@ -1041,13 +1065,13 @@ public class Controller extends Observable {
         }
 
         int count = 0;
-        for (int i = 3; i < blocksMapOld.size(); ++i) {
+        for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
             block = blocksMapOld.get(i);
 
             // need for calculate WIN Value
             int invalid = block.isValidHead(dcSet);
             if (invalid > 0) {
-                LOGGER.info("Block[" + i + "] invalid: " + invalid);
+                LOGGER.info("Block[" + i + "] is invalid: " + invalid);
                 break;
             }
 
@@ -1057,8 +1081,10 @@ public class Controller extends Observable {
             try {
                 block.process(dcSet, true);
             } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
-                System.exit(-15);
+                if (!isStopping)
+                    LOGGER.error(e.getMessage(), e);
+
+                return;
             }
             count += 1 + (block.getTransactionCount() >> 3);
             if (count > 10000) {
@@ -1068,9 +1094,7 @@ public class Controller extends Observable {
             }
 
             if (isStopping) {
-                LOGGER.info("Closing rechain...");
-                dcSet.close();
-                LOGGER.info("Closing done");
+                LOGGER.info("User BREAK on block " + i);
                 return;
             }
         }
@@ -1147,6 +1171,10 @@ public class Controller extends Observable {
     }
 
     public void stopAndExit(int par) {
+
+        Long dd = null;
+        dd++;
+
         // PREVENT MULTIPLE CALLS
         if (this.isStopping)
             return;
@@ -4093,6 +4121,7 @@ public class Controller extends Observable {
 
             if (arg.toLowerCase().equals("-rechain")) {
                 reBuildChain = true;
+                useGui = false;
                 continue;
             }
 
@@ -4308,6 +4337,9 @@ public class Controller extends Observable {
                 //STARTING NETWORK/BLOCKCHAIN/RPC
 
                 Controller.getInstance().start();
+                if (reBuildChain && !Settings.simpleTestNet) {
+                    return;
+                }
 
                 //unlock wallet
                 if (pass != null && doesWalletKeysExists()) {
