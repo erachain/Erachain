@@ -1172,9 +1172,6 @@ public class Controller extends Observable {
 
     public void stopAndExit(int par) {
 
-        Long dd = null;
-        dd++;
-
         // PREVENT MULTIPLE CALLS
         if (this.isStopping)
             return;
