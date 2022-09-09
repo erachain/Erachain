@@ -687,7 +687,6 @@ public class Controller extends Observable {
             }
         }
 
-
         if (error == 0 && useGui && Settings.getInstance().getbackUpEnabled()) {
 
             if (Settings.getInstance().getbackUpAskToStart()) {
@@ -1008,7 +1007,7 @@ public class Controller extends Observable {
         return this.dlSet;
     }
 
-    private void reBuilChain() {
+    public void reBuilChain() {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
         LOGGER.info("Start rebuilding the chain database");
@@ -1038,7 +1037,7 @@ public class Controller extends Observable {
 
     }
 
-    private void reBuilChainProcess() {
+    public void reBuilChainProcess() {
 
         File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
 
