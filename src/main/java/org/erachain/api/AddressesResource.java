@@ -354,7 +354,8 @@ public class AddressesResource {
     public String makePairByPhrase(String phrase) {
 
         // MAKE SEED
-        byte[] seedBytes = Crypto.getInstance().digest(phrase.getBytes(StandardCharsets.UTF_8));
+        byte[] seedBytes = Crypto.getInstance().digest(
+                Crypto.getInstance().digest(phrase.getBytes(StandardCharsets.UTF_8)));
 
         // CREATE ACCOUNT
         PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
