@@ -2468,18 +2468,8 @@ public class Controller extends Observable {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
 
-    public String importAccountSeed(byte[] accountSeed) {
+    public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed) {
         return this.wallet.importAccountSeed(accountSeed);
-    }
-
-    public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey) {
-        if (privateKey.length > 34) {
-            // 64 bytes - from mobile
-            return this.wallet.importPrivateKey(privateKey);
-        } else {
-            // as account pair SEED - 32 bytes
-            return new Tuple3<>(this.wallet.importAccountSeed(privateKey), null, null);
-        }
     }
 
     public byte[] exportAccountSeed(String address) {

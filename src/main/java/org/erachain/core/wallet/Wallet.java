@@ -984,56 +984,19 @@ public class Wallet extends Observable implements Observer {
 		return true;
 	}
 
-	// IMPORT/EXPORT
-	public String importAccountSeed(byte[] accountSeed) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.isUnlocked()) {
-			return "Wallet is locked";
-		}
-
-		// CHECK LENGTH
-		if (accountSeed.length != Crypto.HASH_LENGTH) {
-			return "Wrong length != 32";
-		}
-
-		// CREATE ACCOUNT
-		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
-
-		// CHECK IF ACCOUNT ALREADY EXISTS
-		if (!this.accountExists(account)) {
-			// ADD TO DATABASE
-			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
-
-			// SAVE TO DISK
-			this.dwSet.hardFlush();
-
-			// SYNCHRONIZE
-			this.synchronizeFull();
-
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
-
-			// RETURN
-			return account.getAddress();
-		}
-
-		return "";
-	}
-
-	public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey64) {
+	public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
 			return new Tuple3<>(null, -1, "Wallet is locked");
 		}
 
 		// CHECK LENGTH
-		if (privateKey64.length != Crypto.SIGNATURE_LENGTH) {
-			return new Tuple3<>(null, -1, "Wrong length != 64");
+		if (accountSeed.length != Crypto.SIGNATURE_LENGTH) {
+			return new Tuple3<>(null, -2, "Wrong length != 64");
 		}
 
 		// CREATE ACCOUNT
-		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
+		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (this.accountExists(account))

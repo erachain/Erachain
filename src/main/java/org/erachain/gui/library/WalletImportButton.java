@@ -82,7 +82,7 @@ public class WalletImportButton extends WalletButton {
         new Thread() {
             @Override
             public void run() {
-                Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privateKeyBytes64);
+                Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(privateKeyBytes64);
                 if (result.a == null) {
                     if (result.b < 0)
                         JOptionPane.showMessageDialog(null, Lang.T(result.c), Lang.T("ERROR"),

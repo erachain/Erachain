@@ -224,10 +224,16 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address).getPrivateKey();
+        PrivateKeyAccount privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address);
+
+        JSONObject json = new JSONObject();
+        json.put("pubKey", Base58.encode(privateKey.getPublicKey()));
+        json.put("privateKey", Base58.encode(privateKey.getPrivateKey()));
+        json.put("seed", Base58.encode(privateKey.getSeed()));
+        json.put("address", privateKey.getAddress());
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 //.header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
+                .entity(json.toJSONString()).build();
 
     }
 
@@ -275,40 +281,7 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewWalletAccount();
         } else {
-            APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
-
-            String seed = x;
-
-            // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletKeysExists()) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-            }
-
-            // CHECK WALLET UNLOCKED
-            if (!Controller.getInstance().isWalletUnlocked()) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_WALLET_LOCKED);
-            }
-
-            // DECODE SEED
-            byte[] seedBytes;
-            try {
-                seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
-            } catch (Exception e) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_INVALID_SEED);
-            }
-
-            // CHECK SEED LENGTH
-            if (seedBytes == null || seedBytes.length != 32) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_INVALID_SEED);
-
-            }
-
-            // CONVERT TO BYTE
-            return Controller.getInstance().importAccountSeed(seedBytes);
+            return importAccount(x, Crypto.HASH_LENGTH);
         }
     }
 
@@ -805,13 +778,11 @@ public class AddressesResource {
         return publicKey.getAddress();
     }
 
-    @GET
-    @Path("/importaccountseed/{accountseed}")
-    public String importAccountSeed(@PathParam("accountseed") String accountSeed) {
+    public String importAccount(String accountSeed, int base_len) {
         // CHECK IF CONTENT IS EMPTY
         String password = null;
 
-        APIUtils.askAPICallAllowed(password, "GET addresses import Account seed", request, true);
+        APIUtils.askAPICallAllowed(password, "GET addresses import Account", request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletKeysExists()) {
@@ -828,60 +799,49 @@ public class AddressesResource {
         // DECODE SEED
         byte[] seedBytes;
         try {
-            seedBytes = Base58.decode(accountSeed, Crypto.HASH_LENGTH);
+            seedBytes = Base58.decode(accountSeed, base_len);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != 32) {
+        if (seedBytes == null || seedBytes.length != base_len) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
-
         }
 
-        // CONVERT TO BYTE
-        return Controller.getInstance().importAccountSeed(seedBytes);
+        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(seedBytes);
+        if (result.a == null)
+            throw ApiErrorFactory.getInstance().createError(result.c);
+
+        return result.a;
     }
 
+    @Deprecated
+    @GET
+    @Path("/importaccountseed/{accountseed}")
+    public String importAccountSeed_old(@PathParam("accountseed") String accountSeed) {
+        return importAccount(accountSeed, Crypto.HASH_LENGTH);
+    }
+
+    @POST
+    @Path("/importaccountseed")
+    public String importAccountSeed(String accountSeed) {
+        return importAccount(accountSeed, Crypto.HASH_LENGTH);
+    }
+
+    @Deprecated
     @GET
     @Path("/importprivatekey/{privatekey}")
-    public String importPrivate(@PathParam("privatekey") String privateKey) {
+    public String importPrivate_old(@PathParam("privatekey") String privateKey) {
+        return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
+    }
 
-        // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletKeysExists()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        // CHECK WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
-
-        // DECODE SEED
-        byte[] privatekeyBytes64;
-        try {
-            privatekeyBytes64 = Base58.decode(privateKey, Crypto.SIGNATURE_LENGTH);
-        } catch (Exception e) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_INVALID_SEED);
-        }
-
-        // CHECK SEED LENGTH
-        if (privatekeyBytes64 == null) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_INVALID_SEED);
-
-        }
-
-        // CONVERT TO BYTE
-        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privatekeyBytes64);
-        if (result.a == null)
-            return result.c;
-        return result.a;
+    @POST
+    @Path("/importprivatekey")
+    public String importPrivate(String privateKey) {
+        return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
     }
 
 }
