@@ -193,8 +193,8 @@ public class AddressesResource {
     }
 
     @GET
-    @Path("/private/{address}")
-    public Response getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+    @Path("/accountseedseed/{address}/full")
+    public Response getAccountSeed(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -228,7 +228,7 @@ public class AddressesResource {
 
         JSONObject json = new JSONObject();
         json.put("pubKey", Base58.encode(privateKey.getPublicKey()));
-        json.put("privateKey", Base58.encode(privateKey.getPrivateKey()));
+        //json.put("privateKey", Base58.encode(privateKey.getPrivateKey()));
         json.put("seed", Base58.encode(privateKey.getSeed()));
         json.put("address", privateKey.getAddress());
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
@@ -259,12 +259,12 @@ public class AddressesResource {
 
     @POST
     @Consumes(MediaType.WILDCARD)
-    public String createNewAddress(String x) {
+    public String createNewAddress(String seed) {
         // CHECK IF CONTENT IS EMPTY
-	String password = null;
-	
-        if (x.isEmpty()) {
-            
+        String password = null;
+
+        if (seed.isEmpty()) {
+
             APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request, true);
 
             // CHECK IF WALLET EXISTS
@@ -281,7 +281,10 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewWalletAccount();
         } else {
-            return importAccount(x, Crypto.HASH_LENGTH);
+            seed = seed.trim();
+            // длинна в символах - не байтах!
+            int baseLen = seed.length() > 64 ? Crypto.SIGNATURE_LENGTH : Crypto.HASH_LENGTH;
+            return importAccount(seed, baseLen);
         }
     }
 
@@ -326,7 +329,7 @@ public class AddressesResource {
         PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
         JSONObject json = new JSONObject();
         json.put("pubKey", Base58.encode(account.getPublicKey()));
-        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        //json.put("privateKey", Base58.encode(account.getPrivateKey()));
         json.put("seed", Base58.encode(account.getSeed()));
         json.put("address", account.getAddress());
         return json.toJSONString();
@@ -350,7 +353,7 @@ public class AddressesResource {
         PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
         JSONObject json = new JSONObject();
         json.put("pubKey", Base58.encode(account.getPublicKey()));
-        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        //json.put("privateKey", Base58.encode(account.getPrivateKey()));
         json.put("seed", Base58.encode(account.getSeed()));
         json.put("address", account.getAddress());
         return json.toJSONString();
@@ -828,36 +831,26 @@ public class AddressesResource {
         return result.a;
     }
 
-    @Deprecated
-    @GET
-    @Path("importaccountseed/{accountseed}")
-    public String importAccountSeed_old(@PathParam("accountseed") String accountSeed) {
-        return importAccount(accountSeed, Crypto.HASH_LENGTH);
-    }
-
+    /**
+     * @param accountSeed 32 bytes account Seed
+     * @return
+     */
     @POST
     @Path("importaccountseed")
     public String importAccountSeed(String accountSeed) {
         return importAccount(accountSeed, Crypto.HASH_LENGTH);
     }
 
-    @Deprecated
-    @GET
-    @Path("importprivatekey/{privatekey}")
-    public String importPrivate_old(@PathParam("privatekey") String privateKey) {
-        return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
-    }
-
     /**
-     * Только для импорта приватного ключа из мобилки - больше не применяется
+     * Только для импорта приватного ключа из мобилки или SDK JS 'secretKey' - но не из НОДЫ приватный ключ - он не создаст туже самую пару
      *
-     * @param privateKey
+     * @param secretKey 64 bytes secretKey from SDK JS
      * @return
      */
     @POST
-    @Path("importprivatekey")
-    public String importPrivate(String privateKey) {
-        return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
+    @Path("importsecretkey")
+    public String importSecretKey(String secretKey) {
+        return importAccount(secretKey, Crypto.SIGNATURE_LENGTH);
     }
 
 }

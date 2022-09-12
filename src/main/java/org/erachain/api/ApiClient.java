@@ -361,8 +361,8 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
                     },
                     {
-                            "GET addresses/private/<address>",
-                            "Returns the 64-byte long base58-encoded account private key of the given address.",
+                            "GET addresses/seed/<address>/full",
+                            "Returns seed in JSON of the given address.",
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
                     },
                     {
@@ -386,18 +386,13 @@ public class ApiClient {
                             "Errors: - wrong seed."
                     },
                     {
-                            "POST addresses <accountSeed>",
-                            "Imports the given 32-byte long base58-encoded account seed. Returns the address when successfully imported.",
+                            "POST addresses/importaccountseed <accountseed>",
+                            "Imports the given 32-byte long base58-encoded 'account seed'. Returns the address when successfully imported.",
                             "Errors: 103 - Invalid seed. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "POST addresses/importaccountseed/<accountseed>",
-                            "Imports the given 32-byte long base58-encoded account seed. Returns the address when successfully imported.",
-                            "Errors: 103 - Invalid seed. 201 - Wallet does not exist. 203 - Wallet is locked."
-                    },
-                    {
-                            "POST addresses/importprivatekey/<privatekey>",
-                            "Imports the given 64-byte long base58-encoded private key (from mobile). Returns the address when successfully imported.",
+                            "POST addresses/importsecretkey <secretkey>",
+                            "Imports the given 64-byte long base58-encoded 'secret key' (from SDK JS). Returns the address when successfully imported.",
                             "Errors: 103 - Invalid key. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
