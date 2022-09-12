@@ -998,8 +998,8 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// CHECK LENGTH
-		if (accountSeed.length > baseLen) {
-			return new Tuple3<>(null, -2, "Wrong length > " + baseLen);
+		if (accountSeed.length != baseLen) {
+			return new Tuple3<>(null, -2, "Wrong length != " + baseLen);
 		}
 
 		// CREATE ACCOUNT
