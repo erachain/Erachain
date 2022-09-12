@@ -312,8 +312,15 @@ public class AddressesResource {
         }
     }
 
+    @Deprecated
     @POST
     @Path("makepairbyseed")
+    public String makePair_Old(String seed) {
+        return makePair(seed);
+    }
+
+    @POST
+    @Path("makepairbyaccountseed")
     public String makePair(String seed) {
 
         // DECODE SEED

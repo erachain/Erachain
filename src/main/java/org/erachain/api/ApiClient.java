@@ -376,8 +376,8 @@ public class ApiClient {
                             "Errors: 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "POST addresses/makepairbyseed",
-                            "Make a account pair by address seed (32 bytes in Base58) and returns private key and public key. Without inserting it into the wallet.",
+                            "POST addresses/makepairbyaccountseed",
+                            "Make a account pair by account seed (32 bytes in Base58) and returns private key and public key. Without inserting it into the wallet.",
                             "Errors: - wrong seed."
                     },
                     {
@@ -386,7 +386,7 @@ public class ApiClient {
                             "Errors: - wrong seed."
                     },
                     {
-                            "POST addresses <addressSeed>",
+                            "POST addresses <accountSeed>",
                             "Imports the given 32-byte long base58-encoded account seed. Returns the address when successfully imported.",
                             "Errors: 103 - Invalid seed. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
