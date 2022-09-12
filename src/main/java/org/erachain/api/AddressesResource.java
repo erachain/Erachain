@@ -193,7 +193,7 @@ public class AddressesResource {
     }
 
     @GET
-    @Path("/accountseedseed/{address}/full")
+    @Path("/seed/{address}/full")
     public Response getAccountSeed(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
