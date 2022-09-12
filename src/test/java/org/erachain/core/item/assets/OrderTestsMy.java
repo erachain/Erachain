@@ -147,7 +147,7 @@ public class OrderTestsMy {
         try {
             chain = new BlockChain(dcSet);
             gb = chain.getGenesisBlock();
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

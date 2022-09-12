@@ -761,13 +761,13 @@ public class GenesisBlock extends Block {
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
     }
 
-    public void process(DCSet dcSet) throws Exception {
+    public void process(DCSet dcSet, boolean notLog) throws Exception {
 
         this.target = BlockChain.BASE_TARGET;
 
         this.blockHead = new BlockHead(this);
 
-        super.process(dcSet);
+        super.process(dcSet, notLog);
 
     }
 

@@ -759,7 +759,7 @@ public class Settings {
         return DEFAULT_RPC_ENABLED;
     }
 
-    public boolean getbacUpEnabled() {
+    public boolean getbackUpEnabled() {
         if (this.settingsJSON.containsKey("backupenabled")) {
             return ((Boolean) this.settingsJSON.get("backupenabled")).booleanValue();
         }
@@ -810,7 +810,7 @@ public class Settings {
     }
 
 
-    public boolean getbacUpAskToStart() {
+    public boolean getbackUpAskToStart() {
         if (this.settingsJSON.containsKey("backupasktostart")) {
             return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();
         }

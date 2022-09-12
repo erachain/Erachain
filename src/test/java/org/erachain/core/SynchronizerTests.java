@@ -99,7 +99,7 @@ public class SynchronizerTests {
 
             //PROCESS NEW BLOCK
             try {
-                newBlock.process(databaseSet);
+                newBlock.process(databaseSet, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -134,7 +134,7 @@ public class SynchronizerTests {
 
             //PROCESS NEW BLOCK
             try {
-                newBlock.process(fork);
+                newBlock.process(fork, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -198,7 +198,7 @@ public class SynchronizerTests {
             //Controller.getInstance().initBlockChain(databaseSet2);
             gb2 = Controller.getInstance().getBlockChain().getGenesisBlock();
 
-            genesisBlock.process(databaseSet1);
+            genesisBlock.process(databaseSet1, false);
             //genesisBlock.process(databaseSet2);
         } catch (Exception e1) {
             // TODO Auto-generated catch block
@@ -226,7 +226,7 @@ public class SynchronizerTests {
 
             //PROCESS NEW BLOCK
             try {
-                newBlock.process(databaseSet1);
+                newBlock.process(databaseSet1, false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

@@ -25,7 +25,7 @@ public class ReferenceSuitMapDBForkTest {
         dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
         GenesisBlock gb = new GenesisBlock();
         try {
-            gb.process(dcSet);
+            gb.process(dcSet, false);
         } catch (Exception e) {
 
         }
