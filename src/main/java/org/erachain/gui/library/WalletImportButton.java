@@ -64,8 +64,11 @@ public class WalletImportButton extends WalletButton {
 
         // DECODE SEED
         byte[] privateKeyBytes64;
+        String seed = field.getText().trim();
+        // длинна в символах - не байтах!
+        int baseLen = seed.length() > 64 ? Crypto.SIGNATURE_LENGTH : Crypto.HASH_LENGTH;
         try {
-            privateKeyBytes64 = Base58.decode(field.getText().trim(), Crypto.SIGNATURE_LENGTH);
+            privateKeyBytes64 = Base58.decode(field.getText().trim(), baseLen);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
                     Lang.T("Wrong Base58 format") + ":" + e.getMessage(), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
@@ -82,7 +85,7 @@ public class WalletImportButton extends WalletButton {
         new Thread() {
             @Override
             public void run() {
-                Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(privateKeyBytes64);
+                Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(privateKeyBytes64, baseLen);
                 if (result.a == null) {
                     if (result.b < 0)
                         JOptionPane.showMessageDialog(null, Lang.T(result.c), Lang.T("ERROR"),

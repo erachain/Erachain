@@ -306,7 +306,7 @@ public class AddressesResource {
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != 32) {
+        if (seedBytes == null || seedBytes.length != Crypto.HASH_LENGTH) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
 
@@ -778,7 +778,7 @@ public class AddressesResource {
         return publicKey.getAddress();
     }
 
-    public String importAccount(String accountSeed, int base_len) {
+    public String importAccount(String accountSeed, int baseLen) {
         // CHECK IF CONTENT IS EMPTY
         String password = null;
 
@@ -799,19 +799,19 @@ public class AddressesResource {
         // DECODE SEED
         byte[] seedBytes;
         try {
-            seedBytes = Base58.decode(accountSeed, base_len);
+            seedBytes = Base58.decode(accountSeed, baseLen);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != base_len) {
+        if (seedBytes == null || seedBytes.length != baseLen) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
-        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(seedBytes);
+        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(seedBytes, baseLen);
         if (result.a == null)
             throw ApiErrorFactory.getInstance().createError(result.c);
 
@@ -820,26 +820,32 @@ public class AddressesResource {
 
     @Deprecated
     @GET
-    @Path("/importaccountseed/{accountseed}")
+    @Path("importaccountseed/{accountseed}")
     public String importAccountSeed_old(@PathParam("accountseed") String accountSeed) {
         return importAccount(accountSeed, Crypto.HASH_LENGTH);
     }
 
     @POST
-    @Path("/importaccountseed")
+    @Path("importaccountseed")
     public String importAccountSeed(String accountSeed) {
         return importAccount(accountSeed, Crypto.HASH_LENGTH);
     }
 
     @Deprecated
     @GET
-    @Path("/importprivatekey/{privatekey}")
+    @Path("importprivatekey/{privatekey}")
     public String importPrivate_old(@PathParam("privatekey") String privateKey) {
         return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
     }
 
+    /**
+     * Только для импорта приватного ключа из мобилки - больше не применяется
+     *
+     * @param privateKey
+     * @return
+     */
     @POST
-    @Path("/importprivatekey")
+    @Path("importprivatekey")
     public String importPrivate(String privateKey) {
         return importAccount(privateKey, Crypto.SIGNATURE_LENGTH);
     }

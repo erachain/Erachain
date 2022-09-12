@@ -984,15 +984,22 @@ public class Wallet extends Observable implements Observer {
 		return true;
 	}
 
-	public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed) {
+	/**
+	 * baseLen - обязательно нужно - иначе будет битый счет если длинну точно не указать
+	 *
+	 * @param accountSeed
+	 * @param baseLen
+	 * @return
+	 */
+	public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
 			return new Tuple3<>(null, -1, "Wallet is locked");
 		}
 
 		// CHECK LENGTH
-		if (accountSeed.length != Crypto.SIGNATURE_LENGTH) {
-			return new Tuple3<>(null, -2, "Wrong length != 64");
+		if (accountSeed.length > baseLen) {
+			return new Tuple3<>(null, -2, "Wrong length > " + baseLen);
 		}
 
 		// CREATE ACCOUNT

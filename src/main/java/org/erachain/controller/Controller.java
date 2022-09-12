@@ -2468,8 +2468,8 @@ public class Controller extends Observable {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
 
-    public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed) {
-        return this.wallet.importAccountSeed(accountSeed);
+    public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
+        return this.wallet.importAccountSeed(accountSeed, baseLen);
     }
 
     public byte[] exportAccountSeed(String address) {
