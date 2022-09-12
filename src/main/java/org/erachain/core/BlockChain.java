@@ -812,7 +812,7 @@ public class BlockChain {
             }
 
             //PROCESS
-            genesisBlock.process(dcSet);
+            genesisBlock.process(dcSet, false);
 
         } else {
 

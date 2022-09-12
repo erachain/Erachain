@@ -268,7 +268,7 @@ public class Synchronizer extends Thread {
                 }
                 LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
 
-                block.process(fork);
+                block.process(fork, false);
             } else {
                 LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
 
@@ -306,7 +306,7 @@ public class Synchronizer extends Thread {
                         LOGGER.info("BEFORE ALL_VALID - Block.Head ERROR: " + invalid);
                     }
                     // и полностью просчитать блок
-                    block.process(fork);
+                    block.process(fork, false);
                 }
             }
 
@@ -1106,7 +1106,7 @@ public class Synchronizer extends Thread {
                     if (block.hasValidatedForkDB()) {
                         block.saveToChainFromvalidatedForkDB();
                     } else {
-                        block.process(dcSet);
+                        block.process(dcSet, false);
                     }
 
                     dcSet.getBlockMap().setProcessing(false);

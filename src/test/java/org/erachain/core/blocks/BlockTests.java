@@ -180,7 +180,7 @@ public class BlockTests {
 
         //PROCESS
         try {
-            gb.process(db);
+            gb.process(db, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -258,7 +258,7 @@ public class BlockTests {
 
         //PROCESS BLOCK
         try {
-            genesisBlock.process(db);
+            genesisBlock.process(db, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -314,7 +314,7 @@ public class BlockTests {
 
         init();
         try {
-            gb.process(db);
+            gb.process(db, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -505,7 +505,7 @@ public class BlockTests {
     public void parseBlock() {
         init();
         try {
-            gb.process(db);
+            gb.process(db, false);
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -666,7 +666,7 @@ public class BlockTests {
 
         //PROCESS BLOCK
         try {
-            block.process(db);
+            block.process(db, false);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

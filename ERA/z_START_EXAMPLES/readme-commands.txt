@@ -5,7 +5,8 @@ No use Network
 
 -testnet[=GENESIS_TIMESTAMP]
 -testnet=[XXXX] - Start in TestNET mode and set Genesis Block Timestamp (in millis).
--testnet - set genesis Timestamp = current Date and -nonet is ON and use 9065 port
+-testnet - set genesis Timestamp to current Date and -nonet is ON and use 9065 port and clear chain database (SIMPLE_TEST mode). For quick tests.
+   !! Current database wil be erased! Please set 'datachainpath=dataTEST' parameter for save current database.
 -testnet=demo - set genesis Timestamp = DEMO chain on 9066 port
 -testnet=0 - set current NTP genesis Timestamp on port 9065
 For start generation of blocks need more than 5 accounts on all nodes or in Your wallet is used '-testnet'.
@@ -33,6 +34,10 @@ See RPC and API fpool commands for control and statistic.
 Send in DEBT some forging stake to pool address (setted in settings_pool.json) for start forging. You may confiscate that DEBT (backward) later.
 
 -backup
+
+-rechain
+Rebuild the chain database. The rebuild is autorun if a new version of the database structure is used in the node.
+Ignored in SIMPLE_TEST mode.
 
 -nogui
 Start without GUI
