@@ -292,21 +292,31 @@ public class AddressesResource {
         return makePair(seed);
     }
 
+    /**
+     * USE 32 bytes SEDD or 64 bytes secretKey (privateKey)
+     *
+     * @param seed
+     * @return
+     */
     @POST
     @Path("makepairbyaccountseed")
     public String makePair(String seed) {
 
+        seed = seed.trim();
+        // длинна в символах - не байтах!
+        int baseLen = seed.length() > 64 ? Crypto.SIGNATURE_LENGTH : Crypto.HASH_LENGTH;
+
         // DECODE SEED
         byte[] seedBytes;
         try {
-            seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
+            seedBytes = Base58.decode(seed, baseLen);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != Crypto.HASH_LENGTH) {
+        if (seedBytes == null || seedBytes.length != baseLen) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
 
