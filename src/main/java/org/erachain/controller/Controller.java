@@ -1193,6 +1193,12 @@ public class Controller extends Observable {
             return;
         this.isStopping = true;
 
+        if (reBuildChain) {
+            // там выход сам прозойдет
+            return;
+        }
+
+
         if (transactionsPool == null) {
             // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
             LOGGER.info("Core craching... Please clear databases and restart");
