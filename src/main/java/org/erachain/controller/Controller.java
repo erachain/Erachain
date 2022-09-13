@@ -728,14 +728,6 @@ public class Controller extends Observable {
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
         if (reBuildChain && !Settings.simpleTestNet) {
-            // CLOSE ON CTRL-C and UNEXPECTED SHUTDOWN
-            Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
-                @Override
-                public void run() {
-                    //stopAndExit(0);
-                    isStopping = true;
-                }
-            });
 
             // START API SERVICE
             if (Settings.getInstance().isRpcEnabled()) {
@@ -758,6 +750,13 @@ public class Controller extends Observable {
                 reBuilChainProcess();
             });
             reBuildChainThread.start();
+
+            Runtime.getRuntime()
+                    .addShutdownHook(
+                            new Thread(
+                                    () -> {
+                                        reBuilChainHalt();
+                                    }));
 
             return;
 
@@ -1120,10 +1119,23 @@ public class Controller extends Observable {
         dlSet.close();
 
         LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
-        System.exit(0);
 
     }
 
+    private void reBuilChainHalt() {
+        LOGGER.info("addShutdownHook isStopping: " + isStopping);
+
+        isStopping = true;
+
+        try {
+            reBuildChainThread.join();
+        } catch (InterruptedException e) {
+        }
+
+        //graceful shutdown steps
+        Runtime.getRuntime().halt(0); //override the exit code (130 as Ctrl-C) to 0
+
+    }
 
     private void createDataCheckpoint() {
         if (!this.dcSet.getBlockMap().isProcessing()) {
@@ -1202,6 +1214,7 @@ public class Controller extends Observable {
         this.isStopping = true;
 
         if (reBuildChain) {
+            reBuilChainHalt();
             return;
         }
 
