@@ -732,14 +732,8 @@ public class Controller extends Observable {
             Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
                 @Override
                 public void run() {
+                    //stopAndExit(0);
                     isStopping = true;
-                    setChanged();
-                    notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-                    LOGGER.info("Closing database");
-                    dcSet.close();
-                    dlSet.close();
-
-                    LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
                 }
             });
 
@@ -1097,11 +1091,15 @@ public class Controller extends Observable {
             try {
                 block.process(dcSet, true);
             } catch (Throwable e) {
-                if (!isStopping)
+                if (isStopping) {
+                    LOGGER.info("User BREAK on block " + i);
+                } else {
                     LOGGER.error(e.getMessage(), e);
+                }
 
-                return;
+                break;
             }
+
             count += 1 + (block.getTransactionCount() >> 3);
             if (count > 10000) {
                 count = 0;
@@ -1111,9 +1109,19 @@ public class Controller extends Observable {
 
             if (isStopping) {
                 LOGGER.info("User BREAK on block " + i);
-                return;
+                break;
             }
         }
+
+        setChanged();
+        notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+        LOGGER.info("Closing database");
+        dcSet.close();
+        dlSet.close();
+
+        LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
+        System.exit(0);
+
     }
 
 
@@ -1194,10 +1202,8 @@ public class Controller extends Observable {
         this.isStopping = true;
 
         if (reBuildChain) {
-            // там выход сам прозойдет
             return;
         }
-
 
         if (transactionsPool == null) {
             // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
