@@ -193,8 +193,8 @@ public class AddressesResource {
     }
 
     @GET
-    @Path("/private/{address}")
-    public Response getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+    @Path("/seed/{address}/full")
+    public Response getAccountSeed(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -224,10 +224,16 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address).getPrivateKey();
+        PrivateKeyAccount privateKey = Controller.getInstance().getWalletPrivateKeyAccountByAddress(address);
+
+        JSONObject json = new JSONObject();
+        json.put("pubKey", Base58.encode(privateKey.getPublicKey()));
+        //json.put("privateKey", Base58.encode(privateKey.getPrivateKey()));
+        json.put("seed", Base58.encode(privateKey.getSeed()));
+        json.put("address", privateKey.getAddress());
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 //.header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
+                .entity(json.toJSONString()).build();
 
     }
 
@@ -253,12 +259,12 @@ public class AddressesResource {
 
     @POST
     @Consumes(MediaType.WILDCARD)
-    public String createNewAddress(String x) {
+    public String createNewAddress(String seed) {
         // CHECK IF CONTENT IS EMPTY
-	String password = null;
-	
-        if (x.isEmpty()) {
-            
+        String password = null;
+
+        if (seed.isEmpty()) {
+
             APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request, true);
 
             // CHECK IF WALLET EXISTS
@@ -275,58 +281,45 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewWalletAccount();
         } else {
-            APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
-
-            String seed = x;
-
-            // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletKeysExists()) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-            }
-
-            // CHECK WALLET UNLOCKED
-            if (!Controller.getInstance().isWalletUnlocked()) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_WALLET_LOCKED);
-            }
-
-            // DECODE SEED
-            byte[] seedBytes;
-            try {
-                seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
-            } catch (Exception e) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_INVALID_SEED);
-            }
-
-            // CHECK SEED LENGTH
-            if (seedBytes == null || seedBytes.length != 32) {
-                throw ApiErrorFactory.getInstance().createError(
-                        ApiErrorFactory.ERROR_INVALID_SEED);
-
-            }
-
-            // CONVERT TO BYTE
-            return Controller.getInstance().importAccountSeed(seedBytes);
+            seed = seed.trim();
+            // длинна в символах - не байтах!
+            int baseLen = seed.length() > 64 ? Crypto.SIGNATURE_LENGTH : Crypto.HASH_LENGTH;
+            return importAccount(seed, baseLen);
         }
     }
 
+    @Deprecated
     @POST
     @Path("makepairbyseed")
+    public String makePair_Old(String seed) {
+        return makePair(seed);
+    }
+
+    /**
+     * USE 32 bytes SEDD or 64 bytes secretKey (privateKey)
+     *
+     * @param seed
+     * @return
+     */
+    @POST
+    @Path("makepairbyaccountseed")
     public String makePair(String seed) {
+
+        seed = seed.trim();
+        // длинна в символах - не байтах!
+        int baseLen = seed.length() > 64 ? Crypto.SIGNATURE_LENGTH : Crypto.HASH_LENGTH;
 
         // DECODE SEED
         byte[] seedBytes;
         try {
-            seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
+            seedBytes = Base58.decode(seed, baseLen);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != 32) {
+        if (seedBytes == null || seedBytes.length != baseLen) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
 
@@ -336,7 +329,7 @@ public class AddressesResource {
         PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
         JSONObject json = new JSONObject();
         json.put("pubKey", Base58.encode(account.getPublicKey()));
-        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        //json.put("privateKey", Base58.encode(account.getPrivateKey()));
         json.put("seed", Base58.encode(account.getSeed()));
         json.put("address", account.getAddress());
         return json.toJSONString();
@@ -360,7 +353,7 @@ public class AddressesResource {
         PrivateKeyAccount account = new PrivateKeyAccount(seedBytes);
         JSONObject json = new JSONObject();
         json.put("pubKey", Base58.encode(account.getPublicKey()));
-        json.put("privateKey", Base58.encode(account.getPrivateKey()));
+        //json.put("privateKey", Base58.encode(account.getPrivateKey()));
         json.put("seed", Base58.encode(account.getSeed()));
         json.put("address", account.getAddress());
         return json.toJSONString();
@@ -798,13 +791,11 @@ public class AddressesResource {
         return publicKey.getAddress();
     }
 
-    @GET
-    @Path("/importaccountseed/{accountseed}")
-    public String importAccountSeed(@PathParam("accountseed") String accountSeed) {
+    public String importAccount(String accountSeed, int baseLen) {
         // CHECK IF CONTENT IS EMPTY
         String password = null;
 
-        APIUtils.askAPICallAllowed(password, "GET addresses import Account seed", request, true);
+        APIUtils.askAPICallAllowed(password, "GET addresses import Account", request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletKeysExists()) {
@@ -821,60 +812,45 @@ public class AddressesResource {
         // DECODE SEED
         byte[] seedBytes;
         try {
-            seedBytes = Base58.decode(accountSeed, Crypto.HASH_LENGTH);
+            seedBytes = Base58.decode(accountSeed, baseLen);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
         }
 
         // CHECK SEED LENGTH
-        if (seedBytes == null || seedBytes.length != 32) {
+        if (seedBytes == null || seedBytes.length != baseLen) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_INVALID_SEED);
-
         }
 
-        // CONVERT TO BYTE
-        return Controller.getInstance().importAccountSeed(seedBytes);
+        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importAccountSeed(seedBytes, baseLen);
+        if (result.a == null)
+            throw ApiErrorFactory.getInstance().createError(result.c);
+
+        return result.a;
     }
 
-    @GET
-    @Path("/importprivatekey/{privatekey}")
-    public String importPrivate(@PathParam("privatekey") String privateKey) {
+    /**
+     * @param accountSeed 32 bytes account Seed
+     * @return
+     */
+    @POST
+    @Path("importaccountseed")
+    public String importAccountSeed(String accountSeed) {
+        return importAccount(accountSeed, Crypto.HASH_LENGTH);
+    }
 
-        // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletKeysExists()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-
-        // CHECK WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
-
-        // DECODE SEED
-        byte[] privatekeyBytes64;
-        try {
-            privatekeyBytes64 = Base58.decode(privateKey, Crypto.SIGNATURE_LENGTH);
-        } catch (Exception e) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_INVALID_SEED);
-        }
-
-        // CHECK SEED LENGTH
-        if (privatekeyBytes64 == null) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_INVALID_SEED);
-
-        }
-
-        // CONVERT TO BYTE
-        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privatekeyBytes64);
-        if (result.a == null)
-            return result.c;
-        return result.a;
+    /**
+     * Только для импорта приватного ключа из мобилки или SDK JS 'secretKey' - но не из НОДЫ приватный ключ - он не создаст туже самую пару
+     *
+     * @param secretKey 64 bytes secretKey from SDK JS
+     * @return
+     */
+    @POST
+    @Path("importsecretkey")
+    public String importSecretKey(String secretKey) {
+        return importAccount(secretKey, Crypto.SIGNATURE_LENGTH);
     }
 
 }

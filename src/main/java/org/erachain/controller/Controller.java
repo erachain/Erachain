@@ -728,25 +728,35 @@ public class Controller extends Observable {
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
         if (reBuildChain && !Settings.simpleTestNet) {
-            // CLOSE ON CTRL-C and UNEXPECTED SHUTDOWN
-            Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {
-                @Override
-                public void run() {
-                    isStopping = true;
-                    setChanged();
-                    notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-                    LOGGER.info("Closing database");
-                    dcSet.close();
-                    dlSet.close();
 
-                    LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
-                }
-            });
+            // START API SERVICE
+            if (Settings.getInstance().isRpcEnabled()) {
+                this.setChanged();
+                this.rpcService = new ApiService();
+                this.rpcServiceRestart();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start RPC Service on port") + " " + Settings.getInstance().getRpcPort()));
+                LOGGER.info("Start RPC Service on port " + Settings.getInstance().getRpcPort());
+            }
+            // START WEB SERVICE
+            if (Settings.getInstance().isWebEnabled()) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start WEB & API Service on port") + " " + Settings.getInstance().getWebPort()));
+                LOGGER.info("Start WEB & API Service on port " + Settings.getInstance().getWebPort());
+                this.webService = WebService.getInstance();
+                this.webService.start();
+            }
 
             reBuildChainThread = new Thread(() -> {
                 reBuilChainProcess();
             });
             reBuildChainThread.start();
+
+            Runtime.getRuntime()
+                    .addShutdownHook(
+                            new Thread(
+                                    () -> {
+                                        reBuilChainHalt();
+                                    }));
 
             return;
 
@@ -1080,11 +1090,15 @@ public class Controller extends Observable {
             try {
                 block.process(dcSet, true);
             } catch (Throwable e) {
-                if (!isStopping)
+                if (isStopping) {
+                    LOGGER.info("User BREAK on block " + i);
+                } else {
                     LOGGER.error(e.getMessage(), e);
+                }
 
-                return;
+                break;
             }
+
             count += 1 + (block.getTransactionCount() >> 3);
             if (count > 10000) {
                 count = 0;
@@ -1094,11 +1108,33 @@ public class Controller extends Observable {
 
             if (isStopping) {
                 LOGGER.info("User BREAK on block " + i);
-                return;
+                break;
             }
         }
+
+        setChanged();
+        notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+        LOGGER.info("Closing database");
+        dcSet.close();
+        dlSet.close();
+
+        LOGGER.info("Rebuilding is ended. Please restart the node without '-rechain' parameter!");
+
     }
 
+    private void reBuilChainHalt() {
+
+        isStopping = true;
+
+        try {
+            reBuildChainThread.join();
+        } catch (InterruptedException e) {
+        }
+
+        //graceful shutdown steps
+        Runtime.getRuntime().halt(0); //override the exit code (130 as Ctrl-C) to 0
+
+    }
 
     private void createDataCheckpoint() {
         if (!this.dcSet.getBlockMap().isProcessing()) {
@@ -1175,6 +1211,11 @@ public class Controller extends Observable {
         if (this.isStopping)
             return;
         this.isStopping = true;
+
+        if (reBuildChain) {
+            reBuilChainHalt();
+            return;
+        }
 
         if (transactionsPool == null) {
             // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
@@ -2468,18 +2509,8 @@ public class Controller extends Observable {
         return this.wallet.getUnconfirmedBalance(account, key);
     }
 
-    public String importAccountSeed(byte[] accountSeed) {
-        return this.wallet.importAccountSeed(accountSeed);
-    }
-
-    public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey) {
-        if (privateKey.length > 34) {
-            // 64 bytes - from mobile
-            return this.wallet.importPrivateKey(privateKey);
-        } else {
-            // as account pair SEED - 32 bytes
-            return new Tuple3<>(this.wallet.importAccountSeed(privateKey), null, null);
-        }
+    public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
+        return this.wallet.importAccountSeed(accountSeed, baseLen);
     }
 
     public byte[] exportAccountSeed(String address) {

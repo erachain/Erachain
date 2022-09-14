@@ -16,15 +16,16 @@ public class ApiErrorFactory {
     //COMMON
 
     //VALIDATION
-    //public static final int ERROR_INVALID_SIGNATURE = ERROR + 101;
-    //public static final int ERROR_INVALID_ADDRESS = 102;
-    public static final int ERROR_INVALID_SEED = 10103;
-    public static final int ERROR_INVALID_AMOUNT = Transaction.INVALID_AMOUNT;
     private static final int ERROR = Transaction.AT_ERROR + 10000;
-    //public static final int Екфтыфсешщт = 2;
-    //public static final int ERROR_NOT_YET_RELEASED = ERROR + 3;
     public static final int ERROR_UNKNOWN = ERROR;
     public static final int ERROR_JSON = ERROR + 1;
+
+    //public static final int ERROR_INVALID_SIGNATURE = ERROR + 101;
+    //public static final int ERROR_INVALID_ADDRESS = 102;
+    public static final int ERROR_INVALID_SEED = ERROR + 1033;
+    public static final int ERROR_INVALID_AMOUNT = Transaction.INVALID_AMOUNT;
+    //public static final int Екфтыфсешщт = 2;
+    //public static final int ERROR_NOT_YET_RELEASED = ERROR + 3;
     //public static final int ERROR_INVALID_FEE_POW = ERROR + 105;
     //public static final int ERROR_INVALID_SENDER = 106;
     //public static final int ERROR_INVALID_RECIPIENT = 107;

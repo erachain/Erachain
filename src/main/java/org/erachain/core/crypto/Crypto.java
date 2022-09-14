@@ -65,18 +65,7 @@ public class Crypto {
     }
 
     public Pair<byte[], byte[]> createKeyPair(byte[] seed) {
-        if (seed.length == HASH_LENGTH) {
-            try {
-                //GENERATE PUBLIC KEY
-                return Ed25519.createKeyPair(seed);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                return null;
-            }
-        } else {
-            return Ed25519.createKeyPair(seed);
-
-        }
+        return Ed25519.createKeyPair(seed);
     }
 
     public byte[] getAddressFromShort(byte type, byte[] addressShort) {
