@@ -1118,12 +1118,11 @@ public class Controller extends Observable {
         dcSet.close();
         dlSet.close();
 
-        LOGGER.info("Rebuilding is ended. Please restart without '-rechain' parameter!");
+        LOGGER.info("Rebuilding is ended. Please restart the node without '-rechain' parameter!");
 
     }
 
     private void reBuilChainHalt() {
-        LOGGER.info("addShutdownHook isStopping: " + isStopping);
 
         isStopping = true;
 
