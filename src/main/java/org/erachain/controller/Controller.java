@@ -1065,60 +1065,87 @@ public class Controller extends Observable {
             LOGGER.info("Restart rebuild chain from block " + startHeight);
         }
 
-        Block block = blocksMapOld.get(startHeight);
-        if (block.isValid(this.dcSet, true) > 0) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
-            LOGGER.info("Wrong GENESIS block");
-            System.exit(-14);
-        }
-
-        int count = 0;
-        for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
-            block = blocksMapOld.get(i);
-
-            // need for calculate WIN Value
-            int invalid = block.isValidHead(dcSet);
-            if (invalid > 0) {
-                LOGGER.info("Block[" + i + "] is invalid: " + invalid);
-                break;
-            }
-
-            if (false && block.isValid(this.dcSet, true) > 0) {
-                break;
-            }
-            try {
-                block.process(dcSet, true);
-            } catch (Throwable e) {
-                if (isStopping) {
-                    LOGGER.info("User BREAK on block " + i);
-                } else {
-                    LOGGER.error(e.getMessage(), e);
+        try {
+            Block block = blocksMapOld.get(startHeight);
+            if (block == null) {
+                LOGGER.info("Rechain alreafy is done on height:" + startHeight + ".");
+            } else {
+                if (block.isValid(this.dcSet, true) > 0) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
+                    LOGGER.info("Wrong GENESIS block");
+                    System.exit(-14);
                 }
 
-                break;
+                int count = 0;
+                for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
+                    block = blocksMapOld.get(i);
+
+                    // need for calculate WIN Value
+                    int invalid = block.isValidHead(dcSet);
+                    if (invalid > 0) {
+                        LOGGER.info("Block[" + i + "] is invalid: " + invalid);
+                        break;
+                    }
+
+                    if (false && block.isValid(this.dcSet, true) > 0) {
+                        break;
+                    }
+                    try {
+                        block.process(dcSet, true);
+                    } catch (Throwable e) {
+                        if (isStopping) {
+                            LOGGER.info("User BREAK on block " + i);
+                        } else {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+
+                        break;
+                    }
+
+                    count += 1 + (block.getTransactionCount() >> 3);
+                    if (count > 10000) {
+                        count = 0;
+                        dcSet.flush(0, true, false);
+                        LOGGER.info("Rebuilds block " + i);
+                    }
+
+                    if (isStopping) {
+                        LOGGER.info("User BREAK on block " + i);
+                        break;
+                    }
+                }
             }
 
-            count += 1 + (block.getTransactionCount() >> 3);
-            if (count > 10000) {
-                count = 0;
-                dcSet.flush(0, true, false);
-                LOGGER.info("Rebuilds block " + i);
+        } finally {
+            if (this.webService != null) {
+                LOGGER.info("Stopping WEB server");
+                this.webService.stop();
             }
 
-            if (isStopping) {
-                LOGGER.info("User BREAK on block " + i);
-                break;
+            if (this.rpcService != null) {
+                LOGGER.info("Stopping RPC server");
+                this.rpcService.stop();
             }
+
+            int sizeOld = blocksMapOld.size();
+            int size = blocksMap.size();
+
+            setChanged();
+            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+            LOGGER.info("Closing database");
+            dcSet.close();
+            dlSet.close();
+
+            LOGGER.info("Rebuilding is ended on height:" + size);
+            if (sizeOld > size) {
+                LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
+            } else {
+                LOGGER.info("Rechain  is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
+            }
+
         }
 
-        setChanged();
-        notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-        LOGGER.info("Closing database");
-        dcSet.close();
-        dlSet.close();
-
-        LOGGER.info("Rebuilding is ended. Please restart the node without '-rechain' parameter!");
 
     }
 
