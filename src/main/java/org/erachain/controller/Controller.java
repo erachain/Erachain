@@ -1362,6 +1362,9 @@ public class Controller extends Observable {
     // NETWORK
 
     public List<Peer> getActivePeers() {
+        if (network == null)
+            return new ArrayList<>();
+
         // GET ACTIVE PEERS
         return this.network.getActivePeers(false);
     }
@@ -1373,6 +1376,9 @@ public class Controller extends Observable {
     }
 
     public int getActivePeersCounter() {
+        if (network == null)
+            return 0;
+
         // GET ACTIVE PEERS
         return this.network.getActivePeersCounter(false, false);
     }
@@ -2658,31 +2664,52 @@ public class Controller extends Observable {
     }
 
     public List<String> deleteTelegram(List<String> telegramSignatures) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.deleteTelegram(telegramSignatures);
     }
 
     public long deleteTelegramsToTimestamp(long timestamp, String recipient, String title) {
+        if (network == null)
+            return 0L;
+
         return this.network.deleteTelegramsToTimestamp(timestamp, recipient, title);
     }
 
     public long deleteTelegramsForRecipient(String recipient, long timestamp, String title) {
+        if (network == null)
+            return 0L;
+
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
     public List<TelegramMessage> getTelegramsForRecipient(Account account, long timestamp, String filter, int limit) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.getTelegramsForRecipient(account.getAddress(), timestamp, filter, limit);
     }
 
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes, limit);
     }
 
     public TelegramMessage getTelegram(byte[] signature) {
+        if (network == null)
+            return null;
+
         return this.network.getTelegram(signature);
     }
 
 
     public Integer TelegramInfo() {
+        if (network == null)
+            return 0;
+
         return this.network.TelegramInfo();
     }
 
@@ -2693,6 +2720,9 @@ public class Controller extends Observable {
      * @return
      */
     public TelegramMessage getTelegram(String signature) {
+        if (network == null)
+            return null;
+
         return this.network.getTelegram(signature);
     }
 
