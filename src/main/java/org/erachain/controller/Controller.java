@@ -101,8 +101,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.1.01";
-    public static String buildTime = "2022-09-06 12:00:00 UTC";
+    public static String version = "6.2.01";
+    public static String buildTime = "2022-11-26 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1065,60 +1065,87 @@ public class Controller extends Observable {
             LOGGER.info("Restart rebuild chain from block " + startHeight);
         }
 
-        Block block = blocksMapOld.get(startHeight);
-        if (block.isValid(this.dcSet, true) > 0) {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
-            LOGGER.info("Wrong GENESIS block");
-            System.exit(-14);
-        }
-
-        int count = 0;
-        for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
-            block = blocksMapOld.get(i);
-
-            // need for calculate WIN Value
-            int invalid = block.isValidHead(dcSet);
-            if (invalid > 0) {
-                LOGGER.info("Block[" + i + "] is invalid: " + invalid);
-                break;
-            }
-
-            if (false && block.isValid(this.dcSet, true) > 0) {
-                break;
-            }
-            try {
-                block.process(dcSet, true);
-            } catch (Throwable e) {
-                if (isStopping) {
-                    LOGGER.info("User BREAK on block " + i);
-                } else {
-                    LOGGER.error(e.getMessage(), e);
+        try {
+            Block block = blocksMapOld.get(startHeight);
+            if (block == null) {
+                LOGGER.info("Rechain alreafy is done on height:" + startHeight + ".");
+            } else {
+                if (block.isValid(this.dcSet, true) > 0) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
+                    LOGGER.info("Wrong GENESIS block");
+                    System.exit(-14);
                 }
 
-                break;
+                int count = 0;
+                for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
+                    block = blocksMapOld.get(i);
+
+                    // need for calculate WIN Value
+                    int invalid = block.isValidHead(dcSet);
+                    if (invalid > 0) {
+                        LOGGER.info("Block[" + i + "] is invalid: " + invalid);
+                        break;
+                    }
+
+                    if (false && block.isValid(this.dcSet, true) > 0) {
+                        break;
+                    }
+                    try {
+                        block.process(dcSet, true);
+                    } catch (Throwable e) {
+                        if (isStopping) {
+                            LOGGER.info("User BREAK on block " + i);
+                        } else {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+
+                        break;
+                    }
+
+                    count += 1 + (block.getTransactionCount() >> 3);
+                    if (count > 10000) {
+                        count = 0;
+                        dcSet.flush(0, true, false);
+                        LOGGER.info("Rebuilds block " + i);
+                    }
+
+                    if (isStopping) {
+                        LOGGER.info("User BREAK on block " + i);
+                        break;
+                    }
+                }
             }
 
-            count += 1 + (block.getTransactionCount() >> 3);
-            if (count > 10000) {
-                count = 0;
-                dcSet.flush(0, true, false);
-                LOGGER.info("Rebuilds block " + i);
+        } finally {
+            if (this.webService != null) {
+                LOGGER.info("Stopping WEB server");
+                this.webService.stop();
             }
 
-            if (isStopping) {
-                LOGGER.info("User BREAK on block " + i);
-                break;
+            if (this.rpcService != null) {
+                LOGGER.info("Stopping RPC server");
+                this.rpcService.stop();
             }
+
+            int sizeOld = blocksMapOld.size();
+            int size = blocksMap.size();
+
+            setChanged();
+            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+            LOGGER.info("Closing database");
+            dcSet.close();
+            dlSet.close();
+
+            LOGGER.info("Rebuilding is ended on height:" + size);
+            if (sizeOld > size) {
+                LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
+            } else {
+                LOGGER.info("Rechain  is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
+            }
+
         }
 
-        setChanged();
-        notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-        LOGGER.info("Closing database");
-        dcSet.close();
-        dlSet.close();
-
-        LOGGER.info("Rebuilding is ended. Please restart the node without '-rechain' parameter!");
 
     }
 
@@ -1362,6 +1389,9 @@ public class Controller extends Observable {
     // NETWORK
 
     public List<Peer> getActivePeers() {
+        if (network == null)
+            return new ArrayList<>();
+
         // GET ACTIVE PEERS
         return this.network.getActivePeers(false);
     }
@@ -1373,6 +1403,9 @@ public class Controller extends Observable {
     }
 
     public int getActivePeersCounter() {
+        if (network == null)
+            return 0;
+
         // GET ACTIVE PEERS
         return this.network.getActivePeersCounter(false, false);
     }
@@ -2658,31 +2691,52 @@ public class Controller extends Observable {
     }
 
     public List<String> deleteTelegram(List<String> telegramSignatures) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.deleteTelegram(telegramSignatures);
     }
 
     public long deleteTelegramsToTimestamp(long timestamp, String recipient, String title) {
+        if (network == null)
+            return 0L;
+
         return this.network.deleteTelegramsToTimestamp(timestamp, recipient, title);
     }
 
     public long deleteTelegramsForRecipient(String recipient, long timestamp, String title) {
+        if (network == null)
+            return 0L;
+
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
     public List<TelegramMessage> getTelegramsForRecipient(Account account, long timestamp, String filter, int limit) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.getTelegramsForRecipient(account.getAddress(), timestamp, filter, limit);
     }
 
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
+        if (network == null)
+            return new ArrayList<>();
+
         return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes, limit);
     }
 
     public TelegramMessage getTelegram(byte[] signature) {
+        if (network == null)
+            return null;
+
         return this.network.getTelegram(signature);
     }
 
 
     public Integer TelegramInfo() {
+        if (network == null)
+            return 0;
+
         return this.network.TelegramInfo();
     }
 
@@ -2693,6 +2747,9 @@ public class Controller extends Observable {
      * @return
      */
     public TelegramMessage getTelegram(String signature) {
+        if (network == null)
+            return null;
+
         return this.network.getTelegram(signature);
     }
 

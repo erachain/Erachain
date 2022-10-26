@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -122,7 +123,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return VALIDATE_OK;
         }
 
-        if (BlockChain.CLONE_MODE) {
+        if (BlockChain.CLONE_MODE && Settings.CLONE_OR_SIDE.equals("Clone")) {
             if (creator.getBalanceUSE(RIGHTS_KEY, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
                 errorValue = "USE balance < " + BlockChain.MIN_GENERATING_BALANCE_BD;
                 return Transaction.ACTION_DENIED;

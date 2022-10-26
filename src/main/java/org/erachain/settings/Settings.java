@@ -45,7 +45,7 @@ public class Settings {
     public static String peersURL = "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json";
     public static String cloneLicense; // see sidePROTOCOL_example.json
 
-    public static final String CLONE_OR_SIDE = "Side"; // cloneChain or SideChain
+    public static final String CLONE_OR_SIDE = "Side"; // "Clone" - cloneChain or SideChain
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final int DEFAULT_ACCOUNTS = 1;
