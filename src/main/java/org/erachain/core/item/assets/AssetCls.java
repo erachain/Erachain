@@ -38,6 +38,8 @@ public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
+    public static final int MAX_IMAGE_LENGTH = 5 * (1 << 20);
+
     protected static final int ASSET_TYPE_LENGTH = 1;
 
     protected static final long APP_DATA_DEX_AWARDS_MASK = 1L;
@@ -332,6 +334,11 @@ public abstract class AssetCls extends ItemCls {
                        ExLinkAddress[] dexAwards) {
         this(typeBytes, appDataIn, maker, name, icon, image, description, assetType);
         this.dexAwards = dexAwards;
+    }
+
+    @Override
+    public int getImageMAXLength() {
+        return MAX_IMAGE_LENGTH;
     }
 
     @Override
