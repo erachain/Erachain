@@ -753,16 +753,11 @@ public class RSignNote extends Transaction implements Itemable {
         parseDataFull();
 
         int result;
-        if (false // комиссия у так уже = 0 - нельзя модифицировать флаг внутри
-                && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
-            result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_FEE);
-        } else {
-            result = super.isValid(forDeal, checkFlags);
-        }
 
-        if (result != Transaction.VALIDATE_OK) return result;
+        // тут еще нет преРасчета и непонятно какая плата будет
+        // и общая комиссия будет неверной, поэтому не считаем её тут
+        if ((result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_FEE))
+                != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead
         if (this.key > 0 && !this.dcSet.getItemTemplateMap().contains(this.key))
@@ -773,6 +768,15 @@ public class RSignNote extends Transaction implements Itemable {
             // errorValue updated in extendedData
             errorValue = extendedData.errorValue;
             return result;
+        }
+
+        // тут отдельно посчитаем комиссию - после переРасчета начислений по Фильтру она будет корректной
+        calcFee(true);
+        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0L
+                && height > BlockChain.ALL_BALANCES_OK_TO
+                && !BlockChain.isFeeEnough(height, creator)
+                && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
+            return NOT_ENOUGH_FEE;
         }
 
         if (height > BlockChain.VERS_5_01_01) {
@@ -854,7 +858,7 @@ public class RSignNote extends Transaction implements Itemable {
             long_fee += 100 * BlockChain.FEE_PER_BYTE;
 
         ExAction exAction = extendedData.getExAction();
-        if (exAction != null) {
+        if (exAction != null) { /// тут еще нет ПРЕрасчета и так как в setDC ет прерасчетап
             long_fee += exAction.getTotalFeeBytes() * BlockChain.FEE_PER_BYTE;
         }
 

@@ -1180,7 +1180,12 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
+        // тут должна комиссия пересчитаться поновой
         makeFilterPayList(dcSet, height, asset, rNote.getCreator(), true);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            // ERROR on make LIST
+            return resultCode;
+        }
 
         if (resultsCount < 0) {
             // ERROR on make LIST
