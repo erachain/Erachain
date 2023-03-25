@@ -69,8 +69,11 @@ Set 0..10 - use big buffers. Seed up
 
 -cache=off | lru | weak | soft | hard
 
--dbschain=rocksdb | mapdb | fast
-Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
+-dbschain=mapdb (default)| rocksdb | fast
+Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it is the complex DB for fast speed
+MapDB store all data in one huge file.
+RocksDB separate data in some files (experimental).
+Fast mode - it use MapDB and RockDB for most fastest mode (experimental).
 
 -testdb=[TX_IN_BLOCK]
 Start test for DB system. Make blocks with TX_IN_BLOCK count
