@@ -37,6 +37,9 @@ public class IssuePollPanel extends IssueItemPanel {
         // TABLE OPTIONS
         table = new MTable(optionsTableModel);
         JScrollPane scrollPaneOptionalTable = new JScrollPane();
+        scrollPaneOptionalTable.setPreferredSize(new java.awt.Dimension(0, 200));
+        scrollPaneOptionalTable.setMinimumSize(new java.awt.Dimension(0, 100));
+
         scrollPaneOptionalTable.setViewportView(table);
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(scrollPaneOptionalTable, fieldGBC);

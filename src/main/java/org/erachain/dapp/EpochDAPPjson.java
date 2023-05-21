@@ -37,7 +37,8 @@ public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
                     this.command = (String) pars.get(0);
                 } catch (ParseException | NullPointerException | ClassCastException e) {
                     //JSON EXCEPTION
-                    this.status = e.getMessage();
+                    fail("parse params: \"" + dataStr + "\"" + e.getMessage());
+                    return;
                 }
 
             } else
