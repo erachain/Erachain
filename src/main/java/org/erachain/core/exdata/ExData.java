@@ -42,6 +42,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
+import static org.erachain.core.transaction.Transaction.MAX_DATA_BYTES_LENGTH;
+
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
  * "HS" - Hashes "MS" - message
@@ -1230,10 +1232,16 @@ public class ExData {
         }
 
         // add files
+        int totalLen = 0;
         HashMap<String, Tuple3<byte[], Boolean, byte[]>> filesMap = new HashMap<>();
         Iterator<Tuple3<String, Boolean, byte[]>> it_Filles = files_Set.iterator();
         while (it_Filles.hasNext()) {
             Tuple3<String, Boolean, byte[]> file = it_Filles.next();
+
+            totalLen += file.c.length;
+            if (totalLen > MAX_DATA_BYTES_LENGTH) {
+                return INVALID_DATA_LENGTH;
+            }
 
             Boolean zip = file.b;
             byte[] fileBytes = file.c;
