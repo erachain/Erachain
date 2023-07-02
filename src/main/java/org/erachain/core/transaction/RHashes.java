@@ -377,7 +377,7 @@ public class RHashes extends Transaction {
         }
 
         if (data.length > Transaction.MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + data.length;
+            errorValue = "DATA: totalLen (" + data.length + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")";
             return INVALID_DATA_LENGTH;
         }
 

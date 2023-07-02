@@ -1240,7 +1240,7 @@ public class ExData {
 
             totalLen += file.c.length;
             if (totalLen > MAX_DATA_BYTES_LENGTH) {
-                return INVALID_DATA_LENGTH;
+                throw new RuntimeException("FILES: totalLen (" + totalLen + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")");
             }
 
             Boolean zip = file.b;
@@ -1663,6 +1663,17 @@ public class ExData {
     public int isValid(RSignNote rNote) {
 
         int result;
+
+        if (hasFiles()) {
+            int totalLen = 0;
+            for (Tuple3<byte[], Boolean, byte[]> item : files.values()) {
+                totalLen += item.c.length;
+                if (totalLen > MAX_DATA_BYTES_LENGTH) {
+                    errorValue = "FILES: totalLen (" + totalLen + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")";
+                    return Transaction.INVALID_DATA_LENGTH;
+                }
+            }
+        }
 
         if (hashes != null) {
             for (Object hashObject : hashes.keySet()) {

@@ -744,7 +744,7 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
 
         if (data != null && data.length > MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + data.length;
+            errorValue = "DATA: totalLen (" + data.length + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")";
             return INVALID_DATA_LENGTH;
         }
 

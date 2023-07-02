@@ -636,7 +636,7 @@ public class RSend extends TransactionAmount {
         if (this.data != null) {
             // CHECK DATA SIZE
             if (data.length > MAX_DATA_BYTES_LENGTH) {
-                errorValue = "bytes: " + data.length;
+                errorValue = "DATA: totalLen (" + data.length + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")";
                 return INVALID_DATA_LENGTH;
             }
         }
