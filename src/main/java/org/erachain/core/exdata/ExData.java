@@ -139,10 +139,9 @@ public class ExData {
      * @param exLink
      * @param title
      * @param json
-     * @param files
      */
     public ExData(int version, ExLink exLink, String title,
-                  JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
+                  JSONObject json) {
         this.flags = new byte[]{(byte) version, 0, 0, 0};
 
         this.exLink = exLink;
@@ -155,7 +154,6 @@ public class ExData {
 
         this.title = title;
         this.json = json;
-        this.files = files;
 
     }
 
@@ -909,13 +907,13 @@ public class ExData {
                 String[] items = text.split("\n");
                 JSONObject dataJson = new JSONObject();
                 dataJson.put("Message", text.substring(items[0].length()));
-                return new ExData(0, null, items[0], dataJson, null);
+                return new ExData(0, null, items[0], dataJson);
 
             case 1:
                 text = new String(data, StandardCharsets.UTF_8);
                 dataJson = (JSONObject) JSONValue.parseWithException(text);
                 String title = dataJson.get("Title").toString();
-                return new ExData(1, null, title, dataJson, null);
+                return new ExData(1, null, title, dataJson);
 
             default:
 
@@ -960,7 +958,7 @@ public class ExData {
                 title = new String(titleByte, StandardCharsets.UTF_8);
 
                 if (onlyTitle) {
-                    return new ExData(version, null, title, null, null);
+                    return new ExData(version, null, title, null);
                 }
 
                 if (version > 2) {
@@ -1095,7 +1093,7 @@ public class ExData {
                         return new ExData(flags, exLink, exAction, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, null, null);
                     } else {
                         // version 2.0 - 2.1
-                        return new ExData(version, exLink, title, null, null);
+                        return new ExData(version, exLink, title, null);
                     }
                 } else {
 
@@ -1255,7 +1253,9 @@ public class ExData {
             } else {
                 fileBytesOrig = fileBytes;
             }
-            filesMap.put(file.a, new Tuple3(Crypto.getInstance().digest(fileBytesOrig), zip, fileBytes));
+            byte[] hash = Crypto.getInstance().digest(fileBytesOrig); // slow for HUGE files > 1MB
+            Tuple3 t3 = new Tuple3(hash, zip, fileBytes);
+            filesMap.put(file.a, t3);
         }
 
         if (!isEncrypted && uniqueFiles) {
@@ -1651,7 +1651,7 @@ public class ExData {
             toJson.put("secretsFlags", secretsFlags);
             toJson.put("secretsFlagsB", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(secretsFlags)));
             toJson.put("secrets", secretsArray);
-            toJson.put("encryptedData64", Base64.getEncoder().encodeToString(encryptedData));
+            // SOW SLOW for HUGE files - toJson.put("encryptedData64", Base64.getEncoder().encodeToString(encryptedData));
 
         } else if (json != null) {
             toJson.put("json", json);

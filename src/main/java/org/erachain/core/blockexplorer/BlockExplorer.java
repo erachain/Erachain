@@ -255,7 +255,7 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings("static-access")
-    public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
+    public JSONObject jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
 
         output = new JSONObject();
 

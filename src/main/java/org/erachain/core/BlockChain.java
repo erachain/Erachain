@@ -194,7 +194,7 @@ public class BlockChain {
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
 
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-    public static final int MAX_BLOCK_SIZE_BYTES = MAIN_MODE ? 1 << 25 : 1 << 26;
+    public static final int MAX_BLOCK_SIZE_BYTES = MAIN_MODE ? 1 << 25 : 1 << 28;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
     public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_SIZE_BYTES >> 2;
 
