@@ -74,9 +74,17 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
-                    // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long)(Synchronizer.GET_BLOCK_TIMEOUT >> 2)
+                    // время ожидания увеличиваем по мере номера блока - он ведь на той стороне синхронно нам будет посылаться
+                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long) (Synchronizer.GET_BLOCK_TIMEOUT >> 2)
                             + currentTimestamp - System.currentTimeMillis();
+                    if (peer.network.getActivePeers(false).size() < 3) {
+                        // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
+                        timeSOT = 600000;
+                    } else {
+                        timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long) (Synchronizer.GET_BLOCK_TIMEOUT >> 2)
+                                + currentTimestamp - System.currentTimeMillis();
+                    }
+
                     if (timeSOT > 600000 || timeSOT < 1) {
                         timeSOT = 600000;
                     }
