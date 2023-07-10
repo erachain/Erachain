@@ -187,7 +187,14 @@ public class BlockBuffer extends Thread {
 
             //CHECK IF ALREADY LOADED BLOCK
             //LOAD BLOCK
-            this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT);
+            int timeSOT;
+            if (peer.network.getActivePeers(false).size() < 3) {
+                // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
+                timeSOT = 600000;
+            } else {
+                timeSOT = Synchronizer.GET_BLOCK_TIMEOUT;
+            }
+            this.loadBlock(signature, timeSOT);
 
             //GET BLOCK
             if (this.error) {
