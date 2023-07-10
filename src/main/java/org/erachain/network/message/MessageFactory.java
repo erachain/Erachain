@@ -81,7 +81,7 @@ public class MessageFactory {
     public Message createTelegramMessage(Transaction transaction) {
         return new TelegramMessage(transaction);
     }
-    
+
     public Message createTelegramGetMessage() {
         return new TelegramGetMessage();
     }
@@ -89,7 +89,20 @@ public class MessageFactory {
     public Message createTelegramGetAnswerMessage(ArrayList<String> addresses) {
         return new TelegramAnswerMessage(addresses);
     }
-    
+
+    protected void checkSun(byte[] checksum, byte[] data) throws Exception {
+
+        byte[] digest = Crypto.getInstance().digest(data);
+
+        //TAKE FOR FIRST BYTES
+        digest = Arrays.copyOfRange(digest, 0, Message.CHECKSUM_LENGTH);
+
+        //CHECK IF CHECKSUM MATCHES
+        if (!Arrays.equals(checksum, digest)) {
+            throw new Exception(Lang.T("Invalid data checksum length="));
+        }
+
+    }
 
     public Message parse(Peer sender, DataInputStream inputStream) throws Exception {
         //READ MESSAGE TYPE
@@ -124,16 +137,7 @@ public class MessageFactory {
             //READ DATA
             inputStream.readFully(data);
 
-            //VALIDATE CHECKSUM
-            byte[] digest = Crypto.getInstance().digest(data);
-
-            //TAKE FOR FIRST BYTES
-            digest = Arrays.copyOfRange(digest, 0, Message.CHECKSUM_LENGTH);
-
-            //CHECK IF CHECKSUM MATCHES
-            if (!Arrays.equals(checksum, digest)) {
-                throw new Exception(Lang.T("Invalid data checksum length=") + length);
-            }
+            // не проверяем - подпись проверит - лишние вычисления зачем checkSun(checksum, data);
         }
 
         Message message = null;
