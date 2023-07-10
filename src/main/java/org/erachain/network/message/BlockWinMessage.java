@@ -5,7 +5,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Crypto;
 
 import java.util.Arrays;
 
@@ -94,7 +93,7 @@ public class BlockWinMessage extends Message {
 
     protected byte[] generateChecksum(byte[] data) {
         this.loadBytes = data;
-        byte[] checksum = Crypto.getInstance().digest(data);
+        byte[] checksum = block.getSignature();
         checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
         return checksum;
     }
