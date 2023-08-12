@@ -652,7 +652,7 @@ public class TransactionCreator {
         //CREATE MESSAGE TRANSACTION
         recordNoteTx = new RSignNote(version, property1, property2,
                 creator, (byte) feePow, key, message, timestamp, 0L);
-        recordNoteTx.sign(creator, Transaction.FOR_NETWORK);
+        recordNoteTx.sign(creator, Transaction.FOR_NETWORK);  // slow for HUGE files > 1MB
         recordNoteTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet(), false);
 
         return recordNoteTx;

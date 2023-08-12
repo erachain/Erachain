@@ -229,7 +229,7 @@ public class WebResource {
     @Path("index/blockexplorer.json")
     @GET
     public Response jsonQueryMain(@Context UriInfo info) {
-        Map output;
+        JSONObject output;
         try {
             output = BlockExplorer.getInstance().
                     jsonQueryMain(info);
@@ -241,7 +241,7 @@ public class WebResource {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(StrJSonFine.convert(output))
+                    .entity(output.toJSONString())
                     .build();
         } catch (Exception ee) {
             //ee.printStackTrace();
@@ -259,7 +259,7 @@ public class WebResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(output))
+                .entity(output.toJSONString())
                 .build();
     }
 
