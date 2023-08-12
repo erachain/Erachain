@@ -75,8 +75,7 @@ public class BlockBuffer extends Thread {
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той стороне синхронно нам будет посылаться
-                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long) (Synchronizer.GET_BLOCK_TIMEOUT >> 2)
-                            + currentTimestamp - System.currentTimeMillis();
+                    long timeSOT;
                     if (peer.network.getActivePeers(false).size() < 3) {
                         // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
                         timeSOT = 600000;
@@ -172,6 +171,14 @@ public class BlockBuffer extends Thread {
 
     public Block getBlock(byte[] signature) throws Exception {
 
+        int timeSOT;
+        if (peer.network.getActivePeers(false).size() < 3) {
+            // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
+            timeSOT = 600000;
+        } else {
+            timeSOT = Synchronizer.GET_BLOCK_TIMEOUT;
+        }
+
         Block block;
         if (this.blocks.containsKey(signature)) {
             if (this.error) {
@@ -187,13 +194,6 @@ public class BlockBuffer extends Thread {
 
             //CHECK IF ALREADY LOADED BLOCK
             //LOAD BLOCK
-            int timeSOT;
-            if (peer.network.getActivePeers(false).size() < 3) {
-                // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
-                timeSOT = 600000;
-            } else {
-                timeSOT = Synchronizer.GET_BLOCK_TIMEOUT;
-            }
             this.loadBlock(signature, timeSOT);
 
             //GET BLOCK
@@ -207,7 +207,7 @@ public class BlockBuffer extends Thread {
         this.counter = this.signatures.indexOf(signature);
 
         //
-        block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
+        block = this.blocks.get(signature).poll(timeSOT, TimeUnit.MILLISECONDS);
         if (block == null) {
             throw new Exception("Block buffer error 3 = null");
         }
