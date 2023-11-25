@@ -2,7 +2,6 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Ints;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MessageFactory {
@@ -88,20 +86,6 @@ public class MessageFactory {
 
     public Message createTelegramGetAnswerMessage(ArrayList<String> addresses) {
         return new TelegramAnswerMessage(addresses);
-    }
-
-    protected void checkSun(byte[] checksum, byte[] data) throws Exception {
-
-        byte[] digest = Crypto.getInstance().digest(data);
-
-        //TAKE FOR FIRST BYTES
-        digest = Arrays.copyOfRange(digest, 0, Message.CHECKSUM_LENGTH);
-
-        //CHECK IF CHECKSUM MATCHES
-        if (!Arrays.equals(checksum, digest)) {
-            throw new Exception(Lang.T("Invalid data checksum length="));
-        }
-
     }
 
     public Message parse(Peer sender, DataInputStream inputStream) throws Exception {
