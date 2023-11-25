@@ -5,6 +5,8 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 
+import java.util.Arrays;
+
 public class TransactionMessage extends Message {
 
     private Transaction transaction;
@@ -68,9 +70,17 @@ public class TransactionMessage extends Message {
         data = Bytes.concat(data, transactionBytes);
 
         //ADD CHECKSUM
-        data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
+        data = Bytes.concat(super.toBytes(), generateChecksum(data), data);
 
         return data;
+    }
+
+    @Override
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = transaction.getSignature();
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
     }
 
     @Override

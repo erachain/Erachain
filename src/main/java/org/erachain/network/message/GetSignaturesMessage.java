@@ -3,6 +3,8 @@ package org.erachain.network.message;
 import com.google.common.primitives.Bytes;
 import org.erachain.core.block.Block;
 
+import java.util.Arrays;
+
 
 public class GetSignaturesMessage extends Message {
 
@@ -43,6 +45,13 @@ public class GetSignaturesMessage extends Message {
         data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
 
         return data;
+    }
+
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = parent;
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
     }
 
     @Override

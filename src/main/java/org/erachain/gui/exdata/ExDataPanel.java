@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.erachain.core.transaction.Transaction.MAX_DATA_BYTES_LENGTH;
+
 /**
  * @author Саша
  */
@@ -769,9 +771,16 @@ public class ExDataPanel extends JPanel {
         // files
         Set<Tuple3<String, Boolean, byte[]>> files_1 = new HashSet<Tuple3<String, Boolean, byte[]>>();
         int oF = attached_Files_Model.getRowCount();
+        int totalLen = 0;
         for (int i = 0; i < oF; i++) {
+            byte[] filaData = (byte[]) attached_Files_Model.getValueAt(i, 5);
+            totalLen += filaData.length;
+            if (totalLen > MAX_DATA_BYTES_LENGTH) {
+                return new Fun.Tuple2(null, "FILES: totalLen (" + totalLen + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")");
+            }
+
             files_1.add(new Tuple3<String, Boolean, byte[]>((String) attached_Files_Model.getValueAt(i, 0),
-                    (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
+                    (Boolean) attached_Files_Model.getValueAt(i, 2), filaData));
         }
 
         Transaction parent = DCSet.getInstance().getTransactionFinalMap().getRecord(docTypeAppendixPanel.parentReference.getText());

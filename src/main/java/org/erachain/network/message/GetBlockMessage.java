@@ -3,6 +3,8 @@ package org.erachain.network.message;
 import com.google.common.primitives.Bytes;
 import org.erachain.core.block.Block;
 
+import java.util.Arrays;
+
 public class GetBlockMessage extends Message {
 
     private static final int GET_BLOCK_LENGTH = Block.SIGNATURE_LENGTH;
@@ -42,6 +44,13 @@ public class GetBlockMessage extends Message {
         data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
 
         return data;
+    }
+
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = signature;
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
     }
 
     @Override
