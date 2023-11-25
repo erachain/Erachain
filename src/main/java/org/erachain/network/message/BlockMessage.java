@@ -76,6 +76,14 @@ public class BlockMessage extends Message {
     }
 
     @Override
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = block.getSignature();
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
+    }
+
+    @Override
     public int getDataLength() {
         return HEIGHT_LENGTH + (this.block == null ? 0 : this.block.getDataLength(false));
     }

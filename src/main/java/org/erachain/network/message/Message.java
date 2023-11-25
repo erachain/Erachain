@@ -89,7 +89,7 @@ public abstract class Message {
     private Peer sender;
     protected int id;
     private int length;
-    private byte[] loadBytes;
+    protected byte[] loadBytes;
 
     public Message(int type) {
         this.type = type;

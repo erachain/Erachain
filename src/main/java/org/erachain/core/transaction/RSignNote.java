@@ -27,7 +27,10 @@ import org.mapdb.Fun;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * PROPERTIES:
@@ -451,11 +454,8 @@ public class RSignNote extends Transaction implements Itemable {
         if (data != null && data.length > 0) {
 
             transaction.put("exData", extendedData.toJson());
+            // SLOW for HUGE files - transaction.put("data64", Base64.getEncoder().encodeToString(this.data));
 
-        }
-
-        if (data != null && data.length > 0) {
-            transaction.put("data64", Base64.getEncoder().encodeToString(this.data));
         }
 
         return transaction;
@@ -744,7 +744,7 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
 
         if (data != null && data.length > MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + data.length;
+            errorValue = "DATA: totalLen (" + data.length + ")  > MAX_DATA_BYTES_LENGTH (" + MAX_DATA_BYTES_LENGTH + ")";
             return INVALID_DATA_LENGTH;
         }
 

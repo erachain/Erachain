@@ -101,6 +101,13 @@ public class TelegramMessage extends Message {
 
     }
 
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = transaction.getSignature();
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
+    }
+
     @Override
     public int getDataLength() {
         return this.transaction.getDataLength(Transaction.FOR_NETWORK, true);

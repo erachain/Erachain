@@ -30,9 +30,7 @@ public class BlockWinMessage extends Message {
 
     // берем создателя с транзакции и трансформируем в Целое
     public static Integer getHandledID(byte[] data) {
-
         return Ints.fromBytes(data[HASH_POSITION + 1], data[HASH_POSITION + 2], data[HASH_POSITION + 3], data[HASH_POSITION + 4]);
-
     }
 
     @Override
@@ -91,6 +89,13 @@ public class BlockWinMessage extends Message {
         data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
 
         return data;
+    }
+
+    protected byte[] generateChecksum(byte[] data) {
+        this.loadBytes = data;
+        byte[] checksum = block.getSignature();
+        checksum = Arrays.copyOfRange(checksum, 0, CHECKSUM_LENGTH);
+        return checksum;
     }
 
     @Override

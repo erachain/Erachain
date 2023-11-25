@@ -798,15 +798,23 @@ public class Synchronizer extends Thread {
         // see response callback in controller.Controller.onMessage(Message)
         // type = GET_SIGNATURES_TYPE
         SignaturesMessage response;
+
+        int timeSOT;
+        if (peer.network.getActivePeers(false).size() < 3) {
+            // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
+            timeSOT = 600000;
+        } else {
+            timeSOT = GET_HEADERS_TIMEOUT;
+        }
         try {
-            response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
+            response = (SignaturesMessage) peer.getResponse(message, timeSOT);
         } catch (Exception e) {
-            peer.ban("Cannot retrieve headers, error SOT: " + GET_HEADERS_TIMEOUT + " " + e.getMessage());
+            peer.ban("Cannot retrieve headers, error SOT: " + timeSOT + " " + e.getMessage());
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
         if (response == null) {
-            peer.ban("Cannot retrieve headers =null, SOT: " + GET_HEADERS_TIMEOUT);
+            peer.ban("Cannot retrieve headers =null, SOT: " + timeSOT);
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
