@@ -23,6 +23,10 @@ ErachainBP is a Java application and supported by all operation systems.
 
 All documentation can be found on [WIKI](https://wiki.erachain.org/ru/home).
 
+### Smart-contracts - DAPP
+
+See folder in source java/org/erachain/dapp
+
 # 🚀️ Clone and Build (Windows)
 
 ## Dependencies
