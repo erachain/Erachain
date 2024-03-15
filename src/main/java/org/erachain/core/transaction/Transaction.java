@@ -1361,6 +1361,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return null;
     }
 
+    public static Long parseDBRef(Object ref) {
+        if (ref == null)
+            return null;
+
+        if (ref instanceof String)
+            return parseDBRef((String) ref);
+        else if (ref instanceof Long)
+            return (Long) ref;
+
+        return null;
+    }
+
     public static Long parseDBRefSeqNo(String refStr) {
         if (refStr == null)
             return null;
@@ -1868,20 +1880,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         try {
             error_value = "feePow error";
             feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-
-            String linkToRefStr = (String) jsonObject.get("linkTo");
-            if (linkToRefStr == null) {
-                linkTo = null;
-            } else {
-                Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-                if (linkToRef == null) {
-                    error = Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
-                    Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
-                    return out;
-                } else {
-                    linkTo = new ExLinkAppendix(linkToRef);
-                }
-            }
+            linkTo = ExLinkAppendix.of(jsonObject);
         } catch (Exception e) {
             Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, error_value, out);
             return out;

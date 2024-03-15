@@ -102,7 +102,7 @@ public class RSendResource {
     // @Consumes(MediaType.WILDCARD)
     @Path("{creator}/{recipient}")
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("linkTo") Long exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("linkTo") Object exLinkObj, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                           @QueryParam("message") String message,
                           @QueryParam("encoding") int encoding,
@@ -113,12 +113,7 @@ public class RSendResource {
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
 
-        ExLink exLink;
-        if (exLinkRef == null) {
-            exLink = null;
-        } else {
-            exLink = new ExLinkAppendix(exLinkRef);
-        }
+        ExLink exLink = ExLinkAppendix.of(exLinkObj);
 
         boolean needAmount = false;
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, null, recipientStr, feePowStr,
@@ -149,7 +144,7 @@ public class RSendResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("{creator}/{recipient}")
     public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                           @QueryParam("linkTo") Long exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                           @QueryParam("linkTo") Object exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                            @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                            String message,
                            @QueryParam("encoding") int encoding,
@@ -201,17 +196,7 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String linkToRefStr = (String) jsonObject.get("linkTo");
-        Long linkToRef;
-        if (linkToRefStr == null)
-            linkToRef = null;
-        else {
-            linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            }
-        }
+        Object linkToRefObj = jsonObject.get("linkTo");
 
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
@@ -225,7 +210,7 @@ public class RSendResource {
         return sendGet(
                 creator,
                 recipient,
-                linkToRef,
+                linkToRefObj,
                 feePow,
                 assetKey, amount,
                 title, message,
@@ -317,12 +302,12 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String linkToRefStr = jsonObject.get("linkTo").toString();
+        Object linkToRefObj = jsonObject.get("linkTo");
         Long linkToRef;
-        if (linkToRefStr == null)
+        if (linkToRefObj == null)
             linkToRef = null;
         else {
-            linkToRef = Transaction.parseDBRef(linkToRefStr);
+            linkToRef = Transaction.parseDBRef(linkToRefObj);
             if (linkToRef == null) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
