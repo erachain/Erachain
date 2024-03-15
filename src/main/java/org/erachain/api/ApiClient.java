@@ -30,36 +30,45 @@ public class ApiClient {
     static String[][] helpStrings =
             {
                     {
-                            "GET assets",
-                            "See assets API",
-                    },
-                    {
-                            "GET persons",
-                            "See persons API",
-                    },
-                    {
-                            "GET polls",
-                            "See polls API",
+                            "GET r_send",
+                            "See notes API or http://127.0.0.1:{RPC_PORT}/r_send",
+                            "JSON"
                     },
                     {
                             "GET r_note",
-                            "See notes API",
+                            "See notes API or http://127.0.0.1:{RPC_PORT}/r_note",
+                            "JSON"
+                    },
+                    {
+                            "GET assets",
+                            "See assets API or http://127.0.0.1:{RPC_PORT}/assets",
+                            "JSON"
+                    },
+                    {
+                            "GET persons",
+                            "See persons API or http://127.0.0.1:{RPC_PORT}/persons",
+                            "JSON"
+                    },
+                    {
+                            "GET polls",
+                            "See polls API or http://127.0.0.1:{RPC_PORT}/polls",
+                            "JSON"
                     },
                     {
                             "GET statuses",
-                            "See statuses API",
-                            "See statuses API",
+                            "See statuses API or http://127.0.0.1:{RPC_PORT}/statuses",
+                            "JSON"
                     },
                     {
                             "GET templates",
-                            "See templates API",
+                            "See templates API or http://127.0.0.1:{RPC_PORT}/templates",
+                            "JSON"
                     },
                     {
                             "GET r_linkedhashes",
-                            "See linked hashes API",
+                            "See linked hashes API or http://127.0.0.1:{RPC_PORT}/r_linkedhashes",
+                            "JSON"
                     },
-
-
                     {
                             "GET core",
                             "Returns info of the application.",
@@ -500,13 +509,6 @@ public class ApiClient {
                             "Unlocks the wallet using the given password. Returns true/false depending on the fact if the password is correct.\n201 - Wallet does not exist.",
                             "Errors: 201 - Wallet does not exist."
                     },
-
-                    {
-                            "GET r_send",
-                            "Help for 'r_send' commands",
-                            "-"
-                    },
-
                     /*
 
                     {
