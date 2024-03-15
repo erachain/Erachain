@@ -201,7 +201,7 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String linkToRefStr = jsonObject.get("linkTo").toString();
+        String linkToRefStr = (String) jsonObject.get("linkTo");
         Long linkToRef;
         if (linkToRefStr == null)
             linkToRef = null;
