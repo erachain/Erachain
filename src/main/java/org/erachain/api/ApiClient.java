@@ -501,20 +501,11 @@ public class ApiClient {
                             "Errors: 201 - Wallet does not exist."
                     },
 
-                    {"GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
-                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
-                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
-                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
-                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"GET r_send/multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
-                            "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
-                                    + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
-                                    + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
-                                    + "selfPay=true - if set pay to self address too. Default = true"
-                                    + " title=, onlyperson - get only personalized addresses, password="},
+                    {
+                            "GET r_send",
+                            "Help for 'r_send' commands",
+                            "-"
+                    },
 
                     /*
 
