@@ -102,7 +102,7 @@ public class RSendResource {
     // @Consumes(MediaType.WILDCARD)
     @Path("{creator}/{recipient}")
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("linkTo") Object exLinkObj, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("linkTo") String exLinkObj, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                           @QueryParam("message") String message,
                           @QueryParam("encoding") int encoding,
@@ -144,7 +144,7 @@ public class RSendResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("{creator}/{recipient}")
     public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                           @QueryParam("linkTo") Object exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                           @QueryParam("linkTo") String exLinkRef, @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
                            @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                            String message,
                            @QueryParam("encoding") int encoding,
@@ -196,7 +196,7 @@ public class RSendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        Object linkToRefObj = jsonObject.get("linkTo");
+        String linkToRefObj = (String) jsonObject.get("linkTo");
 
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
