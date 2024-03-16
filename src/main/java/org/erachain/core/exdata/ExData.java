@@ -1182,7 +1182,7 @@ public class ExData {
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
-                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles, boolean filesZiped)
+                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
             throws Exception {
 
         JSONObject out_Map = new JSONObject();
@@ -1244,11 +1244,12 @@ public class ExData {
             Boolean zip = file.b;
             byte[] fileBytes = file.c;
             byte[] fileBytesOrig = null;
-            if (zip && filesZiped) {
+            if (zip) {
                 try {
                     fileBytesOrig = ZipBytes.decompress(fileBytes);
                 } catch (DataFormatException e1) {
                     LOGGER.error(e1.getMessage(), e1);
+                    fileBytesOrig = fileBytes;
                 }
             } else {
                 fileBytesOrig = fileBytes;
@@ -1325,9 +1326,13 @@ public class ExData {
                     }
 
                     if (publicKey == null) {
-                        JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
-                                        ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        if (Controller.getInstance().useGui) {
+                            JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient + " : " +
+                                            ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            throw new RuntimeException(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY) + " - " + recipient);
+                        }
 
                         return null;
                     }

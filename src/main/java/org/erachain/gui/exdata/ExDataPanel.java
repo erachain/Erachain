@@ -228,11 +228,6 @@ public class ExDataPanel extends JPanel {
                         attached_Files_Model.setValueAt(new Boolean(!(boolean) attached_Files_Model.getValueAt(row, 2)),
                                 row, 2);
                         if (new Boolean((boolean) attached_Files_Model.getValueAt(row, 2))) {
-                            // CompressorZIP zip = new CompressorZIP();
-                            // attached_Files_Model.setValueAt(zip.compress((byte[])
-                            // attached_Files_Model.getValueAt(row, 4)) , row,
-                            // 5);
-
                             try {
                                 attached_Files_Model.setValueAt(
                                         ZipBytes.compress((byte[]) attached_Files_Model.getValueAt(row, 4)), row, 5);
@@ -240,14 +235,7 @@ public class ExDataPanel extends JPanel {
                             } catch (Exception e1) {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
-                            }
-                            // read & un Zip info
-
-                            try {
-
-                            } catch (Exception e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                                return;
                             }
 
                         } else {
@@ -820,7 +808,7 @@ public class ExDataPanel extends JPanel {
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                     jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
                     hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
-                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected(), true);
+                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
         } catch (Exception e) {
             return new Fun.Tuple2(null, e.getMessage());
         }

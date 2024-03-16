@@ -14,6 +14,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.FileUtils;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -84,11 +86,11 @@ public class RSignNoteResource {
                         "templateUnique:false," +
                         "hashes: { path:HASH, ..}, " +
                         "hashesUnique:false," +
-                        "files: [ { name:Path, zip:false, data:bytes.UTF-8 }, ..]" +
+                        "files: [ { name:Path, zip:false, file:FILE or data:bytes.UTF-8 }, ..]" +
                         "filesUnique:false," +
 
                         "ai:, ",
-                "accruals - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
+                "accruals - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends. In 'files' - if set 'file' then 'data' ignored (for example: 'file`:'resources/r_note_test.json'"
         );
 
         //
@@ -332,7 +334,15 @@ public class RSignNoteResource {
                 } else {
                     dataBytes = file.get("data").toString().getBytes(StandardCharsets.UTF_8);
                 }
-                files.add(new Fun.Tuple3<>((String) file.get("name"), (Boolean) file.get("zip"), dataBytes));
+                Boolean zip = (Boolean) file.get("zip");
+                if (zip) {
+                    try {
+                        dataBytes = ZipBytes.compress(dataBytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                files.add(new Fun.Tuple3<>((String) file.get("name"), zip, dataBytes));
             }
         }
         boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
@@ -363,7 +373,7 @@ public class RSignNoteResource {
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,
                         hashes, hashesUnique,
-                        files, filesUnique, false);
+                        files, filesUnique);
             } catch (Exception e) {
                 Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, e.getMessage(), out);
                 return out.toJSONString();
