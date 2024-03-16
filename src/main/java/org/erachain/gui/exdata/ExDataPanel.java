@@ -820,7 +820,7 @@ public class ExDataPanel extends JPanel {
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),
                     jTextPane_Message.getText(), checkBoxMakeHashAndCheckUniqueText.isSelected(),
                     hashes_Map, checkBoxMakeHashAndCheckUniqueHashes.isSelected(),
-                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected());
+                    files_1, checkBoxMakeHashAndCheckUniqueAttachedFiles.isSelected(), true);
         } catch (Exception e) {
             return new Fun.Tuple2(null, e.getMessage());
         }

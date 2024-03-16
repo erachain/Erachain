@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
+import org.erachain.utils.FileUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,6 +28,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -208,8 +211,8 @@ public class RSignNoteResource {
         if (recipientsJson == null) {
             recipients = null;
         } else {
-            onlyRecipients = Boolean.valueOf((boolean) jsonObject.getOrDefault("onlyRecipients", false));
-            JSONArray recipientsArray = (JSONArray) jsonObject.get("list");
+            onlyRecipients = Boolean.valueOf((boolean) recipientsJson.getOrDefault("onlyRecipients", false));
+            JSONArray recipientsArray = (JSONArray) recipientsJson.get("list");
             if (recipientsArray == null) {
                 JSONObject out = new JSONObject();
                 Transaction.updateMapByErrorSimple(Transaction.INVALID_RECEIVERS_LIST, out);
@@ -312,9 +315,24 @@ public class RSignNoteResource {
         if (filesArray != null) {
             for (Object fileObj : filesArray) {
                 JSONObject file = (JSONObject) fileObj;
-                files.add(new Fun.Tuple3<>((String) file.get("name"),
-                        (Boolean) file.get("zip"),
-                        file.get("data").toString().getBytes(StandardCharsets.UTF_8)));
+                String filePath = (String) file.remove("file");
+                byte[] dataBytes;
+                if (filePath != null) {
+                    try {
+                        dataBytes = FileUtils.getBytesFromFile(new File(filePath));
+                    } catch (FileNotFoundException e) {
+                        JSONObject out = new JSONObject();
+                        Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, "File not found: [" + filePath + "] - " + e.getMessage(), out);
+                        return out.toJSONString();
+                    } catch (Exception e) {
+                        JSONObject out = new JSONObject();
+                        Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, "File error: [" + filePath + "] - " + e.getMessage(), out);
+                        return out.toJSONString();
+                    }
+                } else {
+                    dataBytes = file.get("data").toString().getBytes(StandardCharsets.UTF_8);
+                }
+                files.add(new Fun.Tuple3<>((String) file.get("name"), (Boolean) file.get("zip"), dataBytes));
             }
         }
         boolean filesUnique = Boolean.valueOf((boolean) jsonObject.getOrDefault("filesUnique", false));
@@ -345,7 +363,7 @@ public class RSignNoteResource {
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,
                         hashes, hashesUnique,
-                        files, filesUnique);
+                        files, filesUnique, false);
             } catch (Exception e) {
                 Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, e.getMessage(), out);
                 return out.toJSONString();
@@ -368,7 +386,10 @@ public class RSignNoteResource {
             int validate = cntr.getTransactionCreator().afterCreate(issueDoc, Transaction.FOR_NETWORK, tryFree, test);
 
             if (validate == Transaction.VALIDATE_OK) {
-                out.put("status", "TEST");
+                if (test)
+                    out.put("status", "TEST");
+                else
+                    out.put("status", "OK");
                 return out.toJSONString();
             } else {
                 issueDoc.updateMapByError(validate, out);

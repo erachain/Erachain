@@ -1182,7 +1182,7 @@ public class ExData {
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
-                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
+                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles, boolean filesZiped)
             throws Exception {
 
         JSONObject out_Map = new JSONObject();
@@ -1244,7 +1244,7 @@ public class ExData {
             Boolean zip = file.b;
             byte[] fileBytes = file.c;
             byte[] fileBytesOrig = null;
-            if (zip) {
+            if (zip && filesZiped) {
                 try {
                     fileBytesOrig = ZipBytes.decompress(fileBytes);
                 } catch (DataFormatException e1) {

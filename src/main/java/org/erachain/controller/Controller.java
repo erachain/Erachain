@@ -3883,10 +3883,10 @@ public class Controller extends Observable {
     }
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
-                                  PrivateKeyAccount sender, int feePow, long key, byte[] message) {
+                                  PrivateKeyAccount sender, int feePow, long key, byte[] exDataBytes) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_SignNote(version, property1, property2, sender, feePow, key,
-                    message);
+                    exDataBytes);
         }
     }
 
