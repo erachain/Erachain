@@ -2165,6 +2165,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         // CHECK CREATOR
         if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
+            errorValue = creator.getBase58();
             return INVALID_ADDRESS;
         }
 
