@@ -451,7 +451,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * Поиск сразу по двум счетам - получателя и отправителя
      *
      * @param address_A_Short
-     * @param address_B_Short
+     * @param address_B
      * @param type
      * @param onlyCreator
      * @param fromID

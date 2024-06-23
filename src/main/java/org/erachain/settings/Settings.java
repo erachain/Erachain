@@ -1,5 +1,7 @@
 package org.erachain.settings;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.erachain.controller.Controller;
@@ -28,7 +30,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L; // MAIN Net
-    public static final long DEFAULT_DEMO_NET_STAMP = 1639404195000L; // DEMO Net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1719028000000L; // DEMO Net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
@@ -174,6 +176,10 @@ public class Settings {
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
+
+    @Getter
+    @Setter
+    private String botTelegramToken = null;
 
     private Settings() {
         this.localAddress = this.getCurrentIp();
@@ -451,7 +457,12 @@ public class Settings {
 
     ////////////////
 
-    // http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
+    /**
+     * URL который будет вызываться при приходе транзакций на наши счета (в кошельке) каждый блок. Нужно еще включить getNotifyIncomingConfirmations
+     * Например для работы обменника <a href="https://github.com/icreator/7pay_in">7pay_in</a>: http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
+     *
+     * @return
+     */
     public String getNotifyIncomingURL() {
         if (this.settingsJSON.containsKey("notify_incoming_url")) {
             return (String) this.settingsJSON.get("notify_incoming_url");
@@ -459,6 +470,13 @@ public class Settings {
         return NOTIFY_INCOMING_URL;
     }
 
+    /**
+     * Задает запуск событий при приходе транзакций для нашего кошелька в блоке. Нужно еще задать getNotifyIncomingURL.
+     * Тогда будет дергать этот URL
+     * Например для работы обменника <a href="https://github.com/icreator/7pay_in">7pay_in</a>
+     *
+     * @return
+     */
     public int getNotifyIncomingConfirmations() {
         if (this.settingsJSON.containsKey("notify_incoming_confirmations")) {
             return (int) (long) this.settingsJSON.get("notify_incoming_confirmations");

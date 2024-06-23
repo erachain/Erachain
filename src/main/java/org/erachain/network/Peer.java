@@ -480,7 +480,7 @@ public class Peer extends MonitoredThread {
                     // MORE EFFECTIVE
                     // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
                     // java.net.Socket.setSoTimeout(30000)
-                    // после чего ловим событие SocketTimeoutException т поаторяем ожидание
+                    // после чего ловим событие SocketTimeoutException и повторяем ожидание
                     // это работает без задержек и более эффективно и не ест время процессора
                     try {
                         in.readFully(messageMagic);
@@ -786,6 +786,8 @@ public class Peer extends MonitoredThread {
     }
 
     public Message getResponse(Message message) {
+        if (true)
+            return getResponse(message, message.getSOT());
         return getResponse(message, Settings.getInstance().getConnectionTimeout());
     }
 

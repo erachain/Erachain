@@ -33,6 +33,11 @@ public class GetBlockMessage extends Message {
         return true;
     }
 
+    public int getSOT() {
+        return 60000;
+    }
+
+
     @Override
     public byte[] toBytes() {
         byte[] data = new byte[0];

@@ -1182,7 +1182,7 @@ public class ExData {
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
-                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
+                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles, boolean onErrorThrown)
             throws Exception {
 
         JSONObject out_Map = new JSONObject();
@@ -1326,12 +1326,12 @@ public class ExData {
                     }
 
                     if (publicKey == null) {
-                        if (Controller.getInstance().useGui) {
+                        if (onErrorThrown) {
+                            throw new RuntimeException(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY) + " - " + recipient);
+                        } else {
                             JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient + " : " +
                                             ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
                                     Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            throw new RuntimeException(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY) + " - " + recipient);
                         }
 
                         return null;

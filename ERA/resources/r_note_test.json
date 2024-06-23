@@ -1,0 +1,24 @@
+{
+  "creator": "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP",
+  "recipients": {
+    "list": [
+      "76N6SWU1Koe3kAncVP9Sk9jKs4ENHzoHHG",
+      "7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz"
+    ]
+  },
+  "title": "Пример rpc записать файл в блокчейн",
+  "message": "message222",
+  "tags": "Пример rpc",
+  "linkTo": "1-1",
+  "test": true,
+  "encrypt": false,
+  "filesUnique": true,
+  "files": [
+    {
+      "name": "TT.txt",
+      "zip": true,
+      "file": "resources/r_note_test.json"
+    }
+  ],
+  "password": "1"
+}

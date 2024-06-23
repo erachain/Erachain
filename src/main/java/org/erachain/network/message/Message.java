@@ -143,6 +143,10 @@ public abstract class Message {
 
     public abstract boolean isRequest();
 
+    public int getSOT() {
+        return 5000;
+    }
+
     public int getId() {
         return id;
     }
