@@ -46,7 +46,7 @@ public class RSignNoteResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("POST make {" +
+        help.put("POST r_note/make {" +
                         "creator - maker account, " +
                         "title, " +
                         "feePow:0..6, " +
@@ -359,7 +359,7 @@ public class RSignNoteResource {
 
         privateKeyAccount = cntr.getWalletPrivateKeyAccountByAddress(resultCreator.a.getAddress());
         if (privateKeyAccount == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS, resultCreator.a.getAddress());
         }
 
         try {
@@ -373,7 +373,7 @@ public class RSignNoteResource {
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,
                         hashes, hashesUnique,
-                        files, filesUnique);
+                        files, filesUnique, true);
             } catch (Exception e) {
                 Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, e.getMessage(), out);
                 return out.toJSONString();

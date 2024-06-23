@@ -527,7 +527,7 @@ public class FPool extends MonitoredThread {
             // PROCESS
             try {
 
-                boolean forged = processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+                boolean forged = processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME_MS(0), TimeUnit.MILLISECONDS));
                 if (!forged && count++ % (PENDING_PERIOD >> 1) != 0)
                     continue;
 
