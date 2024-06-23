@@ -785,6 +785,16 @@ public class TransactionCreator {
         return transaction;
     }
 
+    public Transaction createForNetwork(Transaction record) {
+
+        this.checkUpdate();
+        record.setTimestamp(NTP.getTime());
+        record.sign((PrivateKeyAccount) record.getCreator(), Transaction.FOR_NETWORK);
+        record.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet(), false);
+
+        return record;
+    }
+
     public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData) {
         //CHECK FOR UPDATES
         this.checkUpdate();

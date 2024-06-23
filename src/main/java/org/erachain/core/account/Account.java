@@ -1173,6 +1173,23 @@ public class Account implements Comparable {
 
     }
 
+    /**
+     * Сколько байт примерно сможет переслать данный баланс
+     *
+     * @return
+     */
+    public long bytesPerBalance() {
+        return bytesPerBalance(getBalanceUSE(Transaction.FEE_KEY));
+
+    }
+
+    public static long bytesPerBalance(BigDecimal balance) {
+        long result = balance.setScale(BlockChain.FEE_SCALE).unscaledValue().longValue();
+        result /= BlockChain.FEE_PER_BYTE;
+        return result;
+
+    }
+
     @Override
     public String toString() {
         Tuple2<Integer, PersonCls> personRes = this.getPerson();

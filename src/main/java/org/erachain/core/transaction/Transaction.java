@@ -399,7 +399,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * % - это указатель на параметр например иак - %1
      * see https://regex101.com/
      */
-    public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    //public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    public static String SPLIT_CHARS = "[!?/_,;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
@@ -976,19 +977,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static String[] tags(int typeID, String type, String tags, String words, Object[][] itemsKeys) {
 
-        String allTags = "@TT" + typeID;
+
+        List<String> allTags = new ArrayList<>();
+        allTags.add("@tt" + typeID);
 
         if (type != null)
-            allTags += " " + type;
+            allTags.add(type.toLowerCase());
 
         if (tags != null)
-            allTags += " " + tags;
-
+            allTags.addAll(Arrays.asList(tags.toLowerCase().split(",")));
 
         if (words != null)
-            allTags += " " + words;
+            allTags.addAll(Arrays.asList(words.toLowerCase().split(SPLIT_CHARS)));
 
-        String[] tagsWords = allTags.toLowerCase().split(SPLIT_CHARS);
+        String[] tagsWords = allTags.toArray(new String[allTags.size()]);
 
         if (itemsKeys == null || itemsKeys.length == 0)
             return tagsWords;

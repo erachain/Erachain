@@ -373,7 +373,7 @@ public class RSignNoteResource {
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,
                         hashes, hashesUnique,
-                        files, filesUnique);
+                        files, filesUnique, true);
             } catch (Exception e) {
                 Transaction.updateMapByErrorSimple(Transaction.INVALID_DATA, e.getMessage(), out);
                 return out.toJSONString();

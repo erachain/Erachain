@@ -7,6 +7,7 @@ import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -243,6 +244,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         // И она скелет - нужно базу данных задать и водтянуть номера сущностей и все заново просчитать чтобы правильно удалить метки
                         if (transaction.noDCSet()) {
                             transaction.setDC((DCSet) databaseSet, true);
+                        }
+
+                        if (transaction instanceof RSignNote) {
+                            boolean debug = true;
                         }
 
                         String[] tokens = transaction.getTags();
