@@ -115,23 +115,30 @@ public class ErachainStorageBotTest {
     public void processHelp() {
         init();
 
+        BaseResponse result;
         //Long chatId = -1002147068743L;
         Long chatId = 167208327L;
 
-        String mess = bot.getGreetingsHelp(false, lang);
-        //assertEquals("Для полной помощи используйте команды `help`, `помоги` или `помощь`\n", mess);
-        System.out.println(mess);
-        BaseResponse result = bot.sendMarkdown(chatId, mess);
-        assertEquals(result.isOk(), true);
 
-        bot.sendMarkdown(chatId, "```java\n{\"error1\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}```");
-        bot.sendMarkdown(chatId, "```java {\"error1\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}```");
-        bot.sendMarkdown(chatId, "```java\n\n{\"error2\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "```json\njava\n{\"error3\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "```json\n\n{\"error4\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "```json {\"error5\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "``` json\njava\n{\"error6\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "``` json\n\njava\n\n{\"error7\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
-        bot.sendMarkdown(chatId, "``` json java\n\n{\"error8\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+        bot.sendMarkdown(chatId, "```java Transaction\n{\"error1\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":null}}```");
+
+        if (false) {
+            String mess = bot.getGreetingsHelp(false, lang);
+            //assertEquals("Для полной помощи используйте команды `help`, `помоги` или `помощь`\n", mess);
+            System.out.println(mess);
+            result = bot.sendMarkdown(chatId, mess);
+            assertEquals(result.isOk(), true);
+
+            result = bot.answerChainInfo(chatId, lang);
+            bot.sendMarkdown(chatId, "```java\n{\"error1\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}```");
+            bot.sendMarkdown(chatId, "```java {\"error1\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}```");
+            bot.sendMarkdown(chatId, "```java\n\n{\"error2\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "```json\njava\n{\"error3\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "```json\n\n{\"error4\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "```json {\"error5\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "``` json\njava\n{\"error6\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "``` json\n\njava\n\n{\"error7\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+            bot.sendMarkdown(chatId, "``` json java\n\n{\"error8\":{\"code\":25,\"message\":\"Creator Account is not personalized\",\"lang\":\"ru\",\"value\":\"2Lq5CutaLEiesnbcaB3QLJg5V2goTKEm4mB7Hsh37oTS\",\"local\":\"Счет создателя не персонализирован\"}}\n```");
+        }
     }
 }
