@@ -106,6 +106,10 @@ public class OnDealClick {
                 mess = "Invalid public key";
                 break;
 
+            case Transaction.INVALID_RECEIVERS_LIST:
+                mess = "Invalid recevers list";
+                break;
+
             case Transaction.INVALID_ISSUE_PROHIBITED:
                 mess = "Item Issue Prohibited";
                 break;

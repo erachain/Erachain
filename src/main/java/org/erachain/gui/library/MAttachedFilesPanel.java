@@ -134,7 +134,6 @@ public class MAttachedFilesPanel extends JPanel {
                             buffer = ZipBytes.decompress(buffer);
                         } catch (DataFormatException e1) {
                             logger.error(e1.getMessage(), e1);
-                            return;
                         }
                     }
                     fos.write(buffer, 0, buffer.length);

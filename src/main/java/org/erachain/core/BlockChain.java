@@ -116,7 +116,7 @@ public class BlockChain {
     /**
      * default = 30 sec
      */
-    private static int BLOCKS_PERIOD = 30; // [sec]
+    private static int BLOCKS_PERIOD = 30000; // [milsec]
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
@@ -597,9 +597,21 @@ public class BlockChain {
                 }
 
                 if (chainParams.containsKey("blockPeriod")) {
-                    BLOCKS_PERIOD = Integer.parseInt(chainParams.get("blockPeriod").toString());
-                    if (BLOCKS_PERIOD < 3) {
-                        BLOCKS_PERIOD = 3;
+                    Object basePeriod = chainParams.get("blockPeriod");
+                    if (basePeriod instanceof Long) {
+                        BLOCKS_PERIOD = (int) (long) basePeriod * 1000;
+                    } else if (basePeriod instanceof String) {
+                        String basePeriodStr = (String) basePeriod;
+                        if (basePeriodStr.endsWith("s")) {
+                            BLOCKS_PERIOD = Integer.parseInt(basePeriodStr.substring(0, basePeriodStr.length() - 1)) * 1000;
+                        } else if (basePeriodStr.endsWith("m")) {
+                            BLOCKS_PERIOD = Integer.parseInt(basePeriodStr.substring(0, basePeriodStr.length() - 1));
+                        } else {
+                            BLOCKS_PERIOD = Integer.parseInt(basePeriodStr) * 1000;
+                        }
+                    }
+                    if (BLOCKS_PERIOD < 3000) {
+                        BLOCKS_PERIOD = 3000;
                     }
                 }
 
@@ -836,32 +848,26 @@ public class BlockChain {
         return dcSet.getBlockSignsMap().size();
     }
 
-    public static int GENERATING_MIN_BLOCK_TIME(int height) {
-
-        if (CLONE_MODE)
-            return BLOCKS_PERIOD;
-
-        if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
-            return 288; // old MainNet
-        }
-
-        if (TEST_MODE && !DEMO_MODE)
-            return 7;
-
-        return 30;
-    }
-
     public static boolean isWiped(byte[] signature) {
         return WIPED_RECORDS.contains(Longs.fromByteArray(signature));
     }
 
     public static int GENERATING_MIN_BLOCK_TIME_MS(int height) {
-        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
+        if (CLONE_MODE)
+            return BLOCKS_PERIOD;
+        else if (TEST_MODE && !DEMO_MODE)
+            return 7000;
+
+        if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
+            return 288000; // old MainNet
+        }
+
+        return 30000;
     }
 
     public static int GENERATING_MIN_BLOCK_TIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
-        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
+        return GENERATING_MIN_BLOCK_TIME_MS(height);
     }
 
     public static int FLUSH_TIMEPOINT(int height) {
@@ -898,7 +904,7 @@ public class BlockChain {
 
 
     public static int BLOCKS_PER_DAY(int height) {
-        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+        return 24 * 60 * 60000 / GENERATING_MIN_BLOCK_TIME_MS(height); // 300 PER DAY
     }
 
     public static int WIN_TIMEPOINT(int height) {

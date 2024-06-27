@@ -47,23 +47,13 @@ public class RLinkedHashesResource {
     }
 
     private String make(PrivateKeyAccount creator, String hashes,
-                        String exLinkRef, Long feePow,
+                        Object exLinkObj, Long feePow,
                         String url,
                         String message) {
 
         Controller cntr = Controller.getInstance();
 
-        ExLink exLink;
-        if (exLinkRef == null) {
-            exLink = null;
-        } else {
-            Long linkTo = Transaction.parseDBRef(exLinkRef);
-            if (linkTo != null)
-                exLink = new ExLinkAppendix(linkTo);
-            else
-                exLink = null;
-        }
-
+        ExLink exLink = ExLinkAppendix.of(exLinkObj);
         Transaction transaction = cntr.r_Hashes(creator, exLink, feePow.intValue(),
                 url, message, hashes);
 
@@ -86,7 +76,7 @@ public class RLinkedHashesResource {
     @GET
     @Path("make/{creator}/{hashes}")
     public String makeGet(@PathParam("creator") String creatorStr, @PathParam("hashes") String hashes,
-                          @QueryParam("linkTo") String exLinkRef, @DefaultValue("0") @QueryParam("feePow") Long feePow,
+                          @QueryParam("linkTo") String exLinkObj, @DefaultValue("0") @QueryParam("feePow") Long feePow,
                           @DefaultValue("") @QueryParam("url") String url,
                           @DefaultValue("") @QueryParam("message") String message,
                           @QueryParam("password") String password) {
@@ -106,7 +96,7 @@ public class RLinkedHashesResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
 
-        return make(privateKeyAccount, hashes, exLinkRef, feePow, url, message);
+        return make(privateKeyAccount, hashes, exLinkObj, feePow, url, message);
 
     }
 
@@ -122,7 +112,7 @@ public class RLinkedHashesResource {
         String url = (String) jsonObject.get("url");
         String message = (String) jsonObject.get("message");
         String hashes = (String) jsonObject.get("hashes");
-        String linkTo = (String) jsonObject.get("linkTo");
+        Object linkTo = jsonObject.get("linkTo");
 
         return make(maker, hashes, linkTo, (long) feePow, url, message);
 

@@ -399,7 +399,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * % - это указатель на параметр например иак - %1
      * see https://regex101.com/
      */
-    public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    //public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    public static String SPLIT_CHARS = "[!?/_,;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
@@ -976,19 +977,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static String[] tags(int typeID, String type, String tags, String words, Object[][] itemsKeys) {
 
-        String allTags = "@TT" + typeID;
+
+        List<String> allTags = new ArrayList<>();
+        allTags.add("@tt" + typeID);
 
         if (type != null)
-            allTags += " " + type;
+            allTags.add(type.toLowerCase());
 
         if (tags != null)
-            allTags += " " + tags;
-
+            allTags.addAll(Arrays.asList(tags.toLowerCase().split(",")));
 
         if (words != null)
-            allTags += " " + words;
+            allTags.addAll(Arrays.asList(words.toLowerCase().split(SPLIT_CHARS)));
 
-        String[] tagsWords = allTags.toLowerCase().split(SPLIT_CHARS);
+        String[] tagsWords = allTags.toArray(new String[allTags.size()]);
 
         if (itemsKeys == null || itemsKeys.length == 0)
             return tagsWords;
@@ -1357,6 +1359,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return Long.parseLong(refStr);
         } catch (Exception e1) {
         }
+
+        return null;
+    }
+
+    public static Long parseDBRef(Object ref) {
+        if (ref == null)
+            return null;
+
+        if (ref instanceof String)
+            return parseDBRef((String) ref);
+        else if (ref instanceof Long)
+            return (Long) ref;
 
         return null;
     }
@@ -1868,20 +1882,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         try {
             error_value = "feePow error";
             feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-
-            String linkToRefStr = (String) jsonObject.get("linkTo");
-            if (linkToRefStr == null) {
-                linkTo = null;
-            } else {
-                Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-                if (linkToRef == null) {
-                    error = Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
-                    Transaction.updateMapByErrorValue(error, "for 'linkTo'", out);
-                    return out;
-                } else {
-                    linkTo = new ExLinkAppendix(linkToRef);
-                }
-            }
+            linkTo = ExLinkAppendix.of(jsonObject);
         } catch (Exception e) {
             Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, error_value, out);
             return out;
@@ -2166,6 +2167,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         // CHECK CREATOR
         if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
+            errorValue = creator.getBase58();
             return INVALID_ADDRESS;
         }
 

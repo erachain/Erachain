@@ -365,25 +365,4 @@ public class SynchronizerTests {
         }
     }
 
-    // Yandex test
-    private void gen(String res, int open, int closed, int n) {
-        if (res.length() == 2 * n) {
-            if (open == closed) {
-                System.out.println(res);
-            }
-            return;
-        }
-        gen(res + "(", open + 1, closed, n);
-
-        if (closed < open)
-            gen(res + ")", open, closed + 1, n);
-
-    }
-
-    @Test
-    public void testParens() {
-
-        gen("", 0, 0, 3);
-
-    }
 }

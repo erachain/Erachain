@@ -30,36 +30,45 @@ public class ApiClient {
     static String[][] helpStrings =
             {
                     {
-                            "GET assets",
-                            "See assets API",
-                    },
-                    {
-                            "GET persons",
-                            "See persons API",
-                    },
-                    {
-                            "GET polls",
-                            "See polls API",
+                            "GET r_send",
+                            "See notes API or http://127.0.0.1:{RPC_PORT}/r_send",
+                            "JSON"
                     },
                     {
                             "GET r_note",
-                            "See notes API",
+                            "See notes API or http://127.0.0.1:{RPC_PORT}/r_note",
+                            "JSON"
+                    },
+                    {
+                            "GET assets",
+                            "See assets API or http://127.0.0.1:{RPC_PORT}/assets",
+                            "JSON"
+                    },
+                    {
+                            "GET persons",
+                            "See persons API or http://127.0.0.1:{RPC_PORT}/persons",
+                            "JSON"
+                    },
+                    {
+                            "GET polls",
+                            "See polls API or http://127.0.0.1:{RPC_PORT}/polls",
+                            "JSON"
                     },
                     {
                             "GET statuses",
-                            "See statuses API",
-                            "See statuses API",
+                            "See statuses API or http://127.0.0.1:{RPC_PORT}/statuses",
+                            "JSON"
                     },
                     {
                             "GET templates",
-                            "See templates API",
+                            "See templates API or http://127.0.0.1:{RPC_PORT}/templates",
+                            "JSON"
                     },
                     {
                             "GET r_linkedhashes",
-                            "See linked hashes API",
+                            "See linked hashes API or http://127.0.0.1:{RPC_PORT}/r_linkedhashes",
+                            "JSON"
                     },
-
-
                     {
                             "GET core",
                             "Returns info of the application.",
@@ -500,22 +509,6 @@ public class ApiClient {
                             "Unlocks the wallet using the given password. Returns true/false depending on the fact if the password is correct.\n201 - Wallet does not exist.",
                             "Errors: 201 - Wallet does not exist."
                     },
-
-                    {"GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
-                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
-                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
-                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
-                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
-                    {"GET r_send/multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
-                            "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
-                                    + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
-                                    + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
-                                    + "selfPay=true - if set pay to self address too. Default = true"
-                                    + " title=, onlyperson - get only personalized addresses, password="},
-
                     /*
 
                     {

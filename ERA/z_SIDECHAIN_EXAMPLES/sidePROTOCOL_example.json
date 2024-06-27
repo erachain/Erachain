@@ -1,8 +1,9 @@
 {
   // peers from external source
   "peersURL": "https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json",
-  // Blocks period [sec], minumum: 3, default: 30
-  "blockPeriod": 5,
+  // Blocks period [sec: 30|30s or ms: 30000m], minumum: 3, default: 30
+  // exemple: 30sec - 30 | 30sec - "30s" | 35234 milliseconds - "35234m"
+  "blockPeriod": "5000m",
   // external Block Explorer
   "explorer": "http://my-chain.dom:9057",
   "cloneLicense": "Clonechain Licence Agreement.pdf",

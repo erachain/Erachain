@@ -641,7 +641,7 @@ public class TransactionCreator {
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
                                   PrivateKeyAccount creator,
-                                  int feePow, long key, byte[] message) {
+                                  int feePow, long key, byte[] exDataBytes) {
 
         this.checkUpdate();
 
@@ -651,7 +651,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         recordNoteTx = new RSignNote(version, property1, property2,
-                creator, (byte) feePow, key, message, timestamp, 0L);
+                creator, (byte) feePow, key, exDataBytes, timestamp, 0L);
         recordNoteTx.sign(creator, Transaction.FOR_NETWORK);  // slow for HUGE files > 1MB
         recordNoteTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet(), false);
 
@@ -783,6 +783,16 @@ public class TransactionCreator {
         transaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
         return transaction;
+    }
+
+    public Transaction createForNetwork(Transaction record) {
+
+        this.checkUpdate();
+        record.setTimestamp(NTP.getTime());
+        record.sign((PrivateKeyAccount) record.getCreator(), Transaction.FOR_NETWORK);
+        record.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet(), false);
+
+        return record;
     }
 
     public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData) {

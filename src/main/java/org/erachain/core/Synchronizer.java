@@ -1125,8 +1125,14 @@ public class Synchronizer extends Thread {
                     if (ctrl.isOnStopping())
                         return;
 
-                    if (!ctrl.isStatusSynchronizing() && Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
-                        ctrl.NotifyWalletIncoming(block.getTransactions());
+                    List<Transaction> txs = block.getTransactions();
+                    if (!ctrl.isStatusSynchronizing() && !txs.isEmpty()) {
+                        if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
+                            // уведомление для внешних сервисов что пришли транзакции
+                            ctrl.NotifyWalletIncoming(txs);
+                        }
+                        ctrl.botsErachain.forEach(bot -> bot.processBlock(txs));
+
                     }
 
                     if (ctrl.isOnStopping())

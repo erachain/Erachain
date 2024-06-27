@@ -9,6 +9,9 @@ import org.erachain.api.ApiClient;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
+import org.erachain.bot.telegram.ErachainBotCls;
+import org.erachain.bot.telegram.ErachainIcBot;
+import org.erachain.bot.telegram.ErachainStorageBot;
 import org.erachain.core.*;
 import org.erachain.core.BlockGenerator.ForgingStatus;
 import org.erachain.core.account.Account;
@@ -98,11 +101,12 @@ import java.util.jar.Manifest;
 
 /**
  * main class for connection all modules
+ * set Enviropment Variable: bot_tgm_token=...
  */
 public class Controller extends Observable {
 
-    public static String version = "6.3.02";
-    public static String buildTime = "2023-03-25 12:00:00 UTC";
+    public static String version = "6.4.04";
+    public static String buildTime = "2024-06-21 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -164,6 +168,9 @@ public class Controller extends Observable {
     // private JSONObject Setting_Json;
 
     public AboutFrame about_frame = null;
+
+    public String bot_tgm_token;
+    public List<ErachainBotCls> botsErachain = new ArrayList<>();
     private boolean isStopping = false;
     private String info;
 
@@ -887,6 +894,9 @@ public class Controller extends Observable {
             }
         });
 
+        botsErachain.add(new ErachainIcBot(this));
+        botsErachain.add(new ErachainStorageBot(this));
+
         if (!useNet)
             this.status = STATUS_OK;
 
@@ -1243,6 +1253,8 @@ public class Controller extends Observable {
             reBuilChainHalt();
             return;
         }
+
+        botsErachain.forEach(bot -> bot.stop());
 
         if (transactionsPool == null) {
             // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
@@ -2543,7 +2555,7 @@ public class Controller extends Observable {
     }
 
     public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
-        return this.wallet.importAccountSeed(accountSeed, baseLen);
+        return this.wallet.importAccountSeed(accountSeed, baseLen, false);
     }
 
     public byte[] exportAccountSeed(String address) {
@@ -2640,7 +2652,6 @@ public class Controller extends Observable {
     }
 
     public Transaction getTransaction(byte[] signature) {
-
         return getTransaction(signature, this.dcSet);
     }
 
@@ -2668,6 +2679,10 @@ public class Controller extends Observable {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
         return null;
+    }
+
+    public Long getTransactionSeqBySign(byte[] signature, DCSet database) {
+        return DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
     }
 
     public Transaction getTransaction(long refDB, DCSet database) {
@@ -3883,10 +3898,10 @@ public class Controller extends Observable {
     }
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
-                                  PrivateKeyAccount sender, int feePow, long key, byte[] message) {
+                                  PrivateKeyAccount sender, int feePow, long key, byte[] exDataBytes) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_SignNote(version, property1, property2, sender, feePow, key,
-                    message);
+                    exDataBytes);
         }
     }
 
@@ -3943,6 +3958,16 @@ public class Controller extends Observable {
             return this.transactionCreator.r_SetStatusToItem(1, asPack, creator, feePow, key, item, beg_date, end_date,
                     value_1, value_2, data_1, data_2, refParent, description);
         }
+    }
+
+    public Transaction createForNetwork(Transaction record) {
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createForNetwork(record);
+        }
+    }
+
+    public int afterCreateForNetwork(Transaction record, boolean tryFree, boolean notRelease) {
+        return transactionCreator.afterCreate(record, Transaction.FOR_NETWORK, tryFree, notRelease);
     }
 
     /*
@@ -4355,6 +4380,10 @@ public class Controller extends Observable {
 
             if (arg.equals("-fpool")) {
                 fpool = true;
+                continue;
+            }
+            if (arg.startsWith("-bot_tgm_token=") && arg.length() > 15) {
+                bot_tgm_token = arg.substring(15);
                 continue;
             }
 

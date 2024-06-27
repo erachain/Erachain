@@ -1,7 +1,7 @@
 Start Commands
 
 -nonet
-No use Network
+The network is not in use. Node will generate a blocks even when disconnected from the network
 
 -testnet[=GENESIS_TIMESTAMP]
 -testnet=[XXXX] - Start in TestNET mode and set Genesis Block Timestamp (in millis).
@@ -36,7 +36,7 @@ Send in DEBT some forging stake to pool address (setted in settings_pool.json) f
 -backup
 
 -rechain
-Rebuild the chain database. The rebuild is autorun if a new version of the database structure is used in the node.
+Rebuild the chain database (datachain). The rebuild is autorun if a new version of the database structure is used in the node.
 Ignored in SIMPLE_TEST mode.
 
 -nogui
