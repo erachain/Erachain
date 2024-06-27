@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.OddEvenDAPP;
 import org.erachain.dapp.epoch.Refi;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
@@ -81,6 +82,18 @@ public abstract class DAPP {
         return PublicKeyAccount.makeForDApp(hash);
     }
 
+    /**
+     * @param dcSet
+     * @param block
+     * @param commandTX
+     * @param from
+     * @param to
+     * @param amount
+     * @param assetKey
+     * @param asOrphan
+     * @param memoFrom  если задано, создает Вычисленную транзакцию для показа для адреса From
+     * @param memoTo    если задано, создает Вычисленную транзакцию для показа для адреса To
+     */
     public static void transfer(DCSet dcSet, Block block, Transaction commandTX,
                                 Account from, Account to, BigDecimal amount, long assetKey, boolean asOrphan,
                                 String memoFrom, String memoTo) {
@@ -164,6 +177,8 @@ public abstract class DAPP {
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
+            case OddEvenDAPP.ID:
+                return OddEvenDAPP.Parse(data, position, forDeal);
             case LeafFall.ID:
                 return LeafFall.Parse(data, position, forDeal);
             case DogePlanet.ID:

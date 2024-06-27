@@ -1,7 +1,7 @@
 Start Commands
 
 -nonet
-No use Network
+The network is not in use. Node will generate a blocks even when disconnected from the network
 
 -testnet[=GENESIS_TIMESTAMP]
 -testnet=[XXXX] - Start in TestNET mode and set Genesis Block Timestamp (in millis).

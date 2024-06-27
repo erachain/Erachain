@@ -8,7 +8,6 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.response.BaseResponse;
 import org.erachain.controller.Controller;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,11 @@ public class ErachainIcBot extends ErachainBotCls {
     }
 
     @Override
+    protected String[] retrieveCommand(String text) {
+        return null;
+    }
+
+    @Override
     protected boolean processMessage(Long makerTxId, Long replyChatId, Chat chatMain, Message message, String lang) {
         return false;
     }
@@ -40,7 +44,7 @@ public class ErachainIcBot extends ErachainBotCls {
     }
 
     @Override
-    protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String command, String text, JSONObject out, String lang) {
+    protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
         return false;
     }
 

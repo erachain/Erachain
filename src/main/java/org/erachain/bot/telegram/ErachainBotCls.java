@@ -16,6 +16,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -25,7 +26,6 @@ import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.FileUtils;
-import org.erachain.utils.Pair;
 import org.erachain.utils.SaveStrToFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -60,7 +60,7 @@ abstract public class ErachainBotCls {
     static Gson GSON = new Gson();
 
     private JSONObject settingsJSON;
-    private JSONObject settingsChats;
+    private JSONObject settingsAllChats;
     private byte[] baseSeed;
 
     private GetMeResponse meInfo;
@@ -113,8 +113,8 @@ abstract public class ErachainBotCls {
 
             } catch (Exception e) {
                 settingsJSON = new JSONObject();
-                settingsChats = new JSONObject();
-                settingsJSON.put("chats", settingsChats);
+                settingsAllChats = new JSONObject();
+                settingsJSON.put("chats", settingsAllChats);
                 saveSettings = true;
             }
 
@@ -145,11 +145,11 @@ abstract public class ErachainBotCls {
             baseSeed = Base58.decode((String) settingsJSON.get("baseSeed"));
 
             if (settingsJSON.isEmpty() || !settingsJSON.containsKey("chats")) {
-                settingsChats = new JSONObject();
-                settingsJSON.put("chats", settingsChats);
+                settingsAllChats = new JSONObject();
+                settingsJSON.put("chats", settingsAllChats);
                 saveSettings = true;
             } else {
-                settingsChats = (JSONObject) settingsJSON.get("chats");
+                settingsAllChats = (JSONObject) settingsJSON.get("chats");
             }
 
         } finally {
@@ -202,8 +202,8 @@ abstract public class ErachainBotCls {
         // Для посылки сообщений админу - нужно задать adminChatId в настройках!
         adminChatId = (Long) settingsJSON.get("adminChatId");
         sendToAdminMessage("Started...");
-        settingsChats.keySet().forEach(chatId -> {
-            if (((JSONObject) settingsChats.get(chatId)).get("userName") != null)
+        settingsAllChats.keySet().forEach(chatId -> {
+            if (((JSONObject) settingsAllChats.get(chatId)).get("userName") != null)
                 // пользователям не пишем
                 return;
             sendMarkdown(Long.parseLong((String) chatId), "Я запустился... " + botUserNameMD1);
@@ -261,11 +261,13 @@ abstract public class ErachainBotCls {
 
     abstract protected String getShortName();
 
+    abstract protected String[] retrieveCommand(String text);
+
     abstract protected boolean processMessage(Long makerTxId, Long replyChatId, Chat chatMain, Message message, String lang);
 
     abstract protected void makeEntitiesCommands(String text, List<MessageEntity> commands, MessageEntity entity);
 
-    abstract protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String command, String text, JSONObject out, String lang);
+    abstract protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang);
 
     public void process() {
         GetUpdatesResponse updatesResponse = bot.execute(getUpdates);
@@ -311,62 +313,179 @@ abstract public class ErachainBotCls {
                     // это сообщение пришло из канала к которому привязан данный чат (супергруппа)
                     // это основной чат откуда пришло сообщение - с именем и правильным UserName
                     origMessageChat = message.senderChat();
-                    if (origMessageChat.type().equals(Chat.Type.channel)) {
-                        // при этом message.from() - будет id=777000 firstName= "Telegram"
-                        // поэтому берем Имя основного чата - и счет из него будем делать
-                        // userName = origMessageChat.username();
-                        if (this.processMessage(chatId, chatId, origMessageChat, message, lang))
-                            return;
-                        return;
-                    }
+                    this.processMessage(chatId, chatId, origMessageChat, message, lang);
+                    //if (origMessageChat.type().equals(Chat.Type.channel)) {
+                    // при этом message.from() - будет id=777000 firstName= "Telegram"
+                    // поэтому берем Имя основного чата - и счет из него будем делать
+                    // userName = origMessageChat.username();
+                    //   if (this.processMessage(chatId, chatId, origMessageChat, message, lang))
+                    //       return;
+                    //   return;
+                    //}
 
-                    if (chat.type().equals(Chat.Type.supergroup) // публичная группа
-                            || chat.type().equals(Chat.Type.group)) { // не публичная - только по приглашению
-                        from = message.from();
-                        // в супергруппах, которые прикрепляются как чат для каналов, в чат сообщения из канала пишет бот, поэтому все сообщения не от ботов игнорируем
-                        if (!from.isBot()) {
-                            return;
-                        }
-
-                        if (from.isBot()) {
-                            if (message.newChatMembers() != null && message.newChatMembers().length > 0) {
-                                // прилетает сюда при добавлении бота в супергруппу
-                                return;
-                            }
-                            return;
-                        }
-                        return;
-
-                    } else {
-                        user = message.from();
-                        userId = user.id();
-                        userName = user.firstName();
-                        text = message.text();
-                        chatId = chat.id();
-                        if (text != null) {
-                            if (botAnswerPublic(text, chat, user))
-                                return;
-                        }
-
-                    }
-
-                    sendGreetingsMessage(chatId, lang);
                     return;
 
-                } else {
-                    // это сообщение пользователя или другого бота - но не из головного канала
-                    text = message.text();
-                    chatErrorId = chatId;
-                    if (// даже Яндекс ничего сними сделать не может - это чисто встроенная фишка
-                            message.forwardOrigin() == null &&
-                                    (text == null || text.isEmpty())) {
-                        // сюда приходит если было например изменение названия группы (супергруппы)
-                        return;
-                    }
+                } else
+                    //
+                    // Это сообщение простое внутри чата
+                    if (chat.type().equals(Chat.Type.supergroup) // публичная группа
+                            || chat.type().equals(Chat.Type.group)) { // не публичная - только по приглашению
+                        // Это группа и сообщение не переданное из канала - значит нужно найти в нем саму команду - всё не кидать в блокчейн
 
-                    if (chat.type().equals(Chat.Type.Private)) {
+                        // это сообщение пользователя или другого бота - но не из головного канала
+                        text = message.text();
+                        chatErrorId = chatId;
+                        if (// даже Яндекс ничего сними сделать не может - это чисто встроенная фишка
+                                message.forwardOrigin() == null &&
+                                        (text == null || text.isEmpty())) {
+                            // сюда приходит если было например изменение названия группы (супергруппы)
+                            return;
+                        }
+
+                        if (text.startsWith("/")) {
+                            // это скорее всего команда боту быстрая
+                            // если это ответ на другое - или есть общее обсуждение
+                            if (message.replyToMessage() != null) {
+                                Message reply = message.replyToMessage();
+                                //from = reply.from();
+                                from = message.from();
+                                lang = from.languageCode();
+                                if (from.isBot()) {
+                                    if ("GroupAnonymousBot".equals(from.username()) || "Channel_Bot".equals(from.username())) {
+                                        // это админ канала - chatId не меняем
+                                        if (this.processCommand(chatId, chatId, message.messageId(), reply.chat(), reply.messageId(), reply.date(), reply, new String[]{":" + text.substring(1), null}, lang))
+                                            return;
+                                    }
+                                } else {
+                                    // чат для общения приватный и счет под него генерим
+                                    //chatId = from.id(); - если сообщение катать в приватный чат пользователя
+                                    if (this.processCommand(
+                                            // Ответ о записи в блокчейн в том же чате на нашу команду будет:
+                                            chatId, chatId, message.messageId(),
+                                            reply.chat(), reply.messageId(), reply.date(), reply, new String[]{":" + text.substring(1), null}, lang))
+                                        return;
+                                }
+                            }
+
+                            return;
+
+                        } else if (text.startsWith(botUserNameF)) {
+
+                            // это сообщение боту из общего чата - видное всем
+                            // @blockchain_storage_bot mode 3
+                            String commandLine = text.length() == botUserNameF.length() ? "" : text.substring(botUserName.length() + 1).trim();
+                            String[] command = commandLine.split(" ");
+                            if (command.length == 1) {
+                                // команда без паарметров - просто ответить как правило выдать Инфо или данные текущих настроек
+                                if (botAnswerPublic(command[0], chat, message.from()))
+                                    return;
+
+                            } else {
+                                // Команда с параметрами = для управления
+                                from = message.from();
+                                if (from.isBot()) {
+                                    if (from.username().equals("Channel_Bot")) {
+                                        // команды от админа канала
+                                        botAnswerAdmin(command, chat, from);
+                                        return;
+                                    } else if (from.username().equals("GroupAnonymousBot")) {
+                                        // команды от админа чата
+                                        // TODO проверить разрешение на управление от админа канала - а если это просто группа ьез канала?
+                                        botAnswerAdmin(command, chat, from);
+                                        return;
+                                    } else {
+                                        // иной какой-то бот
+                                    }
+                                    return;
+
+                                } else {
+                                    // Пользователи - они тоже могут быть админами - см. ниже
+                                    // TODO после определения команды - надо ловить статус члена
+                                    GetChatMember request = new GetChatMember(chatId, from.id());
+                                    GetChatMemberResponse response = bot.execute(request);
+                                    if (!response.isOk()) {
+                                        // что пошло не так
+                                        sendMarkdown(chatId, "```java Response\n" + response + "```");
+                                        return;
+                                    }
+
+                                    ChatMember chatMember = response.chatMember();
+                                    if (chatMember.status().equals(ChatMember.Status.creator)
+                                            || chatMember.status().equals(ChatMember.Status.administrator) && chatMember.canManageChat()) {
+                                        botAnswerAdmin(command, chat, from);
+                                    } else {
+                                        replySimpleText(chatId, "Для управления группой нужно быть администратором с правом управлять чатом", message.messageId());
+                                    }
+                                }
+                            }
+                            return;
+
+                        } else {
+
+                            if (false) {
+                                // Если использовать их внутренний механизм выявления Команд по message.entities() - то русские команды туда не попадают ((
+                                MessageEntity[] entities = message.entities();
+                                List<MessageEntity> commands = new ArrayList<>();
+                                if (entities != null && entities.length > 0) {
+                                    for (int i = 0; i < entities.length; i++) {
+                                        MessageEntity entity = entities[i];
+                                        if (entity.type().equals(MessageEntity.Type.bot_command)) {
+                                            makeEntitiesCommands(text, commands, entity);
+                                        }
+                                    }
+                                }
+                                // тут обработчик на основе выявленных команд надо доделать
+                                // ...
+                            }
+
+                            // проверим - а есть ли в сообщении вообще команда или это обычное сообщение
+                            String[] commands = retrieveCommand(text);
+                            if (commands == null || commands[0] == null)
+                                // Это сообщение без команды - выход
+                                return;
+
+                            // проверку админства - по getChatAdministrators и getChatMember
+                            // если это админы то от имени чата сохраняем - иначе оот имени пользователя
+                            // ChatMemberOwner и ChatMemberAdministrator + can_manage_chat
+                            from = message.from();
+                            if (from.isBot()) {
+                                if ("GroupAnonymousBot".equals(from.username()) || "Channel_Bot".equals(from.username())) {
+                                    // это автобот чата, который присоединен к чаты от канала
+                                    // тут не меняем ничего
+                                    ;
+                                } else {
+                                    // иной какой-то бот - игнорируем
+                                    return;
+                                }
+                            } else {
+
+                                // TODO после определения команды - надо ловить статус члена
+                                GetChatMember request = new GetChatMember(chatId, from.id());
+                                GetChatMemberResponse response = bot.execute(request);
+                                if (!response.isOk()) {
+                                    // что пошло не так
+                                    sendMarkdown(chatId, "```java Response\n" + response + "```");
+                                    return;
+                                }
+
+                                ChatMember chatMember = response.chatMember();
+                                if (chatMember.status().equals(ChatMember.Status.creator)
+                                        || chatMember.status().equals(ChatMember.Status.administrator) && chatMember.canManageChat()) {
+                                    // chatId = message.chat().id();
+                                    ;
+                                } else {
+                                    chatId = from.id();
+                                }
+                            }
+
+                            processCommand(chatId, chat.id(), message.messageId(), chat, message.messageId(), message.date(), message, commands, lang);
+                        }
+                        return;
+
+                    } else if (chat.type().equals(Chat.Type.Private)) {
                         // в приватном чате не нужно писать Имя бота в сообщениях - поэтому сразу команды обрабатываем
                         user = message.from();
+                        text = message.text();
 
                         // запомним ИД приватного чата - чтобы напрямую пользователю потом писать
                         JSONObject settings = getChatSettings(user.id());
@@ -440,137 +559,25 @@ abstract public class ErachainBotCls {
                             // в приватном чате одна ссылка только на сообщение
                             ///message.linkPreviewOptions(); // url на https://t.me/antifalivland/8946
                             if (text != null) {
-                                this.processCommand(chatId, chatId, message.messageId(), origChat, origMessageId, origMessageDate, message, null, text, null, lang);
+                                this.processCommand(chatId, chatId, message.messageId(), origChat, origMessageId, origMessageDate, message, new String[]{null, text}, lang);
                                 return;
                             }
                         } else if (message.linkPreviewOptions() != null) {
                             // https://t.me/Onishchenko001/61166?comment=1621294
                             //LinkPreviewOptions link = message.linkPreviewOptions();
-                            this.processCommand(chatId, chatId, message.messageId(), null, null, null, message, null, null, null, lang);
+                            this.processCommand(chatId, chatId, message.messageId(), null, null, null, message, new String[]{text, null}, lang);
                             return;
                         }
-                        if (botAnswerPrivate(text.split(" "), chatId, chat, user))
+                        if (botAnswerPrivate(text.split(" "), chatId, chat, message.messageId(), user))
                             return;
 
                         BaseResponse response = sendGreetingsPrivateMessage(chatId, user, lang);
+                        // Проверим сразу счет - если что вышлем подарок
+                        getPrivKey(chatId, user, lang);
                         return;
-                    } else if (text.startsWith(botUserNameF)) {
 
-                        // это сообщение боту из общего чата - видное всем
-                        // @blockchain_storage_bot mode 3
-                        String commandLine = text.length() == botUserNameF.length() ? "" : text.substring(botUserName.length() + 1).trim();
-                        String[] command = commandLine.split(" ");
-                        if (command.length == 1) {
-                            // команда без паарметров - просто ответить как правило выдать Инфо или данные текущих настроек
-                            if (botAnswerPublic(command[0], chat, message.from()))
-                                return;
-
-                        } else {
-                            // как админ канала основного: User{id=136817688, is_bot=true, first_name='Channel', last_name='null', username='Channel_Bot', language_code='null', is_premium='null', added_to_attachment_menu='null', can_join_groups=null, can_read_all_group_messages=null, supports_inline_queries=null, can_connect_to_business=null}
-                            // как анонимный администратор группы: User{id=1087968824, is_bot=true, first_name='Group', last_name='null', username='GroupAnonymousBot', language_code='null', is_premium='null', added_to_attachment_menu='null', can_join_groups=null, can_read_all_group_messages=null, supports_inline_queries=null, can_connect_to_business=null}
-                            // как пользовательUser{id=19781---, is_bot=false, first_name='', last_name='null', username='', language_code='ru', is_premium='true', added_to_attachment_menu='null', can_join_groups=null, can_read_all_group_messages=null, supports_inline_queries=null, can_connect_to_business=null}
-                            from = message.from();
-                            if (from.isBot()) {
-                                if (from.username().equals("Channel_Bot")) {
-                                    // команды от админа канала
-                                    botAnswerAdmin(command, chat, from);
-                                    return;
-                                } else if (from.username().equals("GroupAnonymousBot")) {
-                                    // команды от админа чата
-                                    // TODO проверить разрешение на управление от админа канала - а если это просто группа ьез канала?
-                                    botAnswerAdmin(command, chat, from);
-                                    return;
-                                } else {
-                                    // иной какой-то бот
-                                }
-                                return;
-                            }
-                        }
-
-                        sendGreetingsMessage(chatId, lang);
-                        return;
-                    } else if (text.startsWith("/")) {
-                        // это скорее всего команда боту быстрая
-                        // если это ответ на другое - или есть общее обсуждение
-                        if (message.replyToMessage() != null) {
-                            Message reply = message.replyToMessage();
-                            //from = reply.from();
-                            from = message.from();
-                            lang = from.languageCode();
-                            if (from.isBot()) {
-                                if ("GroupAnonymousBot".equals(from.username()) || "Channel_Bot".equals(from.username())) {
-                                    // это админ канала - chatId не меняем
-                                    if (this.processCommand(chatId, chatId, message.messageId(), reply.chat(), reply.messageId(), reply.date(), reply, ":" + text.substring(1), null, null, lang))
-                                        return;
-                                }
-                            } else {
-                                // чат для общения приватный и счет под него генерим
-                                JSONObject settingsPrivateChat = getChatSettings(from.id());
-                                Long privateChatId = (Long) settingsPrivateChat.get(PRIVATE_CHAT_ID);
-                                userName = from.username(); // icreator
-                                if (privateChatId == null) {
-                                    sendMarkdown(chatId, userName + ", для использования, сперва настройте под себя " + botUserNameMD1);
-                                    return;
-                                } else {
-                                    //chatId = from.id(); - если сообщение катать в приватный чат пользователя
-                                    if (this.processCommand(
-                                            // Ответ о записи в блокчейн в том же чате на нашу команду будет:
-                                            chatId, chatId, message.messageId(),
-                                            reply.chat(), reply.messageId(), reply.date(), reply, ":" + text.substring(1), null, null, lang))
-                                        return;
-                                }
-                            }
-                        } else {
-                        }
-
-                        if (message.replyToStory() != null) {
-                            Story reply = message.replyToStory();
-                        } else if (message.messageThreadId() != null) {
-                            ;
-                        }
                     }
-
-
-                    if (chat.type().equals(Chat.Type.supergroup) // публичная группа
-                            || chat.type().equals(Chat.Type.group)) { // не публичная - только по приглашению
-                        MessageEntity[] entities = message.entities();
-                        if (false) {
-                            // ели использовать внутренний механизм выявления Команд по message.entities() - то русские команды туда не попадают ((
-                            List<MessageEntity> commands = new ArrayList<>();
-                            if (entities != null && entities.length > 0) {
-                                for (int i = 0; i < entities.length; i++) {
-                                    MessageEntity entity = entities[i];
-                                    if (entity.type().equals(MessageEntity.Type.bot_command)) {
-                                        makeEntitiesCommands(text, commands, entity);
-                                    }
-                                }
-                            }
-                            // тут обработчик на основе выявленных команд надо доделать
-                        }
-
-                        // проверку админства - по getChatAdministrators и getChatMember
-                        // если это админы то от имени чата сохраняем - иначе оот имени пользователя
-                        // ChatMemberOwner и ChatMemberAdministrator + can_manage_chat
-                        from = message.from();
-                        GetChatMember request = new GetChatMember(chatId, from.id());
-                        GetChatMemberResponse response = bot.execute(request);
-                        if (!response.isOk()) {
-                            // что пошло не так
-                            sendMarkdown(chatId, "```java " + response + "```");
-                            return;
-                        }
-                        ChatMember chatMember = response.chatMember();
-                        if (chatMember.status().equals(ChatMember.Status.creator)
-                                || chatMember.status().equals(ChatMember.Status.administrator) && chatMember.canManageChat()) {
-                            chatId = message.chat().id();
-                        } else {
-                            chatId = from.id();
-                        }
-
-                        if (this.processMessage(chatId, chat.id(), chat, message, lang))
-                            return;
-                    }
-                }
+                return;
             }
 
             MessageReactionUpdated reactions = update.messageReaction();
@@ -603,7 +610,7 @@ abstract public class ErachainBotCls {
                     if (command.length == 1) {
                         // это команды получить данные
                         if (command[0].equals("account")) {
-                            sendChatAccountMessage(chat, lang);
+                            sendChatAccountMessage(chat, null, lang);
                         }
                         return;
                     } else {
@@ -615,7 +622,7 @@ abstract public class ErachainBotCls {
                         if (command[0].equals("account")) {
                             // @blockchain_storage_bot account new
                             // задает SEED для чата
-                            sendChatAccountMessage(chat, lang);
+                            sendChatAccountMessage(chat, null, lang);
                         }
 
                     }
@@ -680,8 +687,8 @@ abstract public class ErachainBotCls {
                         sendGreetingsMessage(chatId, lang);
 
                         // В приветный чат вышлем данные о счете по данному Имени чата
-                        sendChatAccountMessage(chat, lang);
-                        sendBotAccountMessage(chat.id(), lang);
+                        sendChatAccountMessage(chat, null, lang);
+                        sendBotAccountMessage(chat.id(), null, lang);
                         //sendAccountChatMessage(from.id(), chat, lang);
 
                     } else if (newStatus.equals(ChatMember.Status.member)) {
@@ -815,22 +822,21 @@ abstract public class ErachainBotCls {
         out.add(new Object[]{new String[]{"account", "счёт", "счет"}, "Работа со счетами летописца"});
         out.add(new Object[]{new String[]{"for", "receivers", "recipients", "получатели", "для"}, "Список получателей сообщений в блокчейн, которые так же смогут расшифровать сообщение если оно зашифровано (закрытое)"});
         out.add(new Object[]{new String[]{"bot", "бот"}, "Команды для самого бота. Например команда `бот счёт`"});
-        out.add(new Object[]{new String[]{"chain", "цепь"}, "Общая информация о блокчейне: имя, подпись начального Блока, скорость блоков и т.д."});
+        out.add(new Object[]{new String[]{"chain", "цепь", "цепочка"}, "Общая информация о блокчейне: имя, подпись начального Блока, скорость блоков и т.д."});
         return out;
     }
 
     abstract protected List<Object[]> getJobCommandsList();
 
-    private void answerChainInfo(Long chatId, String lang) {
+    protected BaseResponse answerChainInfo(Long chatId, String lang) {
         StringBuilder mess = new StringBuilder();
-        mess.append("Свойства блокчейн сети").append("Имя: ").append(cnt.getApplicationName(true))
-                .append("\nДата исходного блока: `").append(new Timestamp(cnt.blockChain.getGenesisBlock().getTimestamp()))
-                .append("\nПодпись исходного блока: `").append(Base58.encode(cnt.blockChain.getGenesisBlock().getSignature()))
+        mess.append("*Свойства блокчейн сети*\n\n").append("Имя среды: *").append(cnt.getApplicationName(true))
+                .append("*\nДата исходного блока: *").append(new Timestamp(cnt.blockChain.getGenesisBlock().getTimestamp()))
+                .append("*\nПодпись исходного блока: `").append(Base58.encode(cnt.blockChain.getGenesisBlock().getSignature()))
                 .append("`\nСкорость сборки блоков (сек): *").append(BlockChain.GENERATING_MIN_BLOCK_TIME_MS(NTP.getTime()) / 1000)
                 .append("*\nПросмотр цепочки данных: ").append(scanUrlMarkdown("сканер блокчейн", "blocks", null));
 
-        sendMarkdown(chatId, mess.toString());
-
+        return sendMarkdown(chatId, mess.toString());
     }
 
     protected boolean botAnswerPublic(String receivedMessage, Chat chat, User user) {
@@ -845,7 +851,7 @@ abstract public class ErachainBotCls {
             case "account":
             case "счёт":
             case "счет":
-                sendChatAccountMessage(chat, lang);
+                sendChatAccountMessage(chat, user, lang);
                 return true;
             case "for":
             case "receivers":
@@ -859,6 +865,7 @@ abstract public class ErachainBotCls {
                 return botAnswerSelf(command, chat.id(), user.languageCode());
             case "chain":
             case "цепь":
+            case "цепочка":
                 answerChainInfo(chat.id(), user.languageCode());
                 return true;
         }
@@ -880,7 +887,7 @@ abstract public class ErachainBotCls {
 
                     return true;
                 }
-                sendChatAccountMessage(chat, user.languageCode());
+                sendChatAccountMessage(chat, user, user.languageCode());
                 return true;
             case "for":
             case "receivers":
@@ -893,13 +900,14 @@ abstract public class ErachainBotCls {
                 return botAnswerSelf(command, chat.id(), user.languageCode());
             case "chain":
             case "цепь":
+            case "цепочка":
                 answerChainInfo(chat.id(), user.languageCode());
                 return true;
         }
         return false;
     }
 
-    protected boolean botAnswerPrivate(String[] command, long chatId, Chat chatPrivate, User user) {
+    protected boolean botAnswerPrivate(String[] command, long chatId, Chat chatPrivate, Integer replyMessageId, User user) {
         switch (command[0].toLowerCase()) {
             case "help":
             case "помоги":
@@ -922,6 +930,7 @@ abstract public class ErachainBotCls {
                 return botAnswerSelf(command, chatId, user.languageCode());
             case "chain":
             case "цепь":
+            case "цепочка":
                 answerChainInfo(chatPrivate.id(), user.languageCode());
                 return true;
         }
@@ -930,7 +939,7 @@ abstract public class ErachainBotCls {
 
     protected boolean botAnswerSelf(String[] command, long chatId, String lang) {
         if (command.length == 1) {
-            sendBotAccountMessage(chatId, lang);
+            sendBotAccountMessage(chatId, null, lang);
             return true;
         }
 
@@ -938,10 +947,10 @@ abstract public class ErachainBotCls {
             case "account":
             case "счёт":
             case "счет":
-                sendBotAccountMessage(chatId, lang);
+                sendBotAccountMessage(chatId, null, lang);
                 return true;
             case "chain":
-            case "цепь":
+            case "цепочка":
                 answerChainInfo(chatId, lang);
                 return true;
         }
@@ -950,6 +959,12 @@ abstract public class ErachainBotCls {
 
     protected BaseResponse sendSimpleText(long chatId, String textToSend) {
         SendMessage message = new SendMessage(chatId, textToSend);
+        return sendMessage(message);
+    }
+
+    protected BaseResponse replySimpleText(long chatId, String textToSend, int messageId) {
+        SendMessage message = new SendMessage(chatId, textToSend);
+        message.replyToMessageId(messageId);
         return sendMessage(message);
     }
 
@@ -1003,42 +1018,6 @@ abstract public class ErachainBotCls {
         }
     }
 
-    // TODO sendChatAction - https://core.telegram.org/bots/api#sendchataction
-    protected void sendTxResult(Long replyChatId, Integer replyMessageId, Transaction transaction, int validate, String lang) {
-
-        SendMessage sendMessage;
-        if (validate == VALIDATE_OK) {
-            // Используем разметку Markdown
-            sendMessage = new SendMessage(replyChatId, "Запущено сохранение в " + scanUrlMarkdown("блокчейн", "tx", Base58.encode(transaction.getSignature())) + "...");
-
-        } else {
-            JSONObject out = new JSONObject();
-            transaction.updateMapByError2(out, validate, lang);
-            String text = "```java\n" + out.toJSONString() + "```";
-            sendMessage = new SendMessage(replyChatId, text);
-        }
-
-        sendMessage.parseMode(ParseMode.Markdown);
-
-        if (replyMessageId != null) {
-            // если чаты ответа и сообщения которое мы сохраняем совпадают,
-            // то сделаем его как ответ на сохраняемое сообщение
-            sendMessage.replyToMessageId(replyMessageId);
-        }
-
-        try {
-            SendResponse response = bot.execute(sendMessage);
-            if (response.isOk() && validate == VALIDATE_OK) {
-                // запомним ее как неподтвержденную и непросчитанную - иначе height по другому блоку считает
-                pendingTxs.put(Base58.encode(transaction.getSignature()), new Pair<>(response.message(), transaction.copy()));
-                log.info("Reply sent");
-            } else {
-                log.error("Send ERROR: " + GSON.toJson(response).toString());
-            }
-        } catch (Exception e) {
-            log.error("Send ERROR: " + e.getMessage());
-        }
-    }
 
     protected String getGreetingsHelp(boolean forChat, String lang) {
         StringBuilder mess = new StringBuilder();
@@ -1088,21 +1067,21 @@ abstract public class ErachainBotCls {
                 : "Это удостоверенный счёт на " + scanUrlMarkdown(result.b.getName(), "person", result.b.getKey()));
     }
 
-    protected BaseResponse sendBotAccountMessage(Long chatId, String lang) {
-        PublicKeyAccount pubKey = getBotAddress(lang);
+    protected BaseResponse sendBotAccountMessage(Long chatId, User user, String lang) {
+        PublicKeyAccount pubKey = getBotAddress(user, lang);
         return sendMarkdown(chatId, "Собственный счет бота, который используется для поощрений других пользователей - "
                 + accountPerson(pubKey, lang));
     }
 
-    protected BaseResponse sendChatAccountMessage(Chat chat, String lang) {
-        PublicKeyAccount pubKey = makeAddress(chat.id(), lang);
+    protected BaseResponse sendChatAccountMessage(Chat chat, User user, String lang) {
+        PublicKeyAccount pubKey = makeAddress(chat.id(), user, lang);
         return sendMarkdown(chat.id(), "Счет для работы летописца чата *" + chat.title() + "* - "
                 + accountPerson(pubKey, lang));
     }
 
     protected BaseResponse sendUserAccountMessage(Long chatId, User user) {
         String lang = user.languageCode();
-        PublicKeyAccount pubKey = makeAddress(user.id(), lang);
+        PublicKeyAccount pubKey = makeAddress(user.id(), user, lang);
         return sendMarkdown(chatId, "Счет для работы вашего, *" + user.firstName() + "*, личного летописца - "
                 + accountPerson(pubKey, lang));
     }
@@ -1116,21 +1095,22 @@ abstract public class ErachainBotCls {
     /**
      * Это счет с которого бот сможет начислять награды на другие счет - для это не забывайте пополнять его
      *
+     * @param user
      * @param lang
      * @return
      */
-    protected PrivateKeyAccount getBotPrivateKey(String lang) {
+    protected PrivateKeyAccount getBotPrivateKey(User user, String lang) {
         if (myPrivacyKey == null)
-            myPrivacyKey = getPrivKey(0L, lang);
+            myPrivacyKey = getPrivKey(0L, user, lang);
         return myPrivacyKey;
     }
 
-    private PublicKeyAccount getBotAddress(String lang) {
-        return getBotPrivateKey(lang);
+    private PublicKeyAccount getBotAddress(User user, String lang) {
+        return getBotPrivateKey(user, lang);
     }
 
-    private PublicKeyAccount makeAddress(Long chatId, String lang) {
-        return getPrivKey(chatId, lang);
+    private PublicKeyAccount makeAddress(Long chatId, User user, String lang) {
+        return getPrivKey(chatId, user, lang);
     }
 
     protected void saveSettings() {
@@ -1143,11 +1123,11 @@ abstract public class ErachainBotCls {
 
     protected JSONObject getChatSettings(Long chatId) {
         String key = "" + chatId;
-        if (!settingsChats.containsKey(key)) {
-            settingsChats.put(key, new JSONObject());
+        if (!settingsAllChats.containsKey(key)) {
+            settingsAllChats.put(key, new JSONObject());
             saveSettings();
         }
-        return (JSONObject) settingsChats.get(key);
+        return (JSONObject) settingsAllChats.get(key);
 
     }
 
@@ -1159,21 +1139,18 @@ abstract public class ErachainBotCls {
 
     }
 
-    protected void giftOnMeet(JSONObject settings, Long chatId, PublicKeyAccount account, String lang) {
-        if (!BlockChain.TEST_MODE && account.getBalanceUSE(FEE_KEY).compareTo(BigDecimal.ZERO) > 0)
-            return;
-        if (chatId.equals(adminChatId))
-            return;
+    protected void giftOnMeet(JSONObject settings, Long chatId, User user, PublicKeyAccount account, String lang) {
     }
 
     /**
      * Либо генерирует свое либо берет уже то что задано - можно положить свой туда
      *
      * @param chatId
+     * @param user
      * @param lang
      * @return
      */
-    protected PrivateKeyAccount getPrivKey(Long chatId, String lang) {
+    protected PrivateKeyAccount getPrivKey(Long chatId, User user, String lang) {
 
         JSONObject settings = getChatSettings(chatId);
         if (settings.containsKey(PRIVATE_KEY_SEED)) {
@@ -1188,9 +1165,13 @@ abstract public class ErachainBotCls {
             knownPubKey.put(privKey.getBase58(), chatId.toString());
             knownAddress.put(privKey.getAddress(), chatId.toString());
 
-            if (chatId != 0) {
+            if (chatId != 0
+                    && !chatId.equals(adminChatId)
+                    // и еще проверим -- если на этот счет не поступало ранее никаких средств - он точно пустой
+                    // проверка по позиции баланса "Всего Приход":
+                    && privKey.getBalanceForPosition(FEE_KEY, Account.BALANCE_POS_OWN).a.compareTo(BigDecimal.ZERO) == 0) {
                 // Это новый пользователь - надо ему выслать награду
-                giftOnMeet(settings, chatId, privKey, lang);
+                giftOnMeet(settings, chatId, user, privKey, lang);
             }
 
             saveSettings();
@@ -1217,7 +1198,72 @@ abstract public class ErachainBotCls {
         }
     }
 
-    protected ConcurrentHashMap<String, Pair<Message, Transaction>> pendingTxs = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, Fun.Tuple5<Message, Boolean, String, String, Transaction>> pendingTxs = new ConcurrentHashMap<>();
+
+
+    // TODO sendChatAction - https://core.telegram.org/bots/api#sendchataction
+    protected void sendTransaction(JSONObject settings, Transaction transaction, Long replyChatId, Integer replyMessageId, boolean replayOnDone, String pendingMess, String domeMess, String lang) {
+
+        cnt.createForNetwork(transaction);
+        int validate = cnt.afterCreateForNetwork(transaction, false, false);
+        if (validate == VALIDATE_OK) {
+            SendMessage sendMessage;
+            if (validate == VALIDATE_OK) {
+                // Используем разметку Markdown
+                sendMessage = new SendMessage(replyChatId, pendingMess + "\nПосмотреть транзакцию \"" + scanUrlMarkdown(transaction.viewTypeName(langList.getLangJson(lang)), "tx", transaction.viewSignature()) + "\" в блокчейн");
+
+            } else {
+                JSONObject out = new JSONObject();
+                transaction.updateMapByError2(out, validate, lang);
+                String text = "```java Error\n" + out.toJSONString() + "```";
+                sendMessage = new SendMessage(replyChatId, text);
+            }
+
+            sendMessage.parseMode(ParseMode.Markdown);
+
+            if (replyMessageId != null) {
+                // если чаты ответа и сообщения которое мы сохраняем совпадают,
+                // то сделаем его как ответ на сохраняемое сообщение
+                sendMessage.replyToMessageId(replyMessageId);
+            }
+
+            try {
+                SendResponse response = bot.execute(sendMessage);
+                if (response.isOk() && validate == VALIDATE_OK) {
+                    // запомним ее как неподтвержденную и непросчитанную - иначе height по другому блоку считает
+                    pendingTxs.put(Base58.encode(transaction.getSignature()), new Fun.Tuple5<>(response.message(), replayOnDone, domeMess, lang, transaction.copy()));
+                    log.info("Reply sent");
+                } else {
+                    log.error("Send ERROR: " + GSON.toJson(response).toString());
+                }
+            } catch (Exception e) {
+                log.error("Send ERROR: " + e.getMessage());
+            }
+
+        } else {
+            JSONObject out = new JSONObject();
+            transaction.updateMapByError2(out, validate, lang);
+            sendMarkdown(replyChatId, "```java Error\n" + out.toJSONString() + "```");
+        }
+
+    }
+
+    protected void rSend(JSONObject settings, Long chatId, Integer replyMessageId, User user, BigDecimal amount, Account account, String lang) {
+
+        long key = FEE_KEY;
+        // TODO hide - если Скрытно задано то имя не писать
+        String title = "Награда от " + user.username() + " - " + botUserNameF;
+        byte[] message = null;
+        byte[] isText = new byte[]{1};
+        byte[] encrypted = new byte[]{0};
+        long flags = 0L;
+        Transaction rSend = new RSend(getBotPrivateKey(user, lang), account, key, amount, title, message, isText, encrypted, flags);
+        sendTransaction(settings, rSend, chatId, replyMessageId, true,
+                String.format("Подарок выслан *%s %s* (Можно сохранить сообщений в общей сложности размером примерно на %d кБ)... Срок доставки подарка примерно через %d секунд.",
+                        amount.toPlainString(), AssetCls.FEE_NAME, Account.bytesPerBalance(amount) / 2000, BlockChain.GENERATING_MIN_BLOCK_TIME_MS(rSend.getTimestamp()) / 800),
+                "Награда доставлена!", lang);
+
+    }
 
     /**
      * Опрос блокчейн для проверки подтверждения транзакций
@@ -1225,22 +1271,22 @@ abstract public class ErachainBotCls {
     protected synchronized void updateTransactions() {
 
         DCSet dcSet = cnt.getDCSet();
-        Iterator<Map.Entry<String, Pair<Message, Transaction>>> iterator = pendingTxs.entrySet().iterator();
-        Map.Entry<String, Pair<Message, Transaction>> entry;
+        Iterator<Map.Entry<String, Fun.Tuple5<Message, Boolean, String, String, Transaction>>> iterator = pendingTxs.entrySet().iterator();
+        Map.Entry<String, Fun.Tuple5<Message, Boolean, String, String, Transaction>> entry;
         while (iterator.hasNext()) {
             entry = iterator.next();
 
-            Pair<Message, Transaction> pair = entry.getValue();
-            Message messge = pair.getA();
+            Fun.Tuple5<Message, Boolean, String, String, Transaction> item = entry.getValue();
+            Message messge = item.a;
             if (messge == null) {
                 iterator.remove();
                 continue;
             }
 
-            if (pair.getB().getBlockHeight() <= 0) {
+            if (item.e.getBlockHeight() <= 0) {
                 // если транзакция еще не подтверждена
                 // проверим ее саму
-                Long seq = cnt.getTransactionSeqBySign(pair.getB().getSignature(), dcSet);
+                Long seq = cnt.getTransactionSeqBySign(item.e.getSignature(), dcSet);
                 if (seq == null)
                     continue;
 
@@ -1254,17 +1300,28 @@ abstract public class ErachainBotCls {
                 // считаем это достаточным числом подтверждений
                 // принимаем как внесенную в блокчейн "навечно"
                 log.info(botTitle + " done: " + tx.viewHeightSeq());
-                entry.setValue(new Pair<>(pair.getA(), tx));
+                item.e.setHeightSeq(tx.getDBRef());
             }
 
-            if (pair.getB().getConfirmations(dcSet) < PENDING_CONFIRMS)
+            if (item.e.getConfirmations(dcSet) < PENDING_CONFIRMS)
                 continue;
 
             // сюда приходит если транзакция подтверждена, но в чате сообщение не обновилось что подтверждено
-            EditMessageText editMessage = new EditMessageText(messge.chat().id(), messge.messageId(),
-                    "Сохранено в " + scanUrlMarkdown("блокчейн", "tx", pair.getB().viewHeightSeq()) + " !!!");
-            editMessage.parseMode(ParseMode.Markdown);
-            BaseResponse response = bot.execute(editMessage);
+            BaseResponse response;
+            String out = item.c + "\nПроверить транзакцию \"" + scanUrlMarkdown(item.e.viewTypeName(langList.getLangJson(item.d)), "tx", item.e.viewHeightSeq()) + "\" в блокчейн";
+            if (item.b) {
+                // сделаем как ответ на первое
+                SendMessage sendMessage = new SendMessage(messge.chat().id(), out);
+                sendMessage.parseMode(ParseMode.Markdown);
+                sendMessage.replyToMessageId(item.a.messageId());
+                response = bot.execute(sendMessage);
+            } else {
+                // изменим первое
+                EditMessageText editMessage = new EditMessageText(messge.chat().id(), messge.messageId(), out);
+                editMessage.parseMode(ParseMode.Markdown);
+                response = bot.execute(editMessage);
+            }
+
             if (response.isOk()) {
                 iterator.remove();
             }
@@ -1278,7 +1335,7 @@ abstract public class ErachainBotCls {
             // если очередь распухла, чистим все старые - чиста очень старых
             iterator = pendingTxs.entrySet().iterator();
             while (iterator.hasNext()) {
-                Transaction tx = iterator.next().getValue().getB();
+                Transaction tx = iterator.next().getValue().e;
                 if (tx.getConfirmations(dcSet) > 60
                         || current - tx.getTimestamp() > 6000000) {
                     iterator.remove();
@@ -1300,6 +1357,7 @@ abstract public class ErachainBotCls {
     }
 
     protected void processIncomeTx(String chatId, Transaction tx, JSONObject settings, String lang) {
+        long longId = Long.parseLong(chatId);
         StringBuilder mess = new StringBuilder();
         mess.append("Поступление:\n\n");
 
@@ -1327,13 +1385,15 @@ abstract public class ErachainBotCls {
             }
 
             if (true)
-                sendSimpleText(Long.parseLong(chatId), mess.toString());
+                sendSimpleText(longId, mess.toString());
             else
-                sendMarkdown(Long.parseLong(chatId), "```Поступление:\n\n" + mess + "```");
+                sendMarkdown(longId, "```java Transaction\n" + mess + "```");
         }
 
+        sendMarkdown(longId, "\nПосмотреть транзакцию \"" + scanUrlMarkdown(tx.viewTypeName(langList.getLangJson(lang)), "tx", tx.viewHeightSeq()) + "\" в блокчейн");
+
         if (BlockChain.TEST_MODE)
-            sendMarkdown(Long.parseLong(chatId), "```Transaction:\n\n" + tx.toJson() + "```");
+            sendMarkdown(longId, "```java Transaction\n" + tx.toJson() + "```");
 
     }
 
@@ -1343,7 +1403,7 @@ abstract public class ErachainBotCls {
      * @param txs
      */
     public void processBlock(List<Transaction> txs) {
-        if (bot == null || settingsChats == null)
+        if (bot == null || settingsAllChats == null)
             return;
 
         HashSet<Account> listTo;
@@ -1359,12 +1419,12 @@ abstract public class ErachainBotCls {
                 if (chatId == null)
                     return;
 
-                chatSettings = (JSONObject) settingsChats.get(chatId);
+                chatSettings = (JSONObject) settingsAllChats.get(chatId);
                 if (chatSettings == null)
                     return;
 
                 try {
-                    processIncomeTx(chatId, tx, settingsChats, (String) chatSettings.get("lang"));
+                    processIncomeTx(chatId, tx, chatSettings, (String) chatSettings.get("lang"));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -1380,8 +1440,8 @@ abstract public class ErachainBotCls {
 
         sendToAdminMessage("Stopped...");
 
-        settingsChats.keySet().forEach(chatId -> {
-            if (((JSONObject) settingsChats.get(chatId)).get("userName") != null)
+        settingsAllChats.keySet().forEach(chatId -> {
+            if (((JSONObject) settingsAllChats.get(chatId)).get("userName") != null)
                 // пользователям не пишем
                 return;
             sendSimpleText(Long.parseLong((String) chatId), "Моя работа временно прекращена, надеюсь не на долго...");
