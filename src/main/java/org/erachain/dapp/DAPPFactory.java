@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.OddEvenDAPP;
 import org.erachain.dapp.epoch.Refi;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
@@ -37,6 +38,7 @@ public abstract class DAPPFactory {
             settingsJSON = new JSONObject();
         }
 
+        OddEvenDAPP.setDAPPFactory(stocks);
         ShibaVerseDAPP.setDAPPFactory(stocks);
         MemoCardsDAPP.setDAPPFactory(stocks);
         Refi.setDAPPFactory(stocks);
@@ -114,6 +116,8 @@ public abstract class DAPPFactory {
         String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8) : null;
 
         switch (dappID) {
+            case OddEvenDAPP.ID:
+                return OddEvenDAPP.make(txSend.getTitle());
             case Refi.ID:
                 return Refi.make(txSend, dataStr);
             case ShibaVerseDAPP.ID:
@@ -132,6 +136,8 @@ public abstract class DAPPFactory {
             return null;
 
         switch (dappID) {
+            case OddEvenDAPP.ID:
+                return OddEvenDAPP.NAME;
             case LeafFall.ID:
                 return LeafFall.NAME;
             case DogePlanet.ID:

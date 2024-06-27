@@ -6,7 +6,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class FileUtils {
@@ -74,16 +78,6 @@ public class FileUtils {
     }
 
     public static String readFileAsString(String filePath) throws IOException {
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = new BufferedReader(
-                new FileReader(filePath));
-        char[] buf = new char[1024 << 4];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-        }
-        reader.close();
-        return fileData.toString();
+        return new String(getBytesFromFile(new File(filePath)), StandardCharsets.UTF_8);
     }
 }
