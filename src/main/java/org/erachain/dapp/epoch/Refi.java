@@ -17,6 +17,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -28,13 +29,23 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Описание тут https://docs.google.com/document/d/1I0AscIkvACigv-aViHf3uNcc1LXXNm3dd4pNd-w-xfE/edit#heading=h.b6s2qmv4aszg
+ * Это стейкинг с рефералкой, причем % растет от числа приглашенных и суммы на их счеттах
+ */
 public class Refi extends EpochDAPPjson {
 
 
     static public final int ID = 1012;
     static public final String NAME = "Referral dApp";
+    static public final boolean DISABLED = BlockChain.MAIN_MODE;
     static public final String ASSET_NAME = "REFI";
+
+    /**
+     * Максимальное количество актива. 0 - бесконечное
+     */
     static public final long ASSET_QUALITY = 25000000;
+    static public final BigDecimal INIT_AMOUNT = new BigDecimal("10000");
     public static final int ASSET_DECIMALS = 18;
 
     // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
@@ -51,38 +62,70 @@ public class Refi extends EpochDAPPjson {
     static final private Tuple2 INIT_KEY = new Tuple2(ID, "i");
     final static public String COMMAND_JOB = "job";
 
-    static final int SKIP = 10;
+    /**
+     * Число блоков между последней обработкой и текущей - чтобы часто не пересчитывать и не спамить
+     */
+    static final int SKIP_BLOCKS = 10;
 
     /**
      * por calculate reward - amount of blocks in one year
      */
     static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1.0d / (30.0d * 24.0d * 120.0d)).setScale(ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
+    /**
+     * Коэффициент доходности
+     */
     static final BigDecimal STAKE_KOEFF_1 = new BigDecimal("0.1");
     static final BigDecimal STAKE_KOEFF_2 = new BigDecimal("0.15");
     static final BigDecimal STAKE_KOEFF_3 = new BigDecimal("0.20");
     static final BigDecimal STAKE_KOEFF_4 = new BigDecimal("0.25");
     static final BigDecimal STAKE_KOEFF_5 = new BigDecimal("0.30");
     static final BigDecimal STAKE_KOEFF_6 = new BigDecimal("0.35");
+    /**
+     * Глубина наград по рефералке
+     */
     public static final int REFERRAL_LEVEL_DEEP = 5;
-    public static final int REFERRAL_SHARE2 = 3;
+    /**
+     * Сдвиг по модулю 2 дохода от процентам пользователю - какая доля идет в рефералку - сдвиг на 3 - это одна восьмая. Эта доля эмитируется контрактом в добавк к доходу от процентов.
+     */
+    public static final int REFERRAL_SHARE_2 = 3;
+    /**
+     * Максимальное число приглашенных, которое учитывается для расчета коэффициента доходности
+     */
     public static final int MAX_REFERRALS_COUNT = 100;
+    /**
+     * Максимальная сумма актива на всех счетах приглашенных, которое учитывается для расчета коэффициента доходности
+     */
     public static final BigDecimal MAX_REFERRALS_STAKE = new BigDecimal(150000);
     /**
-     * divide by power of 2
+     * divide by power of 2 - коэффициенты на каждый уровень
      */
     public static final int[] REFERRAL_LEVEL_KOEFFS = new int[]{1, 1, 1, 1, 1};
 
+    public Refi() {
+        super(ID, MAKER, null, null);
+    }
 
     public Refi(String data, String status) {
         super(ID, MAKER, data, status);
+    }
+
+    public static Refi initInfo(HashMap<Account, Integer> stocks) {
+        Refi dapp = new Refi();
+        dapp.accountsInfo.add(new Pair<>(MAKER, new String[]{"init"}));
+        stocks.put(MAKER, ID);
+        return dapp;
     }
 
     public String getName() {
         return NAME;
     }
 
+    public boolean isDisabled() {
+        return DISABLED;
+    }
+
     private boolean isAdminCommand(Account txCreator) {
-        return txCreator.equals(adminAddress);
+        return BlockChain.TEST_MODE || txCreator.equals(adminAddress);
     }
 
     private BigDecimal stakeKoeff(Tuple2<Integer, BigDecimal> referrals) {
@@ -154,7 +197,8 @@ public class Refi extends EpochDAPPjson {
     }
 
     /**
-     * how many referrals invite that person
+     * how many referrals invite that person.
+     * Учитывает число приглашенных первого уровня и сумму актива на всех из счетах
      *
      * @param dcSet
      * @param person
@@ -311,7 +355,7 @@ public class Refi extends EpochDAPPjson {
         if (stakeReward.signum() <= 0)
             return null;
 
-        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale(), BigDecimal.ROUND_DOWN).unscaledValue().shiftRight(REFERRAL_SHARE2);
+        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale(), BigDecimal.ROUND_DOWN).unscaledValue().shiftRight(REFERRAL_SHARE_2);
         if (referralGift.signum() <= 0)
             return null;
 
@@ -410,7 +454,7 @@ public class Refi extends EpochDAPPjson {
                 status += " Sender reward " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 int lastHeightAction = (Integer) pointNew[0];
-                if (height - lastHeightAction >= SKIP) {
+                if (height - lastHeightAction >= SKIP_BLOCKS) {
                     stakeReward = (BigDecimal) pointNew[1];
                     transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, ASSET_NAME + " stake reward");
 
@@ -468,7 +512,6 @@ public class Refi extends EpochDAPPjson {
         /**
          * issue asset
          */
-        BigDecimal amount = new BigDecimal("10000");
         if (asOrphan) {
 
             // need to remove INIT_KEY - for reinit after orphans
@@ -481,7 +524,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             // ORPHAN for ADMIN
-            transfer(dcSet, block, commandTX, stock, adminAccount, amount, assetKey, true, null, null);
+            transfer(dcSet, block, commandTX, stock, adminAccount, INIT_AMOUNT, assetKey, true, null, null);
 
             // orphan GRAVITA ASSET
             dcSet.getItemAssetMap().decrementDelete(assetKey);
@@ -494,7 +537,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             if (dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                fail("already initated");
+                fail("already initiated");
                 return false;
             }
 
@@ -513,7 +556,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             // TRANSFER ASSET to ADMIN
-            transfer(dcSet, block, commandTX, stock, adminAccount, amount, assetKey, false, null, "init");
+            transfer(dcSet, block, commandTX, stock, adminAccount, INIT_AMOUNT, assetKey, false, null, "init");
 
             status = "done";
         }
@@ -611,8 +654,11 @@ public class Refi extends EpochDAPPjson {
         return new Refi(data, status);
     }
 
-    public static void setDAPPFactory(HashMap<Account, Integer> stocks) {
-        stocks.put(MAKER, ID);
+    public String getCommandInfo(String command, String format) {
+        if ("init".equals(command))
+            return String.format(format, ASSET_NAME, ASSET_QUALITY, INIT_AMOUNT);
+
+        return format;
     }
 
 }

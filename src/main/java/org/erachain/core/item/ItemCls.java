@@ -90,7 +90,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     protected static final int APP_DATA_MASK = 1 << 31;
     /**
-     * Флаг который показывает что есть еще данные вычисленные для бзы данных
+     * Флаг который показывает что есть еще данные вычисленные для базы данных
      */
     protected static final int DB_DATA_MASK = 1 << 30;
 
