@@ -23,11 +23,16 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public abstract class DAPPFactory {
 
     static protected Controller contr = Controller.getInstance();
     static protected Crypto crypto = Crypto.getInstance();
+
+    public static final TreeMap<Integer, DAPP> dAppsById = new TreeMap();
+    public static final TreeMap<Integer, DAPP> dAppsByPopularity = new TreeMap();
+
     static final HashMap<Account, Integer> stocks = new HashMap();
     public static JSONObject settingsJSON;
 
@@ -38,13 +43,22 @@ public abstract class DAPPFactory {
             settingsJSON = new JSONObject();
         }
 
-        OddEvenDAPP.setDAPPFactory(stocks);
-        ShibaVerseDAPP.setDAPPFactory(stocks);
-        MemoCardsDAPP.setDAPPFactory(stocks);
-        Refi.setDAPPFactory(stocks);
+        dAppsById.put(LeafFall.ID, LeafFall.initInfo());
+        dAppsByPopularity.put(500, dAppsById.get(LeafFall.ID));
+
+        dAppsById.put(OddEvenDAPP.ID, OddEvenDAPP.initInfo(stocks));
+        dAppsByPopularity.put(2000, dAppsById.get(OddEvenDAPP.ID));
+
+        if (!BlockChain.MAIN_MODE) {
+            dAppsById.put(Refi.ID, Refi.initInfo(stocks));
+            dAppsByPopularity.put(1000, dAppsById.get(Refi.ID));
+
+            ShibaVerseDAPP.setDAPPFactory(stocks);
+            MemoCardsDAPP.setDAPPFactory(stocks);
+
+        }
 
     }
-
 
     /**
      * Делает смотр-контракт протокольный (на эпоху).
@@ -54,8 +68,8 @@ public abstract class DAPPFactory {
      */
     static public DAPP make(Transaction transaction) {
 
-        /////////// EVENTS
-        if (BlockChain.TEST_MODE
+        /////////// Make DAPP by any EVENTS
+        if (!LeafFall.DISABLED
                 && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY
@@ -75,7 +89,7 @@ public abstract class DAPPFactory {
 
         RSend txSend = (RSend) transaction;
 
-        if (BlockChain.TEST_MODE) {
+        if (BlockChain.TEST_MODE || !Refi.DISABLED) {
             Refi dapp = Refi.tryMakeJob(txSend);
             if (dapp != null)
                 return dapp;
@@ -88,7 +102,7 @@ public abstract class DAPPFactory {
             ) {
                 if (txSend.hasPacket()) {
 
-                } else if (txSend.getAmount().signum() < 0) {
+                } else if (txSend.getAmount().signum() < 0 && !DogePlanet.DISABLED) {
                     return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
                 }
             }
@@ -112,6 +126,10 @@ public abstract class DAPPFactory {
             if (dappID == null)
                 return null;
         }
+
+        DAPP dappInfo = dAppsById.get(dappID);
+        if (dappInfo == null || dappInfo.isDisabled())
+            return null;
 
         String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8) : null;
 

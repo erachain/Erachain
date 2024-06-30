@@ -2,6 +2,7 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -11,12 +12,12 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.datachain.DCSet;
+import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Игра в рулетку. Смарт-контракт ожидает случайное число из будущего - по подписи блока через 3 от блока в который попала ваша транзакция со ставкой на игру.
@@ -40,15 +41,12 @@ public class OddEvenDAPP extends EpochDAPPjson {
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-
-    final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
+    static public final boolean DISABLED = BlockChain.MAIN_MODE;
+    static public final String SHORT = "Roulette game \"Odd-Even\"";
+    static public final String DESC = "Игра в рулетку. Смарт-контракт ожидает случайное число из будущего - по подписи блока через 3 от блока в который попала ваша транзакция со ставкой на игру.";
 
     // DAPP ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
-
-    static {
-        accounts.add(MAKER);
-    }
 
     static public final BigDecimal MIN_BET_ERA = new BigDecimal("1");
     static public final BigDecimal MIN_BET_COMPU = new BigDecimal("0.05");
@@ -57,14 +55,30 @@ public class OddEvenDAPP extends EpochDAPPjson {
     static public final BigDecimal BINGO_MULTI = new BigDecimal("77");
     static public final BigDecimal MAJOR_MULTI = new BigDecimal("12");
 
+    public OddEvenDAPP() {
+        super(ID, MAKER, null, null);
+    }
+
     public OddEvenDAPP(String data, String status) {
         super(ID, MAKER, data, status);
+    }
+
+    public static OddEvenDAPP initInfo(HashMap<Account, Integer> stocks) {
+        OddEvenDAPP dapp = new OddEvenDAPP();
+        dapp.accountsInfo.add(new Pair<>(MAKER, new String[]{"0", "1", "2"}));
+        for (Pair<PublicKeyAccount, ?> pair : dapp.accountsInfo) {
+            stocks.put(pair.getA(), ID);
+        }
+        return dapp;
     }
 
     public String getName() {
         return NAME;
     }
 
+    public boolean isDisabled() {
+        return true;//DISABLED;
+    }
 
     public static OddEvenDAPP make(String data) {
         return new OddEvenDAPP(data, "");
@@ -262,13 +276,6 @@ public class OddEvenDAPP extends EpochDAPPjson {
     @Override
     public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         catchWin(dcSet, block, (RSend) transaction, true);
-    }
-
-
-    public static void setDAPPFactory(HashMap<Account, Integer> stocks) {
-        for (Account account : accounts) {
-            stocks.put(account, ID);
-        }
     }
 
 }
