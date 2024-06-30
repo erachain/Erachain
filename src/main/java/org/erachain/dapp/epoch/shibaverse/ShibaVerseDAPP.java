@@ -1073,6 +1073,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         for (Account account : accounts) {
             stocks.put(account, ID);
         }
+
     }
 
 }

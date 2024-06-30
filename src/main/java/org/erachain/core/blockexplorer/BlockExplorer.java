@@ -22,6 +22,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.Pageable;
 import org.erachain.database.PairMapImpl;
@@ -296,7 +297,7 @@ public class BlockExplorer {
         output.put("id_menu_percons", Lang.T("Persons", langObj));
         output.put("id_menu_pals_asset", Lang.T("Polls", langObj));
         output.put("id_menu_assets", Lang.T("Assets", langObj));
-        output.put("id_menu_aTs", Lang.T("ATs", langObj));
+        output.put("menu_play", Lang.T("Play", langObj));
         output.put("id_menu_transactions", Lang.T("Transactions", langObj));
         output.put("id_menu_exchange", Lang.T("Exchange", langObj));
         output.put("id_menu_order", Lang.T("Order", langObj));
@@ -346,6 +347,10 @@ public class BlockExplorer {
                     case "statuses":
                         //search statuses
                         jsonQuerySearchPages(info, StatusCls.class, search, offset, null);
+                        break;
+                    case "play":
+                        // dAPPs play
+                        output.putAll(jsonQueryPlay(search, offset, info));
                         break;
                     case "templates":
                         //search templates
@@ -478,11 +483,12 @@ public class BlockExplorer {
         // Exchange
         else if (info.getQueryParameters().containsKey("exchange")) {
             jsonQueryExchange(null, offset);
-        }
+        } else if (info.getQueryParameters().containsKey("play")) {
+            output.putAll(jsonQueryPlay(info.getQueryParameters().getFirst("play"), offset, info));
 
-        ///////////////////////////// ADDRESSES //////////////////////
-        // address
-        else if (info.getQueryParameters().containsKey("address")) {
+            ///////////////////////////// ADDRESSES //////////////////////
+            // address
+        } else if (info.getQueryParameters().containsKey("address")) {
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), offset, info));
         } else if (info.getQueryParameters().containsKey("addresses")) {
             jsonQueryAddresses();
@@ -587,7 +593,7 @@ public class BlockExplorer {
         help.put("Address All Not Zero", "blockexplorer.json?top=all|[limit]");
         help.put("Address All Addresses", "blockexplorer.json?top=all");
         help.put("Assets List", "blockexplorer.json?assets");
-        help.put("AT List", "blockexplorer.json?aTs");
+        help.put("Play List", "blockexplorer.json?play");
         help.put("Names List", "blockexplorer.json?names");
         help.put("BlogPosts of Address", "blockexplorer.json?blogposts={address}");
         help.put("Search", "blockexplorer.json?q={text}");
@@ -2356,6 +2362,44 @@ public class BlockExplorer {
             output.put(size - counter, jsonUnitPrint(unit)); //, assetNames));
             counter++;
         }
+
+        return output;
+    }
+
+    public Map jsonQueryPlay(String dAppId, int offset, UriInfo info) {
+
+        output.put("type", "play");
+        output.put("search", "play");
+        output.put("search_placeholder", Lang.T("Insert searching dApp", langObj));
+        output.put("search_message", dAppId);
+
+        if (dAppId != null && !dAppId.isEmpty()) {
+            try {
+                output.put("dApp", DAPPFactory.dAppsById.get(Integer.parseInt(dAppId)).getInfo(langObj));
+
+                output.put("Label_Accounts", Lang.T("Accounts", langObj));
+                output.put("Label_Commands", Lang.T("Commands", langObj));
+                output.put("Label_Desc", Lang.T("Description", langObj));
+
+            } catch (NumberFormatException e) {
+                output.put("error", e.getMessage());
+                return output;
+            }
+        } else {
+
+            JSONObject listBuId = new JSONObject();
+            DAPPFactory.dAppsById.values().forEach(dapp -> listBuId.put(dapp.getID(), dapp.getInfoShort(langObj)));
+            output.put("pageItemsByID", listBuId);
+            //output.put("pageItemsByPop", DAPPFactory.dAppsByPopularity);
+
+            output.put("Label_Accounts", Lang.T("Accounts", langObj));
+            output.put("Label_Commands", Lang.T("Commands", langObj));
+            output.put("Label_Desc", Lang.T("Description", langObj));
+
+        }
+
+        output.put("Label_Name", Lang.T("Name", langObj));
+        output.put("Label_Status", Lang.T("Name", langObj));
 
         return output;
     }
