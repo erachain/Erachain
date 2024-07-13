@@ -30,12 +30,27 @@ public class ErachainIcBot extends ErachainBotCls {
     }
 
     @Override
-    protected String[] retrieveCommand(String text) {
+    protected String[] retrieveChatReplyCommand(String text) {
         return null;
     }
 
     @Override
-    protected boolean processMessage(Long makerTxId, Long replyChatId, Chat chatMain, Message message, String lang) {
+    protected String[] retrieveChatMessageCommand(String text) {
+        return null;
+    }
+
+    @Override
+    protected boolean privateForwardReplyHasCommand(String text) {
+        return false;
+    }
+
+    @Override
+    protected boolean processAutomaticForward(Long makerTxId, Chat replyChat, Chat chatMain, Message message, String lang) {
+        return false;
+    }
+
+    @Override
+    protected boolean processMessage(Long makerTxId, Chat replyChat, Chat chatMain, Message message, String lang) {
         return false;
     }
 
@@ -44,7 +59,22 @@ public class ErachainIcBot extends ErachainBotCls {
     }
 
     @Override
-    protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+    protected boolean processForwardOrigin(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+        return false;
+    }
+
+    @Override
+    protected boolean processLinkPreviewOptions(Long makerTxId, Chat replyChat, Integer replyMessageId, Message message, String[] commands, String lang) {
+        return false;
+    }
+
+    @Override
+    protected boolean processChatReplyCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+        return false;
+    }
+
+    @Override
+    protected boolean processCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
         return false;
     }
 
