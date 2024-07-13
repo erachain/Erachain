@@ -115,9 +115,10 @@ public class ErachainStorageBot extends ErachainBotCls {
 
     int getModeInt(JSONObject chatSettings) {
         Number modeL = (Number) chatSettings.get("mode");
+        Object user = chatSettings.get("user");
         if (modeL == null)
-            //return Mode.get(Mode.OnlyMarked);
-            return Mode.get(Mode.AsOpen);
+            // для чатов по умолчанию только с пометками, для личных - открыто
+            return user == null ? 3 : 1;
         else
             return modeL.intValue();
     }
@@ -131,27 +132,27 @@ public class ErachainStorageBot extends ErachainBotCls {
             return Mode.get(modeL.intValue());
     }
 
-    int getModeInt(Long chatId) {
-        return getModeInt(getChatSettings(chatId));
+    int getModeInt(Long chatId, Object object) {
+        return getModeInt(getChatSettings(chatId, object));
     }
 
-    boolean getOrigDefault(JSONObject chatSettings) {
-        Number value = (Number) chatSettings.get("orig");
+    boolean getFullDefault(JSONObject chatSettings) {
+        Number value = (Number) chatSettings.get("full");
         if (value == null)
             return false;
         else
             return value.intValue() == 1;
     }
 
-    static String getOrigDefaultDescr(boolean value) {
-        return value ? "По умолчанию сохранять Оригинал сообщения. Данные будут сохранены в JSON формате, так что по ним можно воссоздать заново сообщение в мессенджере"
-                : "По умолчанию сохраняется только текст сообщения";
+    static String getFullDefaultDescr(boolean value) {
+        return value ? "По умолчанию сохранять Оригинал сообщения. Данные сообщения будут сохранены полностью, включая и форматирование. Это позволяет отображать сообщение с форматированием"
+                : "По умолчанию сохраняется только текст сообщения. Форматирование будет утеряно";
     }
 
     protected List<Object[]> getSettingsCommandsList() {
         List<Object[]> out = super.getSettingsCommandsList();
         out.add(new Object[]{new String[]{"mode", "режим"}, "Режим работы по умолчанию: как сохранять сообщения в блокчейн? Открыто или закрыто или только по команде"});
-        out.add(new Object[]{new String[]{"orig", "ориг"}, "Флаг по умолчанию - использовать ли Оригинальные данные из сообщения или просто брать текст"});
+        out.add(new Object[]{new String[]{"full", "весь", "всё", "все"}, "Сохранить все данные из сообщения включая и форматирование. Если задать с минусом, например так: `-full`, то сохранит только текст"});
         return out;
     }
 
@@ -179,13 +180,15 @@ public class ErachainStorageBot extends ErachainBotCls {
             case "mode":
             case "режим":
 
-                int mode = getModeInt(chat.id());
+                int mode = getModeInt(chat.id(), chat);
                 sendMarkdown(chat.id(), "Текущий режим" + Mode.view(mode));
                 return true;
 
-            case "orig":
-            case "ориг":
-                sendSimpleText(chat.id(), getOrigDefaultDescr(getOrigDefault(getChatSettings(chat.id()))));
+            case "full":
+            case "весь":
+            case "всё":
+            case "все":
+                sendSimpleText(chat.id(), getFullDefaultDescr(getFullDefault(getChatSettings(chat.id(), chat))));
                 return true;
 
             case "restore":
@@ -201,11 +204,11 @@ public class ErachainStorageBot extends ErachainBotCls {
         return false;
     }
 
-    private boolean editMode(String[] command, Long chatId, Chat chat, User user) {
+    private boolean editEncryptMode(String[] command, Long chatId, Object object) {
         // Задать другой режим работы
         // @blockchain_storage_bot mode 3
         if (command.length == 1) {
-            int mode = getModeInt(chatId);
+            int mode = getModeInt(chatId, object);
             sendMarkdown(chatId, "Текущий режим" + Mode.view(mode));
             return true;
         }
@@ -215,7 +218,7 @@ public class ErachainStorageBot extends ErachainBotCls {
             if (Mode.get(newMode) == null) {
                 sendSimpleText(chatId, "Неверный режим. Используйте значения 1..4");
             } else {
-                getChatSettings(chatId).put("mode", newMode);
+                getChatSettings(chatId, object).put("mode", newMode);
                 saveSettings();
                 sendMarkdown(chatId, "Задан новый режим" + Mode.view(newMode));
             }
@@ -226,22 +229,27 @@ public class ErachainStorageBot extends ErachainBotCls {
         return true;
     }
 
-    private boolean editOrig(String[] command, Long chatId, Chat chat, User user) {
+    private boolean editFullMode(String[] command, Long chatId, Object object) {
         // Задать другой режим работы
         // @blockchain_storage_bot mode 3
         if (command.length == 1) {
-            JSONObject chatSettings = getChatSettings(chatId);
-            sendSimpleText(chatId, getOrigDefaultDescr(getOrigDefault(chatSettings)));
+            JSONObject chatSettings = getChatSettings(chatId, object);
+            sendSimpleText(chatId, getFullDefaultDescr(getFullDefault(chatSettings)));
             return true;
         }
 
-        Integer newOrig = Integer.parseInt(command[1]);
-        if (newOrig == null) {
+        try {
+            Integer newFullMode = Integer.parseInt(command[1]);
+            if (newFullMode == null) {
+                sendSimpleText(chatId, "Неверное значение. Используйте значения 0 или 1");
+            } else {
+                JSONObject chatSettings = getChatSettings(chatId, object);
+                chatSettings.put("full", newFullMode);
+                saveSettings();
+                sendSimpleText(chatId, getFullDefaultDescr(getFullDefault(chatSettings)));
+            }
+        } catch (NumberFormatException e) {
             sendSimpleText(chatId, "Неверное значение. Используйте значения 0 или 1");
-        } else {
-            JSONObject chatSettings = getChatSettings(chatId);
-            chatSettings.put("orig", newOrig);
-            sendSimpleText(chatId, getOrigDefaultDescr(getOrigDefault(chatSettings)));
         }
         return true;
     }
@@ -279,10 +287,12 @@ public class ErachainStorageBot extends ErachainBotCls {
         switch (command[0].toLowerCase()) {
             case "mode":
             case "режим":
-                return editMode(command, chat.id(), chat, user);
-            case "orig":
-            case "ориг":
-                return editOrig(command, chat.id(), chat, user);
+                return editEncryptMode(command, chat.id(), chat);
+            case "full":
+            case "весь":
+            case "всё":
+            case "все":
+                return editFullMode(command, chat.id(), chat);
         }
         return false;
     }
@@ -297,10 +307,12 @@ public class ErachainStorageBot extends ErachainBotCls {
             case "режим":
                 // Задать другой режим работы - -1002230015360
                 // @blockchain_storage_bot mode 3
-                return editMode(command, chatId, chatPrivate, user);
-            case "orig":
-            case "ориг":
-                return editOrig(command, chatId, chatPrivate, user);
+                return editEncryptMode(command, chatId, chatPrivate);
+            case "full":
+            case "весь":
+            case "всё":
+            case "все":
+                return editFullMode(command, chatId, chatPrivate);
             case "gift":
             case "дар":
             case "дари":
@@ -466,11 +478,11 @@ public class ErachainStorageBot extends ErachainBotCls {
     }
 
     @Override
-    protected void giftOnMeet(JSONObject settings, Long chatId, User user, PublicKeyAccount account, String lang) {
+    protected void giftOnMeet(JSONObject settings, Long chatId, Object object, PublicKeyAccount account, String lang) {
 
-        if (user != null)
+        if (object != null && object instanceof User)
             new Thread(() -> {
-                game(settings, chatId, account, user, lang);
+                game(settings, chatId, account, (User) object, lang);
             }).start();
 
         sendSimpleText(chatId, "Вы новый пользователь, Вас ждет награда!");
@@ -481,7 +493,7 @@ public class ErachainStorageBot extends ErachainBotCls {
         byte[] isText = new byte[]{1};
         byte[] encrypted = new byte[]{0};
         long flags = 0L;
-        Transaction tx = new RSend(getBotPrivateKey(user, lang), account, key, amount, title, message, isText, encrypted, flags);
+        Transaction tx = new RSend(getBotPrivateKey(), account, key, amount, title, message, isText, encrypted, flags);
         cnt.createForNetwork(tx);
         int result = cnt.afterCreateForNetwork(tx, false, false);
         if (result == VALIDATE_OK) {
@@ -492,13 +504,28 @@ public class ErachainStorageBot extends ErachainBotCls {
             settings.put("meet", amount.toPlainString());
             sendSimpleText(chatId, "Подарок будет отправлен позже...");
             // сообщить админу
-            sendToAdminMessage(String.format("Баланс счёта бота пуст, пополните `%s`", getBotPrivateKey(user, lang).getAddress()));
+            sendToAdminMessage(String.format("Баланс счёта бота пуст, пополните `%s`", getBotPrivateKey().getAddress()));
         }
 
     }
 
+    /**
+     * Команда как ответ на некоторое сообщение
+     *
+     * @param text
+     * @return
+     */
     @Override
-    protected String[] retrieveCommand(String text) {
+    protected String[] retrieveChatReplyCommand(String text) {
+
+        if (text.startsWith("/store") || text.startsWith("/храни")) {
+            return new String[]{text, null};
+        }
+        return null;
+    }
+
+    @Override
+    protected String[] retrieveChatMessageCommand(String text) {
 
         String[] result = new String[2];
 
@@ -520,7 +547,7 @@ public class ErachainStorageBot extends ErachainBotCls {
             }
         }
 
-        if (lineStart == -1 || command != null && (command.contains("orig") || command.equals("исходно"))) {
+        if (lineStart == -1 || command != null && (command.contains("full") || command.equals("весь") || command.equals("всё") || command.equals("все"))) {
             // команд нет, без изменений
         } else if (lineStart == lines.length) {
             // команда в конце - уберем ее с конца
@@ -545,22 +572,36 @@ public class ErachainStorageBot extends ErachainBotCls {
 
     }
 
+    @Override
+    protected boolean privateForwardReplyHasCommand(String text) {
+        // Если это одна строка и в ней есть команда впереди
+        return !text.contains("\n") && (
+                text.startsWith("/store") || text.startsWith("/храни")
+                        || text.startsWith(":store") || text.startsWith(":храни")
+                        || text.startsWith("store") || text.startsWith("храни")
+        );
+    }
+
     /**
      * Команду в сообщении может дать как админ чата так и простой пользователь.
      * Транзакция создается по makerTxId, но
      *
      * @param makerTxId
-     * @param replyChatId
+     * @param replyChat
      * @param chatMain
      * @param message
      * @param lang
      * @return
      */
     @Override
-    protected boolean processMessage(Long makerTxId, Long replyChatId, Chat chatMain, Message message, String lang) {
+    protected boolean processAutomaticForward(Long makerTxId, Chat replyChat, Chat chatMain, Message message, String lang) {
 
-        String[] commands = retrieveCommand(message.text());
-        JSONObject settings = getChatSettings(makerTxId);
+        String text = message.caption();
+        if (text == null)
+            text = message.text();
+
+        String[] commands = retrieveChatMessageCommand(text);
+        JSONObject settings = getChatSettings(makerTxId, replyChat);
         Mode mode = getModeType(settings);
         if (!mode.equals(Mode.AsOpen) && !mode.equals(Mode.AsHide)) {
             // Значит по умолчанию нельзя - тогда проверим а есть ли команда внутри сообщения
@@ -572,14 +613,44 @@ public class ErachainStorageBot extends ErachainBotCls {
         if (originMessage != null) {
             if (originMessage instanceof MessageOriginChannel) {
                 MessageOriginChannel messageOriginChannel = (MessageOriginChannel) originMessage;
-                return processCommand(makerTxId, replyChatId, message.messageId(), messageOriginChannel.chat(), messageOriginChannel.messageId(), originMessage.date(), message, commands, lang);
+                return processCommand(makerTxId, replyChat, message.messageId(), messageOriginChannel.chat(), messageOriginChannel.messageId(), originMessage.date(), message, commands, lang);
             } else if (originMessage instanceof MessageOriginChat) {
                 MessageOriginChat messageOriginChat = (MessageOriginChat) originMessage;
-                return processCommand(makerTxId, replyChatId, message.messageId(), messageOriginChat.senderChat(), message.messageId(), originMessage.date(), message, commands, lang);
+                return processCommand(makerTxId, replyChat, message.messageId(), messageOriginChat.senderChat(), message.messageId(), originMessage.date(), message, commands, lang);
             }
         }
 
-        return processCommand(makerTxId, replyChatId, message.messageId(), chatMain, message.messageId(), message.date(), message, commands, lang);
+        return processCommand(makerTxId, replyChat, message.messageId(), chatMain, message.messageId(), message.date(), message, commands, lang);
+    }
+
+    @Override
+    protected boolean processMessage(Long makerTxId, Chat replyChat, Chat chatMain, Message message, String lang) {
+
+        String text = message.caption();
+        if (text == null)
+            text = message.text();
+
+        String[] commands = retrieveChatMessageCommand(text);
+        JSONObject settings = getChatSettings(makerTxId, replyChat);
+        Mode mode = getModeType(settings);
+        if (!mode.equals(Mode.AsOpen) && !mode.equals(Mode.AsHide)) {
+            // Значит по умолчанию нельзя - тогда проверим а есть ли команда внутри сообщения
+            if (commands[0] == null)
+                return true;
+        }
+
+        MessageOrigin originMessage = message.forwardOrigin();
+        if (originMessage != null) {
+            if (originMessage instanceof MessageOriginChannel) {
+                MessageOriginChannel messageOriginChannel = (MessageOriginChannel) originMessage;
+                return processCommand(makerTxId, replyChat, message.messageId(), messageOriginChannel.chat(), messageOriginChannel.messageId(), originMessage.date(), message, commands, lang);
+            } else if (originMessage instanceof MessageOriginChat) {
+                MessageOriginChat messageOriginChat = (MessageOriginChat) originMessage;
+                return processCommand(makerTxId, replyChat, message.messageId(), messageOriginChat.senderChat(), message.messageId(), originMessage.date(), message, commands, lang);
+            }
+        }
+
+        return processCommand(makerTxId, replyChat, message.messageId(), chatMain, message.messageId(), message.date(), message, commands, lang);
     }
 
     @Override
@@ -609,25 +680,40 @@ public class ErachainStorageBot extends ErachainBotCls {
      * 5. ответ на сообщение с командой в чате от пользователя <br>
      *
      * @param makerTxId
-     * @param replyChatId
+     * @param replyChat
      * @param replyMessageId
      * @param origChat
      * @param origMessageId
      * @param origMessageDate
      * @param message
-     * @param commands
+     * @param commands 0 - строка с командами, 1 - сам текст, иначе берет из message
      * @param lang
      * @return
      */
     @Override
-    protected boolean processCommand(Long makerTxId, Long replyChatId, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+    protected boolean processForwardOrigin(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+        return processCommand(makerTxId, replyChat, replyMessageId, origChat, origMessageId, origMessageDate, message, commands, lang);
+    }
 
-        JSONObject settings = getChatSettings(makerTxId);
+    @Override
+    protected boolean processLinkPreviewOptions(Long makerTxId, Chat replyChat, Integer replyMessageId, Message message, String[] commands, String lang) {
+        return processCommand(makerTxId, replyChat, replyMessageId, null, null, null, message, commands, lang);
+    }
+
+    @Override
+    protected boolean processChatReplyCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+        return processCommand(makerTxId, replyChat, replyMessageId, origChat, origMessageId, origMessageDate, message, commands, lang);
+    }
+
+    @Override
+    protected boolean processCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang) {
+
+        JSONObject settings = getChatSettings(makerTxId, replyChat);
         int mode = getModeInt(settings);
-        Boolean origDefault = (Boolean) settings.get("orig");
+        boolean fullModeDefault = getFullDefault(settings);
 
         Boolean isEncrypted = null;
-        Boolean storeOriginJson = false;
+        Boolean storeFullJson = null;
         boolean testProc = test ? test : false;
         if (commands != null && commands[0] != null) {
             // соберем параметры
@@ -635,22 +721,26 @@ public class ErachainStorageBot extends ErachainBotCls {
             for (String word : words) {
                 if (word.equals("hide") || word.equals("закрыто") || word.equals("скрыто")) isEncrypted = true;
                 else if (word.equals("open") || word.equals("открыто")) isEncrypted = false;
-                else if (word.equals("orig") || word.equals("исходно")) storeOriginJson = true;
+                else if (word.equals("full") || word.equals("весь") || word.equals("всё") || word.equals("все"))
+                    storeFullJson = true;
+                else if (word.equals("-full") || word.equals("-весь") || word.equals("-всё") || word.equals("-все"))
+                    storeFullJson = false;
                 else if (word.equals("test") || word.equals("проба")) testProc = true;
             }
         }
 
-        if (storeOriginJson == null) {
-            storeOriginJson = origDefault == null ? false : origDefault;
+        if (storeFullJson == null) {
+            storeFullJson = fullModeDefault;
         }
 
         String text = commands == null ? null : commands[1];
-        if (text == null) {
-            if (Boolean.TRUE.equals(storeOriginJson)) {
-                text = GSON.toJson(message);
-            } else {
+        if (Boolean.TRUE.equals(storeFullJson)) {
+            text = GSON.toJson(message);
+        } else {
+            if (text == null)
+                text = message.caption();
+            if (text == null)
                 text = message.text();
-            }
         }
 
         if (isEncrypted == null) {
@@ -675,11 +765,11 @@ public class ErachainStorageBot extends ErachainBotCls {
             if (true)
                 log.warn(out.toJSONString());
             else
-                sendSimpleText(replyChatId, out.toJSONString());
+                sendSimpleText(replyChat.id(), out.toJSONString());
             return true;
         }
 
-        PrivateKeyAccount creator = getPrivKey(makerTxId, null, lang);
+        PrivateKeyAccount creator = getPrivKey(makerTxId, replyChat);
 
         JSONArray chatReceivers = getReceivers(settings);
         Account[] recipients;
@@ -690,7 +780,7 @@ public class ErachainStorageBot extends ErachainBotCls {
             for (int i = 0; i < chatReceivers.size(); i++) {
                 Fun.Tuple2<Account, String> result = Account.tryMakeAccount((String) chatReceivers.get(i));
                 if (result.a == null) {
-                    sendSimpleText(replyChatId, "Неправильный счет получателя: " + chatReceivers.get(i) + result.b);
+                    sendSimpleText(replyChat.id(), "Неправильный счет получателя: " + chatReceivers.get(i) + result.b);
                     return true;
                 }
                 recipients[i] = result.a;
@@ -705,31 +795,35 @@ public class ErachainStorageBot extends ErachainBotCls {
         String title = this.botTitle;
         String tagsStr = "telegram";
 
-        if (origChat != null) {
-            // /https://t.me/iuyiuyiuyiy/530
-            // username - URL
-            //String title = chatMain.username() == null ? chatMain.title() : "t.me/" + chatMain.username() + "/" + message.messageId();
-            title += " - " + origChat.title();
-            tagsStr += ",@" + origChat.title() + "," + origChat.id();
-
-            // Будем формировать Маркдаун
-            String head = origChat.username() == null ? "## Сказ из Telegram - " + origChat.title()
-                    : origMessageId == null ? "## Сказ из Telegram - " + origChat.username()
-                    : String.format("## [Сказ из Telegram](http://%s)", "t.me/" + origChat.username() + "/" + origMessageId);
-            if (message != null && message.messageThreadId() != null) {
-                head += "\n#### " + String.format("[Тема из Telegram](http://%s)", "t.me/" + origChat.username() + "/" + message.messageThreadId());
-            }
-
-            text = head + "\n\n" + text;
-            text += "\n\nchat:" + origChat.title() + ", chatId:" + origChat.id() + ", chatURL:" + origChat.username();
-            if (origMessageId != null)
-                text += ", messageId:" + origMessageId;
-            text += ", time:" + origMessageDate;
-
+        if (storeFullJson) {
+            text = "@TGM" + text;
         } else {
-            if (text != null && message.linkPreviewOptions() != null && text.equals(message.linkPreviewOptions().url())) {
-                title += " " + message.linkPreviewOptions().url();
-                text = null;
+            if (origChat != null) {
+                // /https://t.me/iuyiuyiuyiy/530
+                // username - URL
+                //String title = chatMain.username() == null ? chatMain.title() : "t.me/" + chatMain.username() + "/" + message.messageId();
+                title += " - " + origChat.title();
+                tagsStr += ",@" + origChat.title() + "," + origChat.id();
+
+                // Будем формировать Маркдаун
+                String head = origChat.username() == null ? "## Сказ из Telegram - " + origChat.title()
+                        : origMessageId == null ? "## Сказ из Telegram - " + origChat.username()
+                        : String.format("## [Сказ из Telegram](http://%s)", "t.me/" + origChat.username() + "/" + origMessageId);
+                if (message != null && message.messageThreadId() != null) {
+                    head += "\n#### " + String.format("[Тема из Telegram](http://%s)", "t.me/" + origChat.username() + "/" + message.messageThreadId());
+                }
+
+                text = head + "\n\n" + text;
+                text += "\n\nchat:" + origChat.title() + ", chatId:" + origChat.id() + ", chatURL:" + origChat.username();
+                if (origMessageId != null)
+                    text += ", messageId:" + origMessageId;
+                text += ", time:" + origMessageDate;
+
+            } else {
+                if (text != null && message.linkPreviewOptions() != null && text.equals(message.linkPreviewOptions().url())) {
+                    title += " " + message.linkPreviewOptions().url();
+                    text = null;
+                }
             }
         }
 
@@ -754,7 +848,7 @@ public class ErachainStorageBot extends ErachainBotCls {
         } catch (Exception e) {
             out = out == null ? new JSONObject() : out;
             Transaction.updateMapByErrorSimple2(out, Transaction.INVALID_DATA, e.getMessage(), lang);
-            sendSimpleText(replyChatId, out.toJSONString());
+            sendSimpleText(replyChat.id(), out.toJSONString());
             return true;
         }
 
@@ -766,11 +860,14 @@ public class ErachainStorageBot extends ErachainBotCls {
         RSignNote issueDoc = (RSignNote) cnt.r_SignNote(RSignNote.CURRENT_VERS, property1, property2,
                 creator, 0, key, exDataBytes);
 
-        sendTransaction(settings, issueDoc, replyChatId, replyMessageId, false,
-                botUserNameMD + ": Запущено сохранение сообщения...", botUserNameMD + ": Сообщение сохранено!!", lang);
+        sendTransaction(settings, issueDoc, replyChat.id(), replyMessageId, false,
+                botUserNameMD + (isEncrypted ? ": Запущено сохранение скрытого сообщения... " : ": Запущено сохранение отрытого сообщения... "),
+                botUserNameMD + (isEncrypted ? ": Скрытое сообщение сохранено!!" : ": Отрытое сообщение сохранено!!"), lang);
 
         if (test || settingsInstance.isTestNet()) {
-            sendMarkdown(replyChatId, "```java Transaction\n" + issueDoc.toJson().toJSONString() + "```");
+            sendMarkdown(replyChat.id(), "```java " + GSON.toJson(commands) + "```");
+            sendSimpleText(replyChat.id(), text);
+            sendMarkdown(replyChat.id(), "```java Transaction\n" + issueDoc.toJson().toJSONString() + "```");
         }
 
         return true;

@@ -14,9 +14,7 @@ if (pref2 =="\n"){
 return text.substring(2);
 }
 return text;
-}
-
-if (pref1=="#"){
+} else if (pref1=="#"){
 // return MarkDown
 if (pref2=="\n"){
 // return MarkDown
@@ -31,6 +29,11 @@ return htmlFilter(wordwrap(text, 0, '\n', true));
 }
 
 function fformat(text_in) {
+   // <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="rt_russian/207494" data-width="100%"></script>
+    if (text_in.startsWith('@TGM{')) {
+        return telegramView(text_in, JSON.parse(text_in.substring(4)));
+    }
+
     var preText = preFormat(text_in)
     preText = preText.replace(/@@(\d+-\d+)/g, '<a href=?tx=$1>@@$1</a>')
     preText = preText.replace(/@@A(\d+)/g, '<a href=?asset=$1>@@A$1</a>')
