@@ -1,7 +1,6 @@
 package org.erachain.dapp;
 
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -16,10 +15,14 @@ import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class DAPP {
 
@@ -27,17 +30,19 @@ public abstract class DAPP {
     static protected Crypto crypto = Crypto.getInstance();
 
     protected final int id;
-    protected final PublicKeyAccount stock;
+    protected PublicKeyAccount stock;
+    // заполнить один раз для показа в ИНФО - address = {commands}
+    final public List<Pair<PublicKeyAccount, String[]>> accountsInfo = new ArrayList<>();
+
+    protected DAPP(int id) {
+        this.id = id;
+        //this.stock = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id)));
+    }
 
     protected DAPP(int id, PublicKeyAccount stock) {
         this.id = id;
         assert (stock.isDAppOwned());
         this.stock = stock;
-    }
-
-    protected DAPP(int id) {
-        this.id = id;
-        this.stock = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id)));
     }
 
     public int getID() {
@@ -54,8 +59,62 @@ public abstract class DAPP {
         return "ID: <b>" + id + "</b><br>" + Lang.T("Address", langObj) + ": <b>" + stock.getAddress() + "</b>";
     }
 
+    /**
+     * Информация по смарт-контракту для сканера
+     *
+     * @param langObj
+     * @return
+     */
+    public JSONObject getInfoShort(JSONObject langObj) {
+        JSONObject out = new JSONObject();
+        String key = String.format("DAPP_%d_", getID());
+        out.put("ID", getID());
+        out.put("name", Lang.T(key + "NAME", langObj));
+        out.put("short", Lang.T(key + "SHORT", langObj));
+        if (isDisabled())
+            out.put("disabled", Lang.T("Disabled", langObj));
+
+        return out;
+    }
+
+    public String getCommandInfo(String command, String format) {
+        return format;
+    }
+
+    public JSONObject getInfo(JSONObject langObj) {
+        JSONObject out = getInfoShort(langObj);
+        if (isDisabled())
+            out.put("disabled", Lang.T("Disabled in this Chain", langObj));
+
+        String key = String.format("DAPP_%d_", getID());
+        out.put("desc", Lang.T(key + "DESC", langObj));
+
+        if (!accountsInfo.isEmpty()) {
+            JSONObject accs = new JSONObject();
+            accountsInfo.forEach(pair -> {
+                JSONObject acc = new JSONObject();
+                String address = pair.getA().getAddress();
+                accs.put(address, acc);
+                acc.put("desc", Lang.T(key + address, langObj)); //"Счет для JOB");
+                if (pair.getB() != null && pair.getB().length > 0) {
+                    JSONObject commands = new JSONObject();
+                    Arrays.stream(pair.getB()).forEach(command -> commands.put(command, getCommandInfo(command, Lang.T(key + address + "_" + command, langObj))));
+                    acc.put("commands", commands);
+                }
+            });
+
+            out.put("accs", accs);
+        }
+
+        return out;
+    }
+
     public Object[][] getItemsKeys() {
         return new Object[0][0];
+    }
+
+    public boolean isDisabled() {
+        return true;
     }
 
     /**

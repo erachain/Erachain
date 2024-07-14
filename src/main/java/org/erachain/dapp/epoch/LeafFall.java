@@ -2,6 +2,7 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
@@ -22,6 +23,9 @@ public class LeafFall extends EpochDAPP {
 
     public static final int ID = 1;
     static public final String NAME = "Magic Leaf";
+    static public final boolean DISABLED = BlockChain.MAIN_MODE;
+    static public final String SHORT = "Награды для тех кто торгует на бирже";
+    static public final String DESC = "Награды для тех кто торгует на бирже";
 
     // global values - save in smart-contracts maps
     private int count;
@@ -50,6 +54,14 @@ public class LeafFall extends EpochDAPP {
     public LeafFall(int resultHash) {
         super(ID);
         this.resultHash = resultHash;
+    }
+
+    public static LeafFall initInfo() {
+        return new LeafFall();
+    }
+
+    public boolean isDisabled() {
+        return DISABLED;
     }
 
     public String getName() {

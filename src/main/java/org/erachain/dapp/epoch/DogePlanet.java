@@ -3,6 +3,7 @@ package org.erachain.dapp.epoch;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
@@ -22,6 +23,7 @@ public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
     static public final String NAME = "Doge Planets";
+    static public final boolean DISABLED = BlockChain.MAIN_MODE;
 
     static public final PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     private int count;
@@ -30,12 +32,12 @@ public class DogePlanet extends EpochDAPP {
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
     public DogePlanet(int count) {
-        super(ID);
+        super(ID, MAKER);
         this.count = count;
     }
 
     public DogePlanet(int count, long keyEnd) {
-        super(ID);
+        super(ID, MAKER);
         this.count = count;
         this.keyEnd = keyEnd;
     }

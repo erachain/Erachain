@@ -400,7 +400,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * see https://regex101.com/
      */
     //public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
-    public static String SPLIT_CHARS = "[!?/_,;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    public static String SPLIT_CHARS = "[!?/,;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());

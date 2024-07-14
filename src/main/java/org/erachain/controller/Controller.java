@@ -9,6 +9,7 @@ import org.erachain.api.ApiClient;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
+import org.erachain.bot.BotManager;
 import org.erachain.bot.telegram.ErachainBotCls;
 import org.erachain.bot.telegram.ErachainIcBot;
 import org.erachain.bot.telegram.ErachainStorageBot;
@@ -105,7 +106,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.4.04";
+    public static String version = "6.4.07";
     public static String buildTime = "2024-06-21 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -171,6 +172,7 @@ public class Controller extends Observable {
 
     public String bot_tgm_token;
     public List<ErachainBotCls> botsErachain = new ArrayList<>();
+    public BotManager botsManager;
     private boolean isStopping = false;
     private String info;
 
@@ -896,6 +898,8 @@ public class Controller extends Observable {
 
         botsErachain.add(new ErachainIcBot(this));
         botsErachain.add(new ErachainStorageBot(this));
+        botsManager = new BotManager(this);
+
 
         if (!useNet)
             this.status = STATUS_OK;
@@ -1254,6 +1258,7 @@ public class Controller extends Observable {
             return;
         }
 
+        botsManager.cancel();
         botsErachain.forEach(bot -> bot.stop());
 
         if (transactionsPool == null) {
