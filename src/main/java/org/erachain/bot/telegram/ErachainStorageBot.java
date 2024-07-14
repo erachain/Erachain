@@ -793,7 +793,7 @@ public class ErachainStorageBot extends ErachainBotCls {
         ExLink exLink = null;
         ExAction action = null;
         String title = this.botTitle;
-        String tagsStr = "telegram";
+        String tagsStr = "telegram,@" + (origChat.username() == null ? origChat.title().replace(" ", "_") : origChat.username()) + "," + origChat.id();
 
         if (storeFullJson) {
             text = "@TGM" + text;
@@ -803,7 +803,6 @@ public class ErachainStorageBot extends ErachainBotCls {
                 // username - URL
                 //String title = chatMain.username() == null ? chatMain.title() : "t.me/" + chatMain.username() + "/" + message.messageId();
                 title += " - " + origChat.title();
-                tagsStr += ",@" + origChat.title() + "," + origChat.id();
 
                 // Будем формировать Маркдаун
                 String head = origChat.username() == null ? "## Сказ из Telegram - " + origChat.title()

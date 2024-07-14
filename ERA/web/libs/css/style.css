@@ -559,3 +559,35 @@ div.play-button { height: 72px; width: 72px; left: 50%; top: 50%; margin-left: -
 pre.code-highlight {
 background-color: #f8f8f8;
 }
+
+/* TELEGRAM VIEW */
+a.tgm.text {
+    padding: 0 0.3em;
+}
+a.tgm.text:hover, a.tgm.text:active, a.tgm.text:focus {
+    text-decoration: none;
+    color: black;
+    background-color: mistyrose;
+}
+a.tgm.mention {
+    padding: 0 0.3em;
+}
+a.tgm.mention:hover, a.tgm.mention:active, a.tgm.mention:focus {
+    text-decoration: none;
+    color: black;
+    background-color: gold;
+}
+
+tgm.spoiler: {
+    background-color: powderblue;
+    color: black;
+}
+
+blockquote.tgm: {
+    background-color: antiquewhite !important;
+    border-left: 5px solid burlywood;
+}
+blockquote.tgm.field: {
+    background-color: powderblue !important;
+    color: black !important;
+}
