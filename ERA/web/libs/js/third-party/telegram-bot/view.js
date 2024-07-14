@@ -69,22 +69,25 @@ function convertEntity(text, entity) {
             else
                 return `<pre>${text}</pre>`;
 		case "spoiler":
-            return `<span class="tg-spoiler">${text}</span>`;
+            return `<p class="tgm spoiler">${text}</p>`;
 		case "url":
-            return `<a href="${entity.text}">${text}</a>`;
+            return `<a class="tgm text" href="${entity.text}">${text}</a>`;
 
          // <a href="https://t.me/rt_russian/208358" target="_blank" rel="noopener" onclick="return confirm('Open this link?\n\n'+this.href);"><b>упал</b></a>
         case 'text_link':
-            return `<a href="${entity.url}" target="_blank">${text}</a>`;
+            return `<a class="tgm text" href="${entity.url}" target="_blank">${text}</a>`;
 
         case 'blockquote':
-            return `<blockquote>${text}</blockquote>`;
+            return `<blockquote class="tgm" style="background-color:seashell; border-left: 5px solid burlywood;">${text}</blockquote>`;
 
 // <i class="emoji" style="background-image:url('//telegram.org/img/emoji/40/F09F9FA9.png')"><b>🟩</b></i>
         case 'custom_emoji':
-            return `<img src="https://t.me/iv?url=${entity.custom_emoji_id}">`;
+            // не дает сейчас по ссылке иконки - их нужно в бот по токену загружать и то они живут не долго
+            // см. getFile и getCustomEmojiStickers
+            // return `<img src="https://t.me/iv?url=${entity.custom_emoji_id}">`;
+            return text;
 		case "text_mention":
-            return `<a href="tg://user?id=${entity.user.id}">${text}</a>`;
+            return `<a class="tgm text" href="tg://user?id=${entity.user.id}">${text}</a>`;
 
 // тут не правильнрый код
 		case "mention":
@@ -94,9 +97,9 @@ function convertEntity(text, entity) {
 		case "bot_command":
 		case "phone_number":
 		case "email":
-            return `<a href="https://t.me/${text.slice(1)}">${text}</a>`;
+            return `<a class="tgm mention" href="https://t.me/${text.slice(1)}">${text}</a>`;
         default:
-            return entityText;
+            return `<blockquote class="tgm field" style="background-color:lavender; border-left: 5px solid powderblue;">${text}</blockquote>`;
     }
 }
 
@@ -192,8 +195,10 @@ function telegramView(text_in, json) {
 
     return `
         <div class=row style="border: 2px solid #ccc; background-color: ghostwhite;"><div class=col-xs-12>
-            <div class=row style="font-size: 1.4em"><div class=col-xs-11>${messageUrl}</div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
-            <div class=row><div class=col-xs-12 style="line-height:1.2em; padding-bottom: 10px;">${formattedText}</div></div>
+            <div class=row style="line-height:1.5em; padding-bottom: 10px;"><div class="col-lg-2 col-md-1"></div><div class="col-lg-8 col-md-10 col-xs-12">
+                <div class=row style="font-size: 1.4em"><div class=col-xs-11 style="padding-top: 0.3em"><b>${messageUrl}</b></div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
+                <div class=row ><div class=col>${formattedText}</div></div>
+            </div><div class="col-lg-2 col-md-1"></div></div>
         </div></div>
     `;
 }
