@@ -139,7 +139,7 @@ public class ErachainStorageBot extends ErachainBotCls {
     boolean getFullDefault(JSONObject chatSettings) {
         Number value = (Number) chatSettings.get("full");
         if (value == null)
-            return false;
+            return true;
         else
             return value.intValue() == 1;
     }
@@ -255,6 +255,14 @@ public class ErachainStorageBot extends ErachainBotCls {
     }
 
     private boolean giftFor(String[] command, Long chatId, Integer replyMessageId, Chat chat, User user) {
+
+        JSONObject chatSettings = getChatSettings(chatId, user);
+        String charge = (String) chatSettings.get("charge");
+        if (charge != null) {
+            sendMarkdown(chatId, "Ваш счет включен в список автопополнений. Для переводов необходимо исключить его из автопополнений.\n\nОбратитесь к администратору бота");
+            return true;
+        }
+
         // Задать другой режим работы
         // @blockchain_storage_bot mode 3
         if (command.length < 3) {

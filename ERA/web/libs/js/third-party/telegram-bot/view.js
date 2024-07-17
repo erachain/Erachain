@@ -71,7 +71,7 @@ function convertEntity(text, entity) {
 		case "spoiler":
             return `<p class="tgm spoiler">${text}</p>`;
 		case "url":
-            return `<a class="tgm text" href="${entity.text}">${text}</a>`;
+            return `<a class="tgm text" href="${entity.text}" target="_blank">${text}</a>`;
 
          // <a href="https://t.me/rt_russian/208358" target="_blank" rel="noopener" onclick="return confirm('Open this link?\n\n'+this.href);"><b>упал</b></a>
         case 'text_link':
@@ -87,7 +87,7 @@ function convertEntity(text, entity) {
             // return `<img src="https://t.me/iv?url=${entity.custom_emoji_id}">`;
             return text;
 		case "text_mention":
-            return `<a class="tgm text" href="tg://user?id=${entity.user.id}">${text}</a>`;
+            return `<a class="tgm text" href="tg://user?id=${entity.user.id}" target="_blank">${text}</a>`;
 
 // тут не правильнрый код
 		case "mention":
@@ -97,7 +97,7 @@ function convertEntity(text, entity) {
 		case "bot_command":
 		case "phone_number":
 		case "email":
-            return `<a class="tgm mention" href="https://t.me/${text.slice(1)}">${text}</a>`;
+            return `<a class="tgm mention" href="https://t.me/${text.slice(1)}" target="_blank">${text}</a>`;
         default:
             return `<blockquote class="tgm field" style="background-color:lavender; border-left: 5px solid powderblue;">${text}</blockquote>`;
     }
@@ -189,7 +189,7 @@ function telegramView(text_in, json) {
     }
 
     if (messageChat.chat.username) {
-        messageUrl = "<a href=https://t.me/" + messageChat.chat.username + "/" + messageChat.message_id + ">" + messageChat.chat.title + "</a>";
+        messageUrl = "<a href=https://t.me/" + messageChat.chat.username + "/" + messageChat.message_id + " target=\"_blank\">" + messageChat.chat.title + "</a>";
     }
 
 
