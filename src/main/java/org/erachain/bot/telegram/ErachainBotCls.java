@@ -182,10 +182,14 @@ abstract public class ErachainBotCls implements Rechargeable {
         // Подписка на обновления
         bot.setUpdatesListener(updates -> {
             // Обработка обновлений
-            updates.forEach(update -> onUpdateReceived(update));
-            // return id of last processed update or confirm them all
+            try {
+                updates.forEach(update -> onUpdateReceived(update));
+                // return id of last processed update or confirm them all
+                // Создание Обработчика ошибок
+            } catch (Exception e) {
+                log.error("On TELEGRAM Updates error {}", e.toString());
+            }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            // Создание Обработчика ошибок
         }, e -> {
             if (e.response() != null) {
                 // Ошибка из Телеграма
@@ -208,10 +212,14 @@ abstract public class ErachainBotCls implements Rechargeable {
         adminChatId = (Long) settingsJSON.get("adminChatId");
         sendToAdminMessage("Started...");
         settingsAllChats.keySet().forEach(chatId -> {
-            if (((JSONObject) settingsAllChats.get(chatId)).get("user") != null)
-                // пользователям не пишем
-                return;
-            sendMarkdown(Long.parseLong((String) chatId), "Я запустился... " + botUserNameMD1);
+            try {
+                if (((JSONObject) settingsAllChats.get(chatId)).get("user") != null)
+                    // пользователям не пишем
+                    return;
+                sendMarkdown(Long.parseLong((String) chatId), "Я запустился... " + botUserNameMD1);
+            } catch (Exception e) {
+                log.warn("Init chat {} - error {} ", chatId, e.toString());
+            }
         });
 
         try {
@@ -285,12 +293,6 @@ abstract public class ErachainBotCls implements Rechargeable {
     abstract protected boolean processChatReplyCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang);
 
     abstract protected boolean processCommand(Long makerTxId, Chat replyChat, Integer replyMessageId, Chat origChat, Integer origMessageId, Integer origMessageDate, Message message, String[] commands, String lang);
-
-    public void process() {
-        GetUpdatesResponse updatesResponse = bot.execute(getUpdates);
-        List<Update> updates = updatesResponse.updates();
-        updates.forEach(update -> onUpdateReceived(update));
-    }
 
     String getUserIdAndName(User user) {
         StringBuilder out = new StringBuilder();
@@ -488,54 +490,8 @@ abstract public class ErachainBotCls implements Rechargeable {
                         return;
 
                     } else if (text.startsWith(botUserNameF)) {
-
                         // это сообщение боту из общего чата - видное всем
-                        // @blockchain_storage_bot mode 3
-                        String commandLine = text.length() == botUserNameF.length() ? "" : text.substring(botUserName.length() + 1).trim();
-                        String[] command = commandLine.split(" ");
-                        if (command.length == 1) {
-                            // команда без паарметров - просто ответить как правило выдать Инфо или данные текущих настроек
-                            if (botAnswerPublic(command[0], chat, message.from()))
-                                return;
-
-                        } else {
-                            // Команда с параметрами = для управления
-                            from = message.from();
-                            if (from.isBot()) {
-                                if (from.username().equals("Channel_Bot")) {
-                                    // команды от админа канала
-                                    botAnswerAdmin(command, chat, from);
-                                    return;
-                                } else if (from.username().equals("GroupAnonymousBot")) {
-                                    // команды от админа чата
-                                    // TODO проверить разрешение на управление от админа канала - а если это просто группа ьез канала?
-                                    botAnswerAdmin(command, chat, from);
-                                    return;
-                                } else {
-                                    // иной какой-то бот
-                                }
-                                return;
-
-                            } else {
-                                // Пользователи - они тоже могут быть админами - см. ниже
-                                // TODO после определения команды - надо ловить статус члена
-                                GetChatMember request = new GetChatMember(chatId, from.id());
-                                GetChatMemberResponse response = bot.execute(request);
-                                if (!response.isOk()) {
-                                    // что пошло не так
-                                    sendMarkdown(chatId, "```java Response\n" + response + "```");
-                                    return;
-                                }
-
-                                ChatMember chatMember = response.chatMember();
-                                if (chatMember.status().equals(ChatMember.Status.creator)
-                                        || chatMember.status().equals(ChatMember.Status.administrator) && chatMember.canManageChat()) {
-                                    botAnswerAdmin(command, chat, from);
-                                } else {
-                                    replySimpleText(chatId, "Для управления группой нужно быть администратором с правом управлять чатом", message.messageId());
-                                }
-                            }
-                        }
+                        toBotCommand(chatId, message, chat, text);
                         return;
 
                     } else {
@@ -623,32 +579,17 @@ abstract public class ErachainBotCls implements Rechargeable {
                     userName = chat.username();
                 }
                 String author = message.authorSignature();
-                text = message.text();
-                MessageEntity[] entites = message.entities();
-                LinkPreviewOptions link_preview_options = message.linkPreviewOptions();
+                if (message.caption() != null) {
+                    text = message.caption();
+                } else {
+                    text = message.text();
+                }
+                if (text == null)
+                    return;
 
-                if (text.startsWith(botUserName)) {
-                    String commandLine = text.substring(botUserName.length()).trim();
-                    String[] command = commandLine.split(" ");
-                    command[0] = command[0].toLowerCase();
-                    if (command.length == 1) {
-                        // это команды получить данные
-                        if (command[0].equals("account")) {
-                            sendChatAccountMessage(chat, null, lang);
-                        }
-                        return;
-                    } else {
-                        from = message.from();
-                        if (from.isBot())
-                            return;
-                        // проверить админские права
-
-                        if (command[0].equals("account")) {
-                            // @blockchain_storage_bot account new
-                            // задает SEED для чата
-                            sendChatAccountMessage(chat, null, lang);
-                        }
-                    }
+                if (text.startsWith(botUserNameF)) {
+                    // это сообщение боту из общего чата - видное всем
+                    toBotCommand(chatId, message, chat, text);
                     return;
                 }
 
@@ -746,6 +687,71 @@ abstract public class ErachainBotCls implements Rechargeable {
             log.error(e.getMessage(), e);
             sendSimpleText(chatErrorId, e.toString());
         }
+    }
+
+    void toBotCommand(long chatId, Message message, Chat chat, String text) {
+        // это сообщение боту из общего чата - видное всем
+        // @blockchain_storage_bot mode 3
+        String commandLine = text.length() == botUserNameF.length() ? "" : text.substring(botUserName.length() + 1).trim();
+        String[] command = commandLine.split(" ");
+        if (command.length == 1) {
+            // команда без паарметров - просто ответить как правило выдать Инфо или данные текущих настроек
+            if (botAnswerPublic(command[0], chat, message.from()))
+                return;
+
+        } else {
+            // Команда с параметрами = для управления
+            User from = message.from();
+            if (from == null) {
+                if (message.senderChat() != null && message.senderChat().id() == chatId) {
+                    if (botAnswerAdmin(command, chat, from))
+                        return;
+                }
+            } else if (from.isBot()) {
+                if (from.username().equals("Channel_Bot")) {
+                    // команды от админа канала
+                    if (botAnswerAdmin(command, chat, from))
+                        return;
+                } else if (from.username().equals("GroupAnonymousBot")) {
+                    // команды от админа чата
+                    // TODO проверить разрешение на управление от админа канала - а если это просто группа ьез канала?
+                    if (botAnswerAdmin(command, chat, from))
+                        return;
+                } else {
+                    // иной какой-то бот
+                }
+
+            } else {
+                // Пользователи - они тоже могут быть админами - см. ниже
+                // TODO после определения команды - надо ловить статус члена
+                GetChatMember request = new GetChatMember(chatId, from.id());
+                GetChatMemberResponse response = bot.execute(request);
+                if (!response.isOk()) {
+                    // что пошло не так
+                    sendMarkdown(chatId, "```java Response\n" + response + "```");
+                    return;
+                }
+
+                ChatMember chatMember = response.chatMember();
+                if (chatMember.status().equals(ChatMember.Status.creator)
+                        || chatMember.status().equals(ChatMember.Status.administrator) && chatMember.canManageChat()) {
+                    if (botAnswerAdmin(command, chat, from))
+                        return;
+                } else {
+                    replySimpleText(chatId, "Для управления группой нужно быть администратором с правом управлять чатом", message.messageId());
+                    return;
+                }
+            }
+        }
+
+        User user = message.from();
+        String lang = user == null ? null : user.languageCode();
+        BaseResponse response = sendGreetingsMessage(chatId, lang);
+        // Проверим сразу счет - если что вышлем подарок
+        getPrivKey(chatId, user);
+
+        return;
+
     }
 
     boolean isWrongAddress(Long chatId, String addressOrPublicKey) {
@@ -865,7 +871,7 @@ abstract public class ErachainBotCls implements Rechargeable {
     }
 
     protected boolean botAnswerPublic(String receivedMessage, Chat chat, User user) {
-        String lang = user.languageCode();
+        String lang = user == null ? null : user.languageCode();
         String[] command = receivedMessage.toLowerCase().split(" ");
         switch (command[0]) {
             case "help":
@@ -1421,7 +1427,7 @@ abstract public class ErachainBotCls implements Rechargeable {
 
         sendMarkdown(longId, "\nПосмотреть транзакцию \"" + scanUrlMarkdown(tx.viewTypeName(langList.getLangJson(lang)), "tx", tx.viewHeightSeq()) + "\" в блокчейн");
 
-        if (BlockChain.TEST_MODE)
+        if (test || BlockChain.TEST_MODE)
             sendMarkdown(longId, "```java Transaction\n" + tx.toJson() + "```");
 
     }
@@ -1497,5 +1503,8 @@ abstract public class ErachainBotCls implements Rechargeable {
 
         bot.removeGetUpdatesListener();
         bot.shutdown();
+    }
+
+    interface Chater {
     }
 }

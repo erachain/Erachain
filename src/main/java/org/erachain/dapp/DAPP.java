@@ -69,6 +69,7 @@ public abstract class DAPP {
         JSONObject out = new JSONObject();
         String key = String.format("DAPP_%d_", getID());
         out.put("ID", getID());
+        out.put("type", "DAPP");
         out.put("name", Lang.T(key + "NAME", langObj));
         out.put("short", Lang.T(key + "SHORT", langObj));
         if (isDisabled())

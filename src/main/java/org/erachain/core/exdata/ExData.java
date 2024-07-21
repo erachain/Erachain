@@ -1711,7 +1711,8 @@ public class ExData {
             }
         }
 
-        if (tags != null && tags.length > 255) {
+        // TODO - преобразовывать без знака при парсигне и тагд тут можно до 255 поднять
+        if (tags != null && tags.length > 127) {
             return Transaction.INVALID_TAGS_LENGTH;
         }
 

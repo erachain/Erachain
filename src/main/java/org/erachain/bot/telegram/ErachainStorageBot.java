@@ -24,6 +24,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -733,7 +734,8 @@ public class ErachainStorageBot extends ErachainBotCls {
                     storeFullJson = true;
                 else if (word.equals("-full") || word.equals("-весь") || word.equals("-всё") || word.equals("-все"))
                     storeFullJson = false;
-                else if (word.equals("test") || word.equals("проба")) testProc = true;
+                else if (word.equals("test") || word.equals("probe") || word.equals("тест") || word.equals("проба"))
+                    testProc = true;
             }
         }
 
@@ -770,11 +772,12 @@ public class ErachainStorageBot extends ErachainBotCls {
             out.put("command", commands);
             out.put("isEncrypted", isEncrypted);
             out.put("resultText", text);
-            if (true)
-                log.warn(out.toJSONString());
-            else
-                sendSimpleText(replyChat.id(), out.toJSONString());
-            return true;
+            out.put("message", GSON.toJsonTree(message));
+            //if (true)
+            //    log.warn(out.toJSONString());
+            //else
+            //    sendSimpleText(replyChat.id(), out.toJSONString());
+            //return true;
         }
 
         PrivateKeyAccount creator = getPrivKey(makerTxId, replyChat);
@@ -801,7 +804,11 @@ public class ErachainStorageBot extends ErachainBotCls {
         ExLink exLink = null;
         ExAction action = null;
         String title = this.botTitle;
-        String tagsStr = "telegram,@" + (origChat.username() == null ? origChat.title().replace(" ", "_") : origChat.username()) + "," + origChat.id();
+        Chat tagsChat = origChat == null ? replyChat : origChat;
+        String chatNameTag = tagsChat.username() == null ? tagsChat.title().replace(" ", "_") : "@" + tagsChat.username();
+        if (chatNameTag.length() > 40)
+            chatNameTag = chatNameTag.substring(0, 38) + "..";
+        String tagsStr = "t.me," + chatNameTag + "," + tagsChat.id();
 
         if (storeFullJson) {
             text = "@TGM" + text;
@@ -867,6 +874,14 @@ public class ErachainStorageBot extends ErachainBotCls {
         RSignNote issueDoc = (RSignNote) cnt.r_SignNote(RSignNote.CURRENT_VERS, property1, property2,
                 creator, 0, key, exDataBytes);
 
+        if (testProc) {
+            //out.put("tx", GSON.toJsonTree(issueDoc.toJson()));
+            //sendSimpleText(replyChat.id(), out.toJSONString());
+            log.warn("\n" + out.toJSONString());
+            sendMarkdown(replyChat.id(), "```java " + out.toJSONString() + "```");
+            return true;
+        }
+
         sendTransaction(settings, issueDoc, replyChat.id(), replyMessageId, false,
                 botUserNameMD + (isEncrypted ? ": Запущено сохранение скрытого сообщения... " : ": Запущено сохранение отрытого сообщения... "),
                 botUserNameMD + (isEncrypted ? ": Скрытое сообщение сохранено!!" : ": Отрытое сообщение сохранено!!"), lang);
@@ -878,6 +893,36 @@ public class ErachainStorageBot extends ErachainBotCls {
         }
 
         return true;
+    }
+
+    /**
+     * Информация по ботам для сканера
+     *
+     * @param langObj
+     * @return
+     */
+    public static JSONObject getInfoShort(JSONObject langObj) {
+        JSONObject out = new JSONObject();
+        String key = String.format("BOT_%d_", getID());
+        out.put("ID", getID());
+        out.put("type", "BOT");
+        out.put("name", Lang.T(key + "NAME", langObj));
+        out.put("short", Lang.T(key + "SHORT", langObj));
+
+        return out;
+    }
+
+    public static int getID() {
+        return 5;
+    }
+
+    public static JSONObject getInfo(JSONObject langObj) {
+        JSONObject out = getInfoShort(langObj);
+
+        String key = String.format("BOT_%d_", getID());
+        out.put("desc", Lang.T(key + "DESC", langObj));
+
+        return out;
     }
 
 }
