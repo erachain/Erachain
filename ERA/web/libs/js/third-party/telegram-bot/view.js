@@ -71,7 +71,7 @@ function convertEntity(text, entity) {
 		case "spoiler":
             return `<p class="tgm spoiler">${text}</p>`;
 		case "url":
-            return `<a class="tgm text" href="${entity.text}" target="_blank">${text}</a>`;
+            return `<a class="tgm text" href="${text}" target="_blank">${text}</a>`;
 
          // <a href="https://t.me/rt_russian/208358" target="_blank" rel="noopener" onclick="return confirm('Open this link?\n\n'+this.href);"><b>упал</b></a>
         case 'text_link':
@@ -182,21 +182,44 @@ function telegramView(text_in, json) {
     }
 
     var messageChat;
+    var link, title;
     var messageUrl;
 
     if (json.forward_origin) {
         messageChat = json.forward_origin;
+        if (messageChat.type == "user") {
+            title = messageChat.sender_user.first_name;
+            link = messageChat.sender_user.username;
+        } else if (messageChat.type == "channel") {
+            title = messageChat.chat.title;
+            link = messageChat.chat.username;
+        } else {
+            title = messageChat.sender_chat.title;
+            link = messageChat.sender_chat.username;
+        }
+
+    } else if (json.sender_chat) {
+        messageChat = json;
+        title = messageChat.sender_chat.title;
+        link = messageChat.sender_chat.username;
+
+    } else {
+        messageChat = json;
+        title = messageChat.sender_chat.title;
+        link = messageChat.sender_chat.username;
     }
 
-    if (messageChat.chat.username) {
-        messageUrl = "<a href=https://t.me/" + messageChat.chat.username + "/" + messageChat.message_id + " target=\"_blank\">" + messageChat.chat.title + "</a>";
+    if (link) {
+        messageUrl = `<a class='button ll-blue-bgc' href='https://t.me/${link}/${messageChat.message_id}' target='_blank'><b>${title}</b></a>`;
+    } else {
+        messageUrl = `<b>${title}</b>`;
     }
 
 
     return `
         <div class=row style="border: 2px solid #ccc; background-color: ghostwhite;"><div class=col-xs-12>
             <div class=row style="line-height:1.5em; padding-bottom: 10px;"><div class="col-lg-2 col-md-1"></div><div class="col-lg-8 col-md-10 col-xs-12">
-                <div class=row style="font-size: 1.4em"><div class=col-xs-11 style="padding-top: 0.3em"><b>${messageUrl}</b></div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
+                <div class=row style="font-size: 1.4em"><div class=col-xs-11 style="padding-top: 0.3em">${messageUrl}</div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
                 <div class=row ><div class=col>${formattedText}</div></div>
             </div><div class="col-lg-2 col-md-1"></div></div>
         </div></div>

@@ -3,6 +3,7 @@ package org.erachain.core.blockexplorer;
 import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
+import org.erachain.bot.telegram.ErachainStorageBot;
 import org.erachain.controller.Controller;
 import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
@@ -737,6 +738,8 @@ public class BlockExplorer {
         output.put("type", "asset");
         output.put("search", "assets");
 
+        output.put("assets_list_tip", Lang.T("assets_list_tip", langObj));
+
         AssetCls asset = Controller.getInstance().getAsset(key);
         if (asset == null) {
             return;
@@ -1437,6 +1440,8 @@ public class BlockExplorer {
     private void jsonQueryItemPerson(String first, boolean forPrint) {
         output.put("type", "person");
         output.put("search", "persons");
+
+        output.put("persons_list_tip", Lang.T("persons_list_tip", langObj));
 
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
@@ -2366,32 +2371,47 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryPlay(String dAppId, int offset, UriInfo info) {
+    public Map jsonQueryPlay(String playId, int offset, UriInfo info) {
 
         output.put("type", "play");
         output.put("search", "play");
         output.put("search_placeholder", Lang.T("Insert searching dApp", langObj));
-        output.put("search_message", dAppId);
+        output.put("search_message", playId);
 
-        if (dAppId != null && !dAppId.isEmpty()) {
+        if (playId != null && !playId.isEmpty() && !"undefined".equals(playId)) {
             try {
-                output.put("dApp", DAPPFactory.dAppsById.get(Integer.parseInt(dAppId)).getInfo(langObj));
+                if (playId.startsWith("BOT.")) {
+                    // пока один
+                    output.put("play", ErachainStorageBot.getInfo(langObj));
 
-                output.put("Label_Accounts", Lang.T("Accounts", langObj));
-                output.put("Label_Commands", Lang.T("Commands", langObj));
-                output.put("Label_Desc", Lang.T("Description", langObj));
+                    output.put("Label_Desc", Lang.T("Description", langObj));
 
+                } else if (playId.startsWith("DAPP.")) {
+                    output.put("play", DAPPFactory.dAppsById.get(Integer.parseInt(playId.substring(5))).getInfo(langObj));
+
+                    output.put("Label_Accounts", Lang.T("Accounts", langObj));
+                    output.put("Label_Commands", Lang.T("Commands", langObj));
+                    output.put("Label_Desc", Lang.T("Description", langObj));
+                } else {
+                    output.put("error", "Type not found: " + playId);
+                    return output;
+                }
             } catch (NumberFormatException e) {
                 output.put("error", e.getMessage());
                 return output;
             }
+
         } else {
-
             JSONObject listBuId = new JSONObject();
-            DAPPFactory.dAppsById.values().forEach(dapp -> listBuId.put(dapp.getID(), dapp.getInfoShort(langObj)));
-            output.put("pageItemsByID", listBuId);
-            //output.put("pageItemsByPop", DAPPFactory.dAppsByPopularity);
+            // bots list
+            listBuId.put("BOT.5", ErachainStorageBot.getInfoShort(langObj));
 
+            // dApps list
+            DAPPFactory.dAppsById.values().forEach(dapp -> listBuId.put("DAPP." + dapp.getID(), dapp.getInfoShort(langObj)));
+            output.put("pageItemsByID", listBuId);
+
+            output.put("Label_Head", Lang.T("Play_Scanner_Head", langObj));
+            output.put("Label_Type", Lang.T("Type", langObj));
             output.put("Label_Accounts", Lang.T("Accounts", langObj));
             output.put("Label_Commands", Lang.T("Commands", langObj));
             output.put("Label_Desc", Lang.T("Description", langObj));
