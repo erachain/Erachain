@@ -724,19 +724,19 @@ button.white-bgc[disabled]:focus,
                 return output;
             }
 
-            output += '<div class=row><div class=col-lg-2></div><div class=col-sm-8>';
+            output += '<div class=row><div class=col-md-1></div><div class=col-lg-1></div><div class="col-xs-12 col-md-10 col-lg-8">';
 
-            if (data.hasOwnProperty('dApp')) {
-                var dApp = data.dApp;
-                output += '<h3>' + dApp.name;
-                if (dApp.hasOwnProperty('disabled'))
-                    output += ' (' + dApp.disabled + ')';
-                output += '</h3><b>' + dApp.short + '</b><br>';
+            if (data.hasOwnProperty('play')) {
+                var play = data.play;
+                output += '<h3>' + play.name + ' - ' + play.type;
+                if (play.hasOwnProperty('disabled'))
+                    output += ' (' + play.disabled + ')';
+                output += '</h3><b>' + play.short + '</b><br>';
 
-                output += '<div class=row align=left><p>' + dApp.desc + '</p>';
-                if (dApp.hasOwnProperty('accs')) {
+                output += '<div class=row align=left><p>' + play.desc + '</p>';
+                if (play.hasOwnProperty('accs')) {
                     output += '<p><b>' + data.Label_Accounts + '</b>';
-                    var accs = dApp.accs;
+                    var accs = play.accs;
                     for (addr in accs) {
                         if (accs[addr].hasOwnProperty('desc')) {
                             output += '<br><a href ="?address=' + addr +
@@ -756,23 +756,23 @@ button.white-bgc[disabled]:focus,
                 }
 
             } else {
+                output += '<p>' + data.Label_Head + '</p>';
                 output += '<table id="pageItemsByID" BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
                     ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
-                output += '<tr bgcolor="f1f1f1"><td><b>ID<td><b>' + data.Label_Name + '<td><b>' + data.Label_Desc + '</tr>';
+                output += '<tr bgcolor="f1f1f1"><td><b>ID<td><b>' + data.Label_Type + '<td><b>' + data.Label_Name + '<td><b>' + data.Label_Desc + '</tr>';
                 for (key in data.pageItemsByID) {
-                    var dApp = data.pageItemsByID[key];
-                    output += '<tr><td><a href ="?play=' + dApp.ID +
-                        get_lang() + '">' + dApp.ID + '</a><td><a href ="?play=' + dApp.ID +
-                        get_lang() + '">' + dApp.name + '</a><td>';
-                    if (dApp.hasOwnProperty('disabled'))
-                        output += '(' + dApp.disabled + ') ';
-                    output += dApp.short;
+                    var play = data.pageItemsByID[key];
+                    var href = `href="?play=${play.type}.${play.ID + get_lang()}"`;
+                    output += `<tr><td><a ${href}>${play.ID}</a><td>${play.type}<td><a ${href}">${play.name}</a><td>`;
+                    if (play.hasOwnProperty('disabled'))
+                        output += '(' + play.disabled + ') ';
+                    output += play.short;
 
                 }
                 output += '</table>';
             }
 
-            output += '</div></div><div class=col-lg-2></div></div><br><br>';
+            output += '</div></div><div class=col-lg-1></div><div class=col-md-1></div></div><br><br>';
             return output;
         }
 
