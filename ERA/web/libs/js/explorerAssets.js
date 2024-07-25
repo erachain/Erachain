@@ -3,6 +3,7 @@ function assets(data) {
     var notDisplayPages = data.notDisplayPages;
     var numberShiftDelta = data.pageSize;
     output += lastBlock(data.lastBlock);
+    output += `<p>${data.assets_list_tip}</p>`;
     var start = data.start;
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
@@ -72,8 +73,10 @@ function asset(data, forPrint) {
 
     var output = '';
 
-    if (!forPrint)
+    if (!forPrint) {
         output += lastBlock(data.lastBlock);
+        output += `<p>${data.assets_list_tip}</p>`;
+    }
 
     if (!data.item) {
         output += '<h2>Not found</h2>';
