@@ -161,7 +161,7 @@ function copyToClipboard(data) {
     alert('Copied to clipboard');
 }
 
-function telegramView(text_in, json) {
+function telegramViewJson(json) {
 
     var text;
     var entities;
@@ -180,6 +180,33 @@ function telegramView(text_in, json) {
     } else {
         formattedText = escapeHtml(text);
     }
+
+    return formattedText;
+}
+
+//    var button = `<input id=inp12 placeholder="введите данные Сообщения" oninput="telegramParseButton(this)"><div id=idParseMess></div>`;
+function telegramParseButton(dom) {
+
+    try {
+        var target = document.getElementById('idParseMess');
+        var text = dom.value;
+        var json;
+        if (text.startsWith("@TGM{"))
+            json = text.substring(4);
+        else
+            json = text;
+
+        text = telegramView(text, JSON.parse(json))
+
+        target.innerHTML = text;
+    } catch (err) {
+        target.innerHTML = err;
+    }
+}
+
+function telegramView(text_in, json) {
+
+    var formattedText = telegramViewJson(json);
 
     var messageChat;
     var link, title;
@@ -215,11 +242,10 @@ function telegramView(text_in, json) {
         messageUrl = `<b>${title}</b>`;
     }
 
-
     return `
         <div class=row style="border: 2px solid #ccc; background-color: ghostwhite;"><div class=col-xs-12>
-            <div class=row style="line-height:1.5em; padding-bottom: 10px;"><div class="col-lg-2 col-md-1"></div><div class="col-lg-8 col-md-10 col-xs-12">
-                <div class=row style="font-size: 1.4em"><div class=col-xs-11 style="padding-top: 0.3em">${messageUrl}</div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
+            <div class=row style='line-height:1.5em'><div class="col-lg-2 col-md-1"></div><div class="col-lg-8 col-md-10 col-xs-12">
+                <div class=row style="font-size: 1.4em;;padding:0.5em 0.5em;"><div class=col-xs-11 style="padding-top: 0.3em">${messageUrl}</div><div class=col-xs-1><a class="button ll-blue-bgc glyphicon glyphicon-copy" onclick="copyToClipboard('${encodeURIComponent(text_in)}')"></a></div></div>
                 <div class=row ><div class=col>${formattedText}</div></div>
             </div><div class="col-lg-2 col-md-1"></div></div>
         </div></div>
