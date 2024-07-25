@@ -921,6 +921,7 @@ public class ErachainStorageBot extends ErachainBotCls {
 
         String key = String.format("BOT_%d_", getID());
         out.put("desc", Lang.T(key + "DESC", langObj));
+        out.put("tail", "<label><b>" + Lang.T("BOT_5_BTN_LBL", langObj) + ":</b></label><input style='width:50%; margin-left:1em;' placeholder='" + Lang.T("BOT_5_BTN", langObj) + "' oninput='telegramParseButton(this)'><div id=idParseMess></div>");
 
         return out;
     }

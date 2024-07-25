@@ -1184,5 +1184,7 @@
   "BOT_5_NAME": "The Chronicler for Telegram",
   "BOT_5_SHORT": "It allows you to save messages from the Telegram messenger to the blockchain",
   "BOT_5_DESC": "Saved messages from Telegram chats, channels, or private messages both in plain text and in private (encrypted) and forward them to a specified list of accounts. Full description inside the bot. You can call and launch the bot by following the link <a href=https://t.me/blockchain_storage_bot target='_blank'><b>@blockchain_storage_bot</b></a>",
+  "BOT_5_BTN_LBL": "Remake Message from Data",
+  "BOT_5_BTN": "Enter the Message data in JSON format",
   "": ""
 }

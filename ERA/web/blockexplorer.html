@@ -734,6 +734,10 @@ button.white-bgc[disabled]:focus,
                 output += '</h3><b>' + play.short + '</b><br>';
 
                 output += '<div class=row align=left><p>' + play.desc + '</p>';
+                if (play.hasOwnProperty('tail')) {
+                    output += '<p>' + play.tail + '</p>';
+                }
+
                 if (play.hasOwnProperty('accs')) {
                     output += '<p><b>' + data.Label_Accounts + '</b>';
                     var accs = play.accs;
