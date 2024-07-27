@@ -1471,6 +1471,9 @@ abstract public class ErachainBotCls implements Rechargeable {
 
     @Override
     public void getRechargeable(Map<Account, Fun.Tuple3<ErachainBotCls, BigDecimal, JSONObject>> recharges) {
+        if (bot == null || settingsAllChats == null)
+            return;
+
         ((JSONObject) settingsJSON.get("chats")).forEach((id, val) -> {
             JSONObject chatSettings = (JSONObject) val;
             String charge = (String) chatSettings.get("charge");
