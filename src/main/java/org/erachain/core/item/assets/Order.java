@@ -214,7 +214,7 @@ public class Order implements Comparable<Order> {
             return true;
         }
 
-        BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
+        BigDecimal priceForLeft = calcPrice(willHave, willWant);
         if (priceForLeft.signum() == 0)
             return true;
 
@@ -286,7 +286,7 @@ public class Order implements Comparable<Order> {
         return calcPriceScale(Order.powerTen(amountHave), wantScale, addScale);
     }
 
-    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant) {
 
         if (amountHave.signum() == 0)
             return BigDecimal.ONE.negate();
@@ -306,7 +306,7 @@ public class Order implements Comparable<Order> {
     }
 
     public BigDecimal calcPrice() {
-        return calcPrice(amountHave, amountWant, wantAssetScale);
+        return calcPrice(amountHave, amountWant);
     }
 
     /**
@@ -322,7 +322,7 @@ public class Order implements Comparable<Order> {
         if (wantLeft.signum() == 0)
             return BigDecimal.ZERO;
 
-        return calcPrice(getAmountHaveLeft(), wantLeft, wantAssetScale);
+        return calcPrice(getAmountHaveLeft(), wantLeft);
     }
 
     /**
@@ -334,11 +334,11 @@ public class Order implements Comparable<Order> {
         if (getAmountHaveLeft().signum() == 0)
             return calcPriceReverse();
 
-        return calcPrice(getAmountWantLeft(), getAmountHaveLeft(), haveAssetScale);
+        return calcPrice(getAmountWantLeft(), getAmountHaveLeft());
     }
 
     public BigDecimal calcPriceReverse() {
-        return calcPrice(amountWant, amountHave, haveAssetScale);
+        return calcPrice(amountWant, amountHave);
     }
 
     public static Order reloadOrder(DCSet dcSet, Long orderID) {

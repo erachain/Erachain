@@ -38,6 +38,10 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
 
     @Override
     public void openMap() {
+
+        LO = new Fun.Tuple2(0L, 0L);
+        HI = new Fun.Tuple2(Long.MAX_VALUE, Long.MAX_VALUE);
+
         //OPEN MAP
 
         /* EXAMPLE for Long, Long

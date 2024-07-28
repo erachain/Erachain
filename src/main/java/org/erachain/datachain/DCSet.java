@@ -196,6 +196,10 @@ public class DCSet extends DBASet implements Closeable {
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver, dynamicGUI);
+    }
+
     /**
      *
      * @param dbFile
@@ -607,6 +611,16 @@ public class DCSet extends DBASet implements Closeable {
             DBASet.setVersion(database, CURRENT_VERSION);
 
         return database;
+
+    }
+
+    public static DB makeReadOnlyFileDB(File dbFile) {
+
+        if (!dbFile.exists()) {
+            throw new RuntimeException("File not exists - " + dbFile.getName());
+        }
+
+        return DBMaker.newFileDB(dbFile).readOnly().checksumEnable().make();
 
     }
 

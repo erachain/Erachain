@@ -43,9 +43,9 @@ public class AccrualsModel extends DefaultTableModel {
 
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
-            rowVector.addElement(item.b.toPlainString());
+            rowVector.addElement(item.b == null ? "--" : item.b.toPlainString());
             rowVector.addElement(item.a.getPersonAsString());
-            rowVector.addElement(item.c.toPlainString());
+            rowVector.addElement(item.c == null ? "--" : item.c.toPlainString());
             if (item.d == null) {
                 rowVector.addElement("");
             } else {

@@ -45,10 +45,7 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.dapp.DAPP;
 import org.erachain.database.DLSet;
-import org.erachain.datachain.BlocksMapImpl;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemMap;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -106,7 +103,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.4.09b";
+    public static String version = "6.4.10";
     public static String buildTime = "2024-06-21 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -136,6 +133,7 @@ public class Controller extends Observable {
     public static long buildTimestamp;
     private static Controller instance;
     public PairsController pairsController;
+    public TradeHistoryController tradeHistoryController;
     private Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
@@ -801,8 +799,6 @@ public class Controller extends Observable {
             this.webService.start();
         }
 
-        pairsController = new PairsController();
-
         // CREATE WALLET
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open Wallet"));
@@ -900,6 +896,11 @@ public class Controller extends Observable {
         botsErachain.add(new ErachainStorageBot(this));
         botsManager = new BotManager(this);
 
+
+        if (!onlyProtocolIndexing) {
+            pairsController = new PairsController();
+            tradeHistoryController = new TradeHistoryController(this);
+        }
 
         if (!useNet)
             this.status = STATUS_OK;
@@ -1034,7 +1035,7 @@ public class Controller extends Observable {
     public void reBuilChain() {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
-        LOGGER.info("Start rebuilding the chain database");
+        LOGGER.warn("\n\nStart rebuilding the chain database\n");
 
         File dataDir = new File(Settings.getInstance().getDataChainPath());
         File dataBackDir = new File(dataDir.getPath() + "TMP");
@@ -1067,14 +1068,19 @@ public class Controller extends Observable {
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database. Please do not turn off the program!!"));
-        LOGGER.info("Start rebuilding the chain database. Please do not turn off the program!!");
+        LOGGER.warn("\n\nStart rebuilding the chain database. Please do not turn off the program!!\n");
 
         // OPEN BACKUP CHaIN
-        DCSet dcSetBackUp = new DCSet(dataBackFile, false, false, false, databaseSystem);
+        // на UNIX тут очень большая задержка и файл начинает расти - трнзакционный больше данных в несколько раз!!
+        LOGGER.warn("\n\nOpen backup {}", dataBackFile.getName());
+        DCSetRO dcSetBackUp = new DCSetRO(dataBackFile, databaseSystem);
 
+        LOGGER.warn("\n\nCheck backup BlockMap");
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
         BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
+        // Размер определяется по getBlockSignsMap!
         int startHeight = blocksMap.size() + 1;
+        LOGGER.warn("\n\nnew BlockMap size: {}", startHeight);
         if (startHeight > 2) {
             LOGGER.info("Restart rebuild chain from block " + startHeight);
         }
@@ -1091,8 +1097,10 @@ public class Controller extends Observable {
                     System.exit(-14);
                 }
 
+                int blockSizeOld = blocksMapOld.size();
+                LOGGER.warn("\nRechain started... backup block height: {}", blockSizeOld);
                 int count = 0;
-                for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
+                for (int i = ++startHeight; i < blockSizeOld; ++i) {
                     block = blocksMapOld.get(i);
 
                     // need for calculate WIN Value
@@ -1102,11 +1110,24 @@ public class Controller extends Observable {
                         break;
                     }
 
-                    if (false && block.isValid(this.dcSet, true) > 0) {
+                    if (false && // полную валидацию не делаем так как это же наши данные - мы им верим
+                            block.isValid(this.dcSet, true) > 0) {
                         break;
                     }
+
                     try {
                         block.process(dcSet, true);
+
+                        count += 1 + (block.getTransactionCount() >> 3);
+                        if (count > 10000) {
+                            count = 0;
+                            dcSet.flush(0, true, false);
+                            LOGGER.info("Rebuilds block " + i);
+                            Thread.sleep(100); // осовободим время процессора
+                        }
+
+                    } catch (InterruptedException e) {
+                        break;
                     } catch (Throwable e) {
                         if (isStopping) {
                             LOGGER.info("User BREAK on block " + i);
@@ -1117,12 +1138,6 @@ public class Controller extends Observable {
                         break;
                     }
 
-                    count += 1 + (block.getTransactionCount() >> 3);
-                    if (count > 10000) {
-                        count = 0;
-                        dcSet.flush(0, true, false);
-                        LOGGER.info("Rebuilds block " + i);
-                    }
 
                     if (isStopping) {
                         LOGGER.info("User BREAK on block " + i);
@@ -1259,6 +1274,9 @@ public class Controller extends Observable {
         }
 
         botsManager.cancel();
+        if (!onlyProtocolIndexing) {
+            tradeHistoryController.close();
+        }
         botsErachain.forEach(bot -> bot.stop());
 
         if (transactionsPool == null) {

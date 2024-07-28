@@ -29,7 +29,6 @@ return htmlFilter(wordwrap(text, 0, '\n', true));
 }
 
 function fformat(text_in) {
-   // <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-post="rt_russian/207494" data-width="100%"></script>
     if (text_in.startsWith('@TGM{')) {
         return telegramView(text_in, JSON.parse(text_in.substring(4)));
     }
