@@ -228,7 +228,7 @@ function person(data, forPrint) {
 
     if (!forPrint) {
         output += lastBlock(data.lastBlock);
-        output += `<p>${data.persons_list_tip}</p>`;
+        output += `<p>${data.persons_list_tip} <a class="button ll-blue-bgc" href="https://wiki.erachain.org/ru/Persons" target="_blank">?</a></p>`;
     }
 
     if (!data.hasOwnProperty('item')) {
@@ -361,7 +361,7 @@ function persons(data) {
     var numberShiftDelta = data.pageSize;
     //Отображение последнего блока
     output += lastBlock(data.lastBlock);
-    output += `<p>${data.persons_list_tip}</p>`;
+    output += `<p>${data.persons_list_tip} <a class="button ll-blue-bgc" href="https://wiki.erachain.org/ru/Persons" target="_blank">?</a></p>`;
 
     var start = data.start;
     if (!notDisplayPages) {

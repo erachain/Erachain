@@ -597,4 +597,23 @@ public class APIExchange {
                 .build();
     }
 
+    @GET
+    @Path("v1/pair/history/{baseAssetKey}/{quoteAssetKey}")
+    // apiexchange/v1/pair/history/1/2
+    public Response getPairHistory(@PathParam("baseAssetKey") Long baseAssetKey, @PathParam("quoteAssetKey") Long quoteAssetKey,
+                                   @DefaultValue("m") @QueryParam("period") String period) {
+
+        if (baseAssetKey == null || quoteAssetKey == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        String result = cntrl.tradeHistoryController.getPoints(baseAssetKey, quoteAssetKey, period);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result)
+                .build();
+    }
+
 }

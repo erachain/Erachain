@@ -164,7 +164,7 @@ public class OrderProcess {
                         // и отклонение будет небольшое для текущего Заказа
                         && !Order.isPricesNotClose(
                         orderPrice,
-                        Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft, haveAssetScale),
+                        Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft),
                         BlockChain.MAX_ORDER_DEVIATION)
                     //&& !order.isLeftDeviationOut(thisAmountHaveLeft.multiply(orderReversePrice), BlockChain.MAX_ORDER_DEVIATION)
                 ) {
@@ -193,7 +193,7 @@ public class OrderProcess {
                                 // и остаток небольшой для всего Заказа
                                 && !Order.isPricesNotClose(
                                 orderPrice,
-                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant, haveAssetScale),
+                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant),
                                 BlockChain.MAX_ORDER_DEVIATION)
                             // && !order.isLeftDeviationOut(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION)
                         ) {
@@ -217,7 +217,7 @@ public class OrderProcess {
                                 // и остаток небольшой для всего Заказа
                                 && !Order.isPricesNotClose(
                                 orderPrice,
-                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant, haveAssetScale),
+                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant),
                                 BlockChain.MAX_ORDER_DEVIATION)
                             //&& !order.isLeftDeviationOut(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION)
                         ) {
@@ -243,7 +243,7 @@ public class OrderProcess {
                                 // и такая сделка сильно ухудшит цену текущего Заказа
                                 && !Order.isPricesNotClose(
                                 orderPrice,
-                                Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft, haveAssetScale),
+                                Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft),
                                 BlockChain.MAX_ORDER_DEVIATION)
                             //&& !order.isLeftDeviationOut(thisAmountHaveLeft.multiply(orderReversePrice), BlockChain.MAX_ORDER_DEVIATION)
                         ) {

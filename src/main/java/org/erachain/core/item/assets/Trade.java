@@ -156,10 +156,10 @@ public class Trade {
     }
 
     public BigDecimal calcPrice() {
-        return Order.calcPrice(this.amountHave, this.amountWant, wantAssetScale);
+        return Order.calcPrice(this.amountHave, this.amountWant);
     }
     public BigDecimal calcPriceRevers() {
-        return Order.calcPrice(this.amountWant, this.amountHave, haveAssetScale);
+        return Order.calcPrice(this.amountWant, this.amountHave);
     }
 
     public int getSequence() {
