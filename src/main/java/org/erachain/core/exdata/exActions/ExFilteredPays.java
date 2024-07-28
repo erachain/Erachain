@@ -1235,7 +1235,8 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
             }
 
             ////////// TODO NEED CHECK ALL
-            boolean needCheckAllList = false;
+            /// так как проверка для ИЗЬЯТЬ не проводилась сверху - то делаем тут полную проверку по каждому
+            boolean needCheckAllList = backward && (!BlockChain.MAIN_MODE || height > 5396170);
             if (needCheckAllList) {
 
                 for (Fun.Tuple4 item : results) {
