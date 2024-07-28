@@ -70,10 +70,12 @@ public class APIExchange {
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
+        help.put("GET apiexchange/v1/pair/history/{baseAssetKey}/{quoteAssetKey}?period=m|d",
+                "Get Pair trade history for baseAssetKey / quoteAssetKey. period=m - monthly for all times, =d - daily for last 150 days");
         help.put("GET apiexchange/v2/pair/{baseAssetKey}/{quoteAssetKey}",
-                "Get Pair info fot baseAssetKey / quoteAssetKey");
+                "Get Pair info for baseAssetKey / quoteAssetKey");
         help.put("GET apiexchange/pair/{have}/{want}",
-                "Get Pair info fot Have / Want");
+                "Get Pair info for Have / Want");
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
                 "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");

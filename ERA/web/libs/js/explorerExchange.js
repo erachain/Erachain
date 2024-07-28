@@ -267,13 +267,13 @@ function trades(data) {
 
     output += '<h3 style="display:inline;"><a href="?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang()
         + '"><img src="img/exchange.png" style="width:1em"></a> '
-        + data.Label_Trades + '</h3> ';
+        + data.Label_Trades;
 
-    output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
+    output += ' <a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '">';
     output += getItemName2(1000, data.assetHave, data.assetHaveName) + ' / ';
-    output += getItemName2(1000, data.assetWant, data.assetWantName) + '</h3></a>';
+    output += getItemName2(1000, data.assetWant, data.assetWantName) + '</a></h3>';
 
-    output += '<br>';
+    output +='<div class=row><div class="col-lg-2 col-md-1 col-sm-1"></div><div class="col-lg-8 col-md-10 col-sm-10 col-xs-12" id="container" style="height: 400px;"></div><div class="col-lg-2 col-md-1 col-sm-1"></div></div>';
 
     output +='<div><div class="col-lg-5" style="padding-left:5em;">';
     output += '<h4>' + data.Label_Orders + '</h4>';
@@ -310,7 +310,7 @@ function trades(data) {
     }
 
     output += '<tr bgcolor="#f9f9f9">';
-    output += ':<td><b>' + addCommas(data.sellsSumAmountGood);
+    output += '<td><b>' + addCommas(data.sellsSumAmountGood);
     output += '<td>' + data.Label_Total_For_Sell + '<td>' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
 
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=20% style="font-size:1.4em"><b>'
@@ -425,4 +425,56 @@ function trades(data) {
     output += '</b>';
 
     return output;
+}
+
+// https://playground.anychart.com/PGCK5IPH/1
+async function anyChartEra(data_in) {
+
+let url = '/apiexchange/v1/pair/history/' + data_in.assetHave + '/' + data_in.assetWant + '?period=m';
+let response = await fetch(url);
+let data;
+if (response.ok) { // если HTTP-статус в диапазоне 200-299
+  // получаем тело ответа (см. про этот метод ниже)
+  data = await response.json();
+} else {
+  alert("Ошибка HTTP: " + response.status);
+}
+
+  // create a data table with the loaded data
+  var dataTable = anychart.data.table();
+  dataTable.addData(data);
+
+  // map the loaded data for the candlestick series
+  var mapping = dataTable.mapAs({
+    open: 1,
+    close: 2,
+    low: 4,
+    high: 5
+  });
+
+  // create a stock chart
+  var chart = anychart.stock();
+
+  // create the chart plot
+  var plot = chart.plot(0);
+
+  // set the grid settings
+  plot.yGrid(true).xGrid(true).yMinorGrid(true).xMinorGrid(true);
+
+  // create the candlestick series
+  var series = plot.candlestick(mapping);
+
+  var pairName = data_in.assetHaveName + '/' + data_in.assetWantName;
+  series.name(pairName);
+  //series.legendItem().iconType('rising-falling');
+
+  // set the title of the chart
+  //chart.title('Stock Chart');
+
+  // set the container id for the chart
+  chart.container('container');
+
+  // initiate the chart drawing
+  chart.draw();
+
 }
