@@ -3,7 +3,7 @@ function assets(data) {
     var notDisplayPages = data.notDisplayPages;
     var numberShiftDelta = data.pageSize;
     output += lastBlock(data.lastBlock);
-    output += `<p>${data.assets_list_tip}</p>`;
+    output += `<p>${data.assets_list_tip} <a class="button ll-blue-bgc" href="https://wiki.erachain.org/ru/Assets" target="_blank">?</a></p>`;
     var start = data.start;
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
@@ -75,7 +75,7 @@ function asset(data, forPrint) {
 
     if (!forPrint) {
         output += lastBlock(data.lastBlock);
-        output += `<p>${data.assets_list_tip}</p>`;
+        output += `<p>${data.assets_list_tip} <a class="button ll-blue-bgc" href="https://wiki.erachain.org/ru/Assets" target="_blank">?</a></p>`;
     }
 
     if (!data.item) {
@@ -223,174 +223,6 @@ function asset(data, forPrint) {
     output += '<td><td><b>' + totalTradeVolume;
     output += '<td></td></tr></table>';
 
-
-    return output;
-}
-
-function trades(data) {
-    var output = "";
-
-    output += lastBlock(data.lastBlock);
-
-    output += '';
-
-    output += '<h3 style="display:inline;"><a href="?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang()
-        + '"><img src="img/exchange.png" style="width:1em"></a> '
-        + data.Label_Trades + '</h3> ';
-
-    output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
-    output += getItemName2(1000, data.assetHave, data.assetHaveName) + ' / ';
-    output += getItemName2(1000, data.assetWant, data.assetWantName) + '</h3></a>';
-
-    output += '<br>';
-
-    output +='<div><div class="col-lg-5" style="padding-left:5em;">';
-    output += '<h4>' + data.Label_Orders + '</h4>';
-
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped"'
-        + 'style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
-
-    var averageVolume = 1 * data.sellsSumAmountGood;
-    if (1 * data.buysSumAmountGood > averageVolume)
-        averageVolume = 1 * data.buysSumAmountGood;
-
-    var width = data.sellsSumAmountGood;
-
-    for (key in data.sells) {
-
-        output += '<tr style="background-color: transparent">';
-
-        var widthLocal = width;
-        if (widthLocal > averageVolume) {
-            widthLocal = averageVolume;
-        }
-
-        output += '<td style="position: relative">';
-        output += '<span style="z-index: -1; width:' + 250 * widthLocal / averageVolume
-                + '%; position:absolute; background-color:#ffe4e4; top: 0; bottom: 0; left: 0;"></span>';
-
-        width -= data.sells[key].amount;
-
-        output += '<span><a href ="?address=' + data.sells[key].creator_addr + get_lang() + '">' + cutBlank(data.sells[key].creator, 20) + '</a></span>';
-        output += '<td><a href=?tx=' + key + get_lang() + '><b>' + addCommas(data.sells[key].price) + '</b</a>';
-        output += '<td align=right><a href=?tx=' + key + get_lang() + '>' + addCommas(data.sells[key].amount) + '</a></tr>';
-
-    }
-
-    output += '<tr bgcolor="#f9f9f9">';
-    output += '<td><td>' + data.Label_Total_For_Sell;
-    output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
-
-    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
-        + data.Label_Creator + ' / ' + data.Label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.Label_Price
-        + '</b></td><td width=40%><b>' + data.Label_Amount + ' / ' + data.Label_Creator + '</b></td></tr>';
-
-    output += '<tr bgcolor="#f9f9f9">';
-    output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
-    output += '<td>- ' + data.Label_Total_For_Buy + '<td>';
-
-    width = 0;
-    for (key in data.buys) {
-
-        output += '<tr style="background-color: transparent">';
-        output += '<td style="position: relative" align=right>';
-
-        width += 1 * data.buys[key].buyingAmount; // преобразование строки в число
-
-        var widthLocal = width;
-        if (widthLocal > averageVolume) {
-            widthLocal = averageVolume;
-        }
-
-        output += '<span style="position:absolute; z-index: -1; background-color:#cdfdcc; width:'
-            + 250 * widthLocal / averageVolume + '%; top: 0; bottom: 0; left: 0;"></span>';
-
-        output += '<span><a href=?tx=' + key + get_lang() + '>' + addCommas(data.buys[key].buyingAmount) + '</a></span>';
-        output += '<td><a href=?tx=' + key + get_lang() + ' ><b>' + addCommas(data.buys[key].buyingPrice) + '</b></a>';
-        output += '<td><a href ="?address=' + data.buys[key].creator_addr + get_lang() + '">' +
-                cutBlank(data.buys[key].creator, 20) + '</a>';
-
-    }
-
-    output += '</table>';
-
-    output += '</div><div class="col-lg-7" style="padding-right: 5em;">';
-
-    output += '<h4 style="text-align: center;">' + data.Label_Trade_History + '</h4>';
-
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
-    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.Label_Date; // + '<td align=center><b>' + data.Label_Type + '</b></td>';
-    output += '<td align=center><b>' + data.Label_Trade_Initiator
-    output += '<td align=center><b>' + data.Label_Amount;
-    output += '<td align=center><b>' + data.Label_Price;
-    output += '<td align=center><b>' + data.Label_Total_Cost;
-    output += '<td align=center><b>' + data.Label_Position_Holder
-    output += '</tr>';
-
-    for (key in data.trades) {
-
-        var trade = data.trades[key];
-        output += '<tr>';
-
-        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
-        output += '>' + convertTimestamp( trade.timestamp, false);
-
-        output += '<td align=right style="line-height: 150%;">';
-
-        if (trade.initiatorCreator_addr == data.assetWantMaker) {
-            if (trade.type != 'sell') {
-                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
-                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
-            }
-        }
-
-        output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
-
-        if (trade.type == 'sell') {
-
-            output += '<td align=right>' + addCommas(trade.amountHave);
-
-            output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
-                + '<b>' + addCommas(trade.realReversePrice) + '</b>';
-
-            output += '<td align=right>' + addCommas(trade.amountWant);
-
-        } else {
-
-            output += '<td align=right>' + addCommas(trade.amountHave);
-
-            output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
-                + '<b>' + addCommas(trade.realPrice) + '</b>';
-
-            output += '<td align=right>' + addCommas(trade.amountWant);
-
-        }
-
-        output += '<td style="line-height: 150%;">';
-        output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
-
-        if (trade.targetCreator_addr == data.assetHaveMaker) {
-            if (trade.type == 'sell') {
-                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
-                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
-            }
-        }
-
-    }
-
-    output += '</table>';
-
-    output += '</div></div>';
-
-    //output += '<b>' + data.Label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
-    //output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
-
-    output += '<br><br><b>' + data.Label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getItemName2(1000, data.assetHave, data.assetHaveName) + '</a>';
-    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '</a>';
-    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '/' + getItemName2(1000, data.assetHave, data.assetHaveName);
-    output += '</b>';
 
     return output;
 }

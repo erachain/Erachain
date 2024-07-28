@@ -404,20 +404,20 @@ public class TradePair {
     public static TradePair reverse(TradePair tradePair) {
 
         BigDecimal lastPriceRev = tradePair.lastPrice.signum() == 0 ? tradePair.lastPrice
-                : Order.calcPrice(tradePair.lastPrice, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.lastPrice, BigDecimal.ONE);
 
         BigDecimal highest_bidPriceRev = tradePair.lower_askPrice.signum() == 0 ? tradePair.lower_askPrice
-                : Order.calcPrice(tradePair.lower_askPrice, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.lower_askPrice, BigDecimal.ONE);
         BigDecimal lower_askPriceRev = tradePair.highest_bidPrice.signum() == 0 ? tradePair.highest_bidPrice
-                : Order.calcPrice(tradePair.highest_bidPrice, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.highest_bidPrice, BigDecimal.ONE);
 
         BigDecimal highest_price_24hRev = tradePair.lowest_price_24h.signum() == 0 ? tradePair.lowest_price_24h
-                : Order.calcPrice(tradePair.lowest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.lowest_price_24h, BigDecimal.ONE);
         BigDecimal lowest_price_24hRev = tradePair.highest_price_24h.signum() == 0 ? tradePair.highest_price_24h
-                : Order.calcPrice(tradePair.highest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.highest_price_24h, BigDecimal.ONE);
 
         BigDecimal first_priceRev = tradePair.firstPrice.signum() == 0 ? tradePair.firstPrice
-                : Order.calcPrice(tradePair.firstPrice, BigDecimal.ONE, tradePair.assetScale1);
+                : Order.calcPrice(tradePair.firstPrice, BigDecimal.ONE);
 
         if (tradePair.asset1 != null && tradePair.asset2 != null) {
             return new TradePair(

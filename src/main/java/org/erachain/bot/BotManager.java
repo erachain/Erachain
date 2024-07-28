@@ -78,6 +78,9 @@ public class BotManager {
         @Override
         public void run() {
 
+            if (cnt.isStatusSynchronizing())
+                return;
+
             Timestamp time = new Timestamp(NTP.getTime());
             int newDay = time.getDay();
             if (lastDay != newDay) {
