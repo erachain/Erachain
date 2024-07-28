@@ -1010,24 +1010,24 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("0.00000333");
         BigDecimal amountWant = new BigDecimal("0.00010000");
 
-        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
-        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
-        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+        BigDecimal price = Order.calcPrice(amountHave, amountWant);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant);
 
-        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
-        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
-        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave);
 
         BigDecimal orderAmountHave = new BigDecimal("30.00000000");
         BigDecimal orderAmountWant = new BigDecimal("1.00000000");
 
-        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
-        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
-        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant);
 
-        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
-        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
-        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave);
 
         int thisPriceRevScale = thisPriceRev.stripTrailingZeros().scale();
         int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
@@ -1056,24 +1056,24 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("10.00000000");
         BigDecimal amountWant = new BigDecimal("0.33333333");
 
-        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
-        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
-        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+        BigDecimal price = Order.calcPrice(amountHave, amountWant);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant);
 
-        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
-        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
-        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave);
 
         BigDecimal orderAmountHave = new BigDecimal("1.00000000");
         BigDecimal orderAmountWant = new BigDecimal("30.00000000");
 
-        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
-        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
-        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant);
 
-        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
-        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
-        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave);
 
 
         int thisPriceScale = thisPrice.stripTrailingZeros().scale();

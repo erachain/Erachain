@@ -1929,7 +1929,7 @@ public class BlockExplorer {
                         orderJSON.put("amountLeft", "??");
                         orderJSON.put("amountWant", createOrder.getAmountWant().toPlainString());
                         orderJSON.put("price", Order.calcPrice(createOrder.getAmountHave(),
-                                createOrder.getAmountWant(), 8).toPlainString());
+                                createOrder.getAmountWant()).toPlainString());
 
                         transactionDataJSON.put("orderSource", orderJSON);
                     }
@@ -2909,7 +2909,11 @@ public class BlockExplorer {
 
                         RCalculated txCalculated = (RCalculated) transaction;
 
-                        outcome = txCalculated.getAmount().signum() < 0;
+                        if (txCalculated.getAmount() != null) {
+                            outcome = txCalculated.getAmount().signum() < 0;
+                            out.put("amount", txCalculated.getAmount().toPlainString());
+                            out.put("asset", txCalculated.getAssetKey());
+                        }
 
                         out.put("signature", transaction.viewHeightSeq());
                         try {
@@ -2925,8 +2929,6 @@ public class BlockExplorer {
                         out.put("creator", txCalculated.getRecipient().getPersonAsString());
                         out.put("creator_addr", txCalculated.getRecipient().getAddress());
 
-                        out.put("amount", txCalculated.getAmount().toPlainString());
-                        out.put("asset", txCalculated.getAssetKey());
 
                         out.put("size", "--");
                         out.put("fee", "--");
