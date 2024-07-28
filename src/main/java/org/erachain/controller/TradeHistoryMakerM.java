@@ -28,7 +28,7 @@ public class TradeHistoryMakerM extends TradeHistoryMaker {
     @Override
     String makeKey(String pair, Timestamp pointTimeStamp) {
         // года с 1900-го
-        return String.format("%s %02d-%02d", pair, pointTimeStamp.getYear() - 100, pointTimeStamp.getMonth() + 1);
+        return String.format("%s %4d-%02d-%02d", pair, pointTimeStamp.getYear() + 1900, pointTimeStamp.getMonth() + 1, 15);
     }
 
     @Override

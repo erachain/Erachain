@@ -187,18 +187,18 @@ public class TradeHistoryController extends Thread {
                 points = tradeHistoryMakerM.getPoints(key);
         }
 
-        StringBuilder strArray = new StringBuilder().append("{");
+        StringBuilder strArray = new StringBuilder().append("[");
         if (reverse) {
             points.forEach((k, v) -> {
                 if (strArray.length() > 2)
                     strArray.append(",");
 
-                strArray.append("\"").append(k.split(" ")[1]).append("\":[")
-                        .append("\"").append(v[0].toPlainString()).append("\",")
-                        .append("\"").append(v[1].toPlainString()).append("\",")
-                        .append("\"").append(v[2].toPlainString()).append("\",")
-                        .append("\"").append(v[3].toPlainString()).append("\",")
-                        .append("\"").append(v[4].toPlainString()).append("\"")
+                strArray.append("[\"").append(k.split(" ")[1]).append("\",")
+                        .append(v[0].toPlainString()).append(",")
+                        .append(v[1].toPlainString()).append(",")
+                        .append(v[2].toPlainString()).append(",")
+                        .append(v[3].toPlainString()).append(",")
+                        .append(v[4].toPlainString())
                         .append("]");
             });
 
@@ -208,19 +208,19 @@ public class TradeHistoryController extends Thread {
                     strArray.append(",");
 
                 //Order.AMOUNT_LENGTH
-                strArray.append("\"").append(k.split(" ")[1]).append("\":[")
-                        .append("\"").append(Order.calcPrice(v[0], BigDecimal.ONE).toPlainString()).append("\",")
-                        .append("\"").append(Order.calcPrice(v[1], BigDecimal.ONE).toPlainString()).append("\",")
+                strArray.append("[\"").append(k.split(" ")[1]).append("\",")
+                        .append(Order.calcPrice(v[0], BigDecimal.ONE).toPlainString()).append(",")
+                        .append(Order.calcPrice(v[1], BigDecimal.ONE).toPlainString()).append(",")
                         // среднее между началом и окончанием умножить на Объем
-                        .append("\"").append((v[0].add(v[1]).multiply(BigDecimal.valueOf(0.5d)).multiply(v[2])).setScale((v[0].scale() + v[0].scale()) / 2, RoundingMode.HALF_DOWN).toPlainString()).append("\",")
+                        .append((v[0].add(v[1]).multiply(BigDecimal.valueOf(0.5d)).multiply(v[2])).setScale((v[0].scale() + v[0].scale()) / 2, RoundingMode.HALF_DOWN).toPlainString()).append(",")
                         // тут места Мин Макс меняются
-                        .append("\"").append(Order.calcPrice(v[4], BigDecimal.ONE).toPlainString()).append("\",")
-                        .append("\"").append(Order.calcPrice(v[3], BigDecimal.ONE).toPlainString()).append("\"")
+                        .append(Order.calcPrice(v[4], BigDecimal.ONE).toPlainString()).append(",")
+                        .append(Order.calcPrice(v[3], BigDecimal.ONE).toPlainString())
                         .append("]");
             });
         }
 
-        strArray.append("}");
+        strArray.append("]");
 
         return strArray.toString();
     }
