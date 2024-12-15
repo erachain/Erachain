@@ -105,7 +105,7 @@ public class TestRecSendOutsideClaims {
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-        keyA = issueAssetTransaction.getAssetKey(db);
+        keyA = issueAssetTransaction.getAssetKey();
         balanceA = maker.getBalance(db, keyA);
 
     }

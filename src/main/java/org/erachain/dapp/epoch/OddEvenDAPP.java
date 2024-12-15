@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -59,8 +60,17 @@ public class OddEvenDAPP extends EpochDAPPjson {
         super(ID, MAKER, null, null);
     }
 
-    public OddEvenDAPP(String data, String status) {
-        super(ID, MAKER, data, status);
+    public OddEvenDAPP(String dataStr, String status) {
+        super(ID, MAKER, dataStr, status);
+    }
+
+    public OddEvenDAPP(String dataStr, JSONObject values) {
+        super(ID, MAKER, dataStr, values, "");
+    }
+
+    @Override
+    public EpochDAPPjson of(String dataStr, JSONObject values) {
+        return new OddEvenDAPP(dataStr, values);
     }
 
     public static OddEvenDAPP initInfo(HashMap<Account, Integer> stocks) {
@@ -82,7 +92,6 @@ public class OddEvenDAPP extends EpochDAPPjson {
 
     public static OddEvenDAPP make(String data) {
         return new OddEvenDAPP(data, "");
-
     }
 
     @Override

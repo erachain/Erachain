@@ -1765,7 +1765,10 @@ public class DCSet extends DBASet implements Closeable {
                 this.uses = 0;
             }
 
-            logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
+            if (parent == null)
+                logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
+            else
+                logger.debug("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
     }

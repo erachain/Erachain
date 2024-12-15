@@ -42,11 +42,15 @@ public abstract class AssetCls extends ItemCls {
 
     protected static final int ASSET_TYPE_LENGTH = 1;
 
+    /**
+     * Награды от продажи на бирже - список счетов с %% кому начисляются проценты
+     */
     protected static final long APP_DATA_DEX_AWARDS_MASK = 1L;
     // untransferable
     protected static final long APP_DATA_UNTRANSFERABLE_MASK = 2L;
     // anonimouse protection
     protected static final long APP_DATA_ANONIM_PROTECT_MASK = 4L;
+    protected static final long APP_DATA_USE_DAPP_MASK = 8L;
 
     //
     protected int assetType;
@@ -376,6 +380,8 @@ public abstract class AssetCls extends ItemCls {
             flags |= APP_DATA_UNTRANSFERABLE_MASK;
         if (isAnonimDenied)
             flags |= APP_DATA_ANONIM_PROTECT_MASK;
+        if (isAnonimDenied)
+            flags |= APP_DATA_USE_DAPP_MASK;
 
         byte[] appData = ItemCls.makeAppData(flags,
                 iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags);
@@ -976,6 +982,15 @@ public abstract class AssetCls extends ItemCls {
      */
     public boolean isAnonimDenied() {
         return (flags & APP_DATA_ANONIM_PROTECT_MASK) != 0;
+    }
+
+    /**
+     * anonymous ownership is denied
+     *
+     * @return
+     */
+    public boolean isUseDAPP() {
+        return (flags & APP_DATA_USE_DAPP_MASK) != 0;
     }
 
     /**
