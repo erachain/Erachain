@@ -100,8 +100,17 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     public static final int RARE_RARE = 2;
     public static final int RARE_EPIC = 3;
 
-    public MemoCardsDAPP(String data, String status) {
-        super(ID, MAKER, data, status);
+    public MemoCardsDAPP(String dataStr, String status) {
+        super(ID, MAKER, dataStr, status);
+    }
+
+    public MemoCardsDAPP(String dataStr, JSONObject values) {
+        super(ID, MAKER, dataStr, values, "");
+    }
+
+    @Override
+    public EpochDAPPjson of(String dataStr, JSONObject jsonObject) {
+        return new MemoCardsDAPP(dataStr, jsonObject);
     }
 
     public String getName() {

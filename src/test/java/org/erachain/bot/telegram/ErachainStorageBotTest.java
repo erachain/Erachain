@@ -87,27 +87,27 @@ public class ErachainStorageBotTest {
 
         messageJson.put("text", "...simple test - Простой Тест");
         Message message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
         messageJson.put("text", ":store:open\n...Сохранить Открыто\nвесь текст");
         message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
         messageJson.put("text", "...Сохранить Открыто\nвесь текст\n:store:open");
         message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
         messageJson.put("text", "...Сохранить Открыто\n:store:open\nТолько этот кусок теста");
         message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
         messageJson.put("text", "...Сохранить Открыто\n:store:open\nТолько этот кусок теста\n:\nНо не этот кусок");
         message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
         messageJson.put("text", "...Сохранить Открыто - весь оригинал\n включая команду\n:store:open:orig");
         message = GSON.fromJson(messageJson.toString(), Message.class);
-        bot.processMessage(chatId, replyChatId, message.chat(), message, lang);
+        bot.processMessage(chatId, message.chat(), message.chat(), message, lang);
 
     }
 

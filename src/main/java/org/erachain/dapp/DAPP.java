@@ -7,10 +7,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.epoch.DogePlanet;
-import org.erachain.dapp.epoch.LeafFall;
-import org.erachain.dapp.epoch.OddEvenDAPP;
-import org.erachain.dapp.epoch.Refi;
+import org.erachain.dapp.epoch.*;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
@@ -237,6 +234,10 @@ public abstract class DAPP {
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
+            case MoneyStaking.ID:
+                return MoneyStaking.Parse(data, position, forDeal);
+            case ErrorDAPP.ID:
+                return ErrorDAPP.Parse(data, position, forDeal);
             case OddEvenDAPP.ID:
                 return OddEvenDAPP.Parse(data, position, forDeal);
             case LeafFall.ID:
@@ -264,7 +265,9 @@ public abstract class DAPP {
      * @param asOrphan
      */
     public static void processByBlock(DCSet dcSet, Block block, boolean asOrphan) {
-        ShibaVerseDAPP.blockAction(dcSet, block, asOrphan);
+        // ShibaVerseDAPP job on block
+        if (false)
+            ShibaVerseDAPP.blockAction(dcSet, block, asOrphan);
     }
 
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
