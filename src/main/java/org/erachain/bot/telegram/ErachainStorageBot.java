@@ -527,6 +527,15 @@ public class ErachainStorageBot extends ErachainBotCls {
     @Override
     protected String[] retrieveChatReplyCommand(String text) {
 
+        // Можно задавать имя бота - чтобы другие боты не реагировали, а именно этот сработал
+        if (text.startsWith("@")) {
+            if (text.startsWith(botUserNameF)) {
+                text = text.substring(botUserNameF.length()).trim();
+            } else {
+                return null;
+            }
+        }
+
         if (text.startsWith("/store") || text.startsWith("/храни")) {
             return new String[]{text, null};
         }
@@ -753,18 +762,28 @@ public class ErachainStorageBot extends ErachainBotCls {
                 text = message.text();
         }
 
+        // Пропустить если не совпал режим тайности
+        boolean ignoreByMode = false;
         if (isEncrypted == null) {
             if (mode == 1) isEncrypted = false;
             else if (mode == 2) isEncrypted = true;
-            else return true; // без меток пропускаем
+            else ignoreByMode = true; // без меток пропускаем
         } else {
             if (mode == 4 && isEncrypted)
                 // только открытые, закрытые пропускаем
-                return true;
+                ignoreByMode = true;
             else if (mode == 5 && !isEncrypted) {
                 // только закрытые, открытые пропускаем
-                return true;
+                ignoreByMode = true;
             }
+        }
+
+        if (ignoreByMode) {
+            // Пропускаем, но если была ручная команда напишем в лог что не соответствует режим - чтобы человек понял почему нет сохранения
+            if (commands != null) {
+                sendMarkdown(replyChat.id(), "Текущий режим" + Mode.view(mode) + "\n\n Поэтому данное сообщение не сохранено");
+            }
+            return true;
         }
 
         JSONObject out = new JSONObject();
