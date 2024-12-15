@@ -128,11 +128,11 @@ abstract public class ErachainBotCls implements Rechargeable {
             botToken = (String) settingsJSON.get(parsTokenName);
             botToken = botToken == null ? System.getProperty(parsTokenName, System.getenv(parsTokenName)) : botToken;
             if (botToken == null) {
-                log.warn("Token for bot [" + parsTokenName + "] not found in parameters, skip start... Use -D" + parsTokenName + "=...");
+                log.warn("Token for bot [{}] not found in parameters, skip start... Use -D{}=...", parsTokenName, parsTokenName);
                 return;
             }
 
-            log.info("Try start [" + settingsName + "], used " + settingsPath);
+            log.info("Try start [{}], used {}", settingsName, settingsPath);
 
             this.cnt = cnt;
 
@@ -175,7 +175,7 @@ abstract public class ErachainBotCls implements Rechargeable {
         }
 
         if (!meInfo.isOk()) {
-            log.warn("GetMy: " + GSON.toJson(meInfo).toString() + " - canceled");
+            log.warn("GetMy: {} - canceled", GSON.toJson(meInfo));
             stop();
             return;
         }
@@ -183,18 +183,13 @@ abstract public class ErachainBotCls implements Rechargeable {
         // Подписка на обновления
         bot.setUpdatesListener(updates -> {
             // Обработка обновлений
-            try {
-                updates.forEach(update -> onUpdateReceived(update));
-                // return id of last processed update or confirm them all
-                // Создание Обработчика ошибок
-            } catch (Exception e) {
-                log.error("On TELEGRAM Updates error {}", e.toString());
-            }
+            updates.forEach(update -> onUpdateReceived(update));
+            // return id of last processed update or confirm them all
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, e -> {
             if (e.response() != null) {
                 // Ошибка из Телеграма
-                log.warn("TELEGRAM ERR: " + e.response().errorCode() + " - " + e.response().description());
+                log.warn("TELEGRAM ERROR: {} - {}", e.response().errorCode(), e.response().description());
             } else {
                 // Как видно проблема сети
                 e.printStackTrace();
@@ -208,7 +203,7 @@ abstract public class ErachainBotCls implements Rechargeable {
         botUserNameMD1 = "`" + botUserNameF + "`";
         botUserNameMD = "@" + botUserName.replace("_", "\\_");
         log.warn(botUserName + " started!");
-        log.warn("GetMy: " + GSON.toJson(meInfo).toString());
+        log.warn("GetMy: {}", GSON.toJson(meInfo));
 
         // Для посылки сообщений админу - нужно задать adminChatId в настройках!
         adminChatId = (Long) settingsJSON.get("adminChatId");
@@ -248,7 +243,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                 }
                 try {
                     updateTransactions();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -395,7 +390,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                             text = messageOriginHiddenUser.senderUserName() + ": " + message.text();
                         } else {
                             // hidden name
-                            log.warn("skip forwardOrigin: " + forwardOrigin.getClass().getSimpleName());
+                            log.warn("skip forwardOrigin: {}", forwardOrigin.getClass().getSimpleName());
                             return;
                         }
 
@@ -455,6 +450,14 @@ abstract public class ErachainBotCls implements Rechargeable {
                             message.forwardOrigin() == null &&
                                     (text == null || text.isEmpty())) {
                         // сюда приходит если было например изменение названия группы (супергруппы)
+                        // или кого-то забанили
+                        return;
+                    }
+
+                    if (text == null) {
+                        String warn = "Unknown action: " + GSON.toJson(message);
+                        sendToAdminMessage(warn);
+                        log.warn(warn);
                         return;
                     }
 
@@ -628,8 +631,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                 chatErrorId = chat.id();
                 from = myChatMember.from(); // кто это сделал
 
-                //log.warn("Chat: " + GSON.toJson(chat).toString());
-                log.warn("User from: " + GSON.toJson(from).toString());
+                log.warn("User from: {}", GSON.toJson(from));
 
                 ChatMember newChatMember = myChatMember.newChatMember();
                 user = newChatMember.user();
@@ -643,7 +645,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                     if (newStatus.equals(ChatMember.Status.kicked) || newStatus.equals(ChatMember.Status.left)) {
                         // нас удалили из группы
                         Integer untilDate = newChatMember.untilDate(); // 0 - просто удалили
-                        log.error("kicked from " + chat.title() + " by User " + from.username());
+                        log.warn("kicked from {} by User {}", chat.title(), from.username());
 
                         // Конкретный пользователь известен только когда удаляют администратора! Иначе бот кикает и не понятно кто тебя кикнул
                         if (!from.isBot())
@@ -677,7 +679,8 @@ abstract public class ErachainBotCls implements Rechargeable {
 
                     }
 
-                    log.info("status:" + newStatus.name());
+                    if (log.isInfoEnabled())
+                        log.info("status: {}", newStatus.name());
 
                     JSONObject chatSettings = getChatSettings(chatId, chat);
                     chatSettings.put("status", newStatus.name());
@@ -693,9 +696,12 @@ abstract public class ErachainBotCls implements Rechargeable {
 
             }
 
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            sendSimpleText(chatErrorId, e.toString());
+        } catch (Throwable e) {
+            String error = "TELEGRAM BOt Updates error - " + e;
+            sendSimpleText(chatErrorId, error);
+            error += "\n" + GSON.toJson(update);
+            log.error(error);
+            sendToAdminMessage(error);
         }
     }
 
@@ -1049,10 +1055,10 @@ abstract public class ErachainBotCls implements Rechargeable {
             BaseResponse sendResponse = bot.execute(sendMessage);
             if (sendResponse.isOk())
                 return sendResponse;
-            log.warn("Reply sent: " + GSON.toJson(sendResponse));
+            log.warn("Reply sent: {}", GSON.toJson(sendResponse));
             return sendResponse;
         } catch (Exception e) {
-            log.error("Send ERROR: " + e.getMessage());
+            log.error("Send ERROR: {}", e.toString());
             return null;
         }
     }
@@ -1277,10 +1283,10 @@ abstract public class ErachainBotCls implements Rechargeable {
                     pendingTxs.put(Base58.encode(transaction.getSignature()), new Fun.Tuple5<>(response.message(), replayOnDone, domeMess, lang, transaction.copy()));
                     log.info("Reply sent");
                 } else {
-                    log.error("Send ERROR: " + GSON.toJson(response).toString());
+                    log.error("Send ERROR: {}", GSON.toJson(response));
                 }
             } catch (Exception e) {
-                log.error("Send ERROR: " + e.getMessage());
+                log.error("Send ERROR: {}", e.toString());
             }
 
         } else {
@@ -1342,7 +1348,7 @@ abstract public class ErachainBotCls implements Rechargeable {
 
                 // считаем это достаточным числом подтверждений
                 // принимаем как внесенную в блокчейн "навечно"
-                log.info(botTitle + " done: " + tx.viewHeightSeq());
+                log.info("{} done: {}", botTitle, tx.viewHeightSeq());
                 item.e.setHeightSeq(tx.getDBRef());
             }
 
