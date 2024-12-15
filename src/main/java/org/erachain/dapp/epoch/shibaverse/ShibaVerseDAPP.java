@@ -103,8 +103,17 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     private Long gravitaKey;
 
-    public ShibaVerseDAPP(String data, String status) {
-        super(ID, MAKER, data, status);
+    public ShibaVerseDAPP(String dataStr, String status) {
+        super(ID, MAKER, dataStr, status);
+    }
+
+    public ShibaVerseDAPP(String dataStr, JSONObject values) {
+        super(ID, MAKER, dataStr, values, "");
+    }
+
+    @Override
+    public EpochDAPPjson of(String dataStr, JSONObject values) {
+        return new ShibaVerseDAPP(dataStr, values);
     }
 
     public String getName() {
@@ -614,7 +623,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     //////// PROCESSES
     public static void blockAction(DCSet dcSet, Block block, boolean asOrphan) {
-        if (true && block.heightBlock % 100 == 0) {
+        if (block.heightBlock % 100 == 0) {
             farm(dcSet, block, asOrphan);
         }
     }

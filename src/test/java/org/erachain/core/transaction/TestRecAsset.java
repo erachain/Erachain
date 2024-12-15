@@ -800,7 +800,7 @@ public class TestRecAsset {
                 assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                Long key_1 = issueAssetTransaction.getAssetKey(db);
+                Long key_1 = issueAssetTransaction.getAssetKey();
                 assertEquals(key + 1, (long) key_1);
                 assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key_1, db));
 

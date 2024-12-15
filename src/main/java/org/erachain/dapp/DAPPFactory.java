@@ -10,14 +10,13 @@ import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.dapp.epoch.DogePlanet;
-import org.erachain.dapp.epoch.LeafFall;
-import org.erachain.dapp.epoch.OddEvenDAPP;
-import org.erachain.dapp.epoch.Refi;
+import org.erachain.dapp.epoch.*;
 import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.utils.FileUtils;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -50,6 +49,10 @@ public abstract class DAPPFactory {
         dAppsByPopularity.put(2000, dAppsById.get(OddEvenDAPP.ID));
 
         if (!BlockChain.MAIN_MODE) {
+            dAppsById.put(MoneyStaking.ID, MoneyStaking.initInfo(stocks));
+            dAppsByPopularity.put(1000, dAppsById.get(MoneyStaking.ID));
+
+            // Пример
             dAppsById.put(Refi.ID, Refi.initInfo(stocks));
             dAppsByPopularity.put(1000, dAppsById.get(Refi.ID));
 
@@ -59,6 +62,8 @@ public abstract class DAPPFactory {
         }
 
     }
+
+    static JSONParser jsonParser = new JSONParser();
 
     /**
      * Делает смотр-контракт протокольный (на эпоху).
@@ -83,16 +88,56 @@ public abstract class DAPPFactory {
             }
         }
 
-        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-            return null;
-        }
-
         RSend txSend = (RSend) transaction;
 
-        if (BlockChain.TEST_MODE || !Refi.DISABLED) {
-            Refi dapp = Refi.tryMakeJob(txSend);
-            if (dapp != null)
-                return dapp;
+        if (transaction.getAssetKey() > 0) {
+            AssetCls asset = transaction.getAsset();
+            if (asset.isUseDAPP()) {
+                JSONObject jsonObject;
+                String jsonStr = asset.getDescription();
+                if (jsonStr == null)
+                    return new ErrorDAPP("JSON is empty");
+
+                try {
+                    jsonObject = (JSONObject) jsonParser.parse(jsonStr);
+                } catch (ParseException e) {
+                    return new ErrorDAPP("JSON parse error: " + e.getMessage());
+                }
+
+                if (jsonObject == null) {
+                    return new ErrorDAPP("JSON parse error");
+                }
+
+                Integer dappID;
+                try {
+                    dappID = (Integer) jsonObject.get("id");
+                } catch (Exception e) {
+                    return new ErrorDAPP("JSON parse `id` error: " + e.getMessage());
+                }
+
+                DAPP dappInfo = dAppsById.get(dappID);
+                if (dappInfo == null)
+                    return new ErrorDAPP("DAPP `id` not found");
+                if (dappInfo.isDisabled())
+                    return new ErrorDAPP("DAPP is disabled");
+                if (!(dappInfo instanceof EpochDAPPjson))
+                    return new ErrorDAPP("DAPP not EpochDAPPjson class");
+
+                return ((EpochDAPPjson) dappInfo).of(jsonStr, jsonObject);
+            } else {
+
+                if (BlockChain.TEST_MODE || !Refi.DISABLED) {
+                    Refi dapp = Refi.tryMakeJob(txSend);
+                    if (dapp != null)
+                        return dapp;
+                }
+            }
+
+        }
+
+
+        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+            return null;
         }
 
         if (!txSend.getRecipient().isDAppOwned()) {
@@ -136,8 +181,6 @@ public abstract class DAPPFactory {
         switch (dappID) {
             case OddEvenDAPP.ID:
                 return OddEvenDAPP.make(txSend.getTitle());
-            case Refi.ID:
-                return Refi.make(txSend, dataStr);
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.make(txSend, dataStr);
             case MemoCardsDAPP.ID:
@@ -154,6 +197,8 @@ public abstract class DAPPFactory {
             return null;
 
         switch (dappID) {
+            case MoneyStaking.ID:
+                return MoneyStaking.NAME;
             case OddEvenDAPP.ID:
                 return OddEvenDAPP.NAME;
             case LeafFall.ID:
@@ -164,6 +209,8 @@ public abstract class DAPPFactory {
                 return ShibaVerseDAPP.NAME;
             case MemoCardsDAPP.ID:
                 return MemoCardsDAPP.NAME;
+            case Refi.ID:
+                return Refi.NAME;
         }
 
         return null;
