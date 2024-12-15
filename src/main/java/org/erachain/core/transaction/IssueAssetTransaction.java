@@ -9,7 +9,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.dapp.DAPP;
-import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.mapdb.Fun;
 
@@ -80,8 +79,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
         return len * BlockChain.FEE_PER_BYTE;
     }
 
-    public long getAssetKey(DCSet db) {
-        return getItem().getKey();
+    @Override
+    public long getAssetKey() {
+        return getKey();
     }
 
     @Override

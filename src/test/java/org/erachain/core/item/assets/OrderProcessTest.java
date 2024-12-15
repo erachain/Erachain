@@ -119,7 +119,7 @@ public class OrderProcessTest {
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-        keyA = issueAssetTransaction.getAssetKey(dcSet);
+        keyA = issueAssetTransaction.getAssetKey();
         balanceA = accountA.getBalance(dcSet, keyA);
 
         assetB = new AssetVenture(itemAppData, gb.getCreator(), "COMPU", icon, image, ".", 0, 8, 0L);
@@ -127,7 +127,7 @@ public class OrderProcessTest {
         issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
-        keyB = issueAssetTransaction.getAssetKey(dcSet);
+        keyB = issueAssetTransaction.getAssetKey();
 
     }
 
@@ -147,7 +147,7 @@ public class OrderProcessTest {
                 issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
-                long asset10key = issueAssetTransaction.getAssetKey(dcSet);
+                long asset10key = issueAssetTransaction.getAssetKey();
 
                 BigDecimal have1 = new BigDecimal("8.12");
                 BigDecimal want1 = new BigDecimal("0.01771142");

@@ -448,25 +448,30 @@ if (response.ok) { // если HTTP-статус в диапазоне 200-299
   var mapping = dataTable.mapAs({
     open: 1,
     close: 2,
+    volume: 3,
     low: 4,
     high: 5
   });
-
+  var mappingVol = dataTable.mapAs({value: 3});
   // create a stock chart
   var chart = anychart.stock();
 
   // create the chart plot
   var plot = chart.plot(0);
-
-  // set the grid settings
-  plot.yGrid(true).xGrid(true).yMinorGrid(true).xMinorGrid(true);
-
   // create the candlestick series
   var series = plot.candlestick(mapping);
+  plot.stick(mappingVol);
+
+  var plotVol = chart.plot(1);
+  // create an On Balance Volume indicator
+  var volume = plotVol.column(mappingVol);
+  // set the grid settings
+  //plot.yGrid(true).xGrid(true).yMinorGrid(true).xMinorGrid(true);
+
 
   var pairName = data_in.assetHaveName + '/' + data_in.assetWantName;
   series.name(pairName);
-  //series.legendItem().iconType('rising-falling');
+  volume.name("VOL");
 
   // set the title of the chart
   //chart.title('Stock Chart');

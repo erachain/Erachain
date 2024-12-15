@@ -20,7 +20,30 @@ public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
     protected String command;
     protected String dataStr;
     protected JSONArray pars;
+    protected JSONObject values;
     protected String status;
+
+    public EpochDAPPjson(int id, PublicKeyAccount maker, String dataStr, JSONObject values, String status) {
+        super(id, maker);
+
+        this.dataStr = dataStr;
+        this.values = values;
+        this.command = (String) values.get("command");
+
+        this.status = status == null ? "" : status;
+
+    }
+
+    public EpochDAPPjson(int id, PublicKeyAccount maker, String dataStr, JSONArray pars, String status) {
+        super(id, maker);
+
+        this.dataStr = dataStr;
+        this.pars = pars;
+        this.command = (String) pars.get(0);
+
+        this.status = status == null ? "" : status;
+
+    }
 
     public EpochDAPPjson(int id, PublicKeyAccount maker, String dataStr, String status) {
         super(id, maker);
@@ -40,6 +63,16 @@ public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
                     fail("parse params: \"" + dataStr + "\"" + e.getMessage());
                     return;
                 }
+            } else if (dataStr.charAt(0) == '{') {
+                try {
+                    //READ JSON
+                    values = (JSONObject) JSONValue.parseWithException(dataStr);
+                    this.command = (String) values.get("command");
+                } catch (ParseException | NullPointerException | ClassCastException e) {
+                    //JSON EXCEPTION
+                    fail("parse values: \"" + dataStr + "\"" + e.getMessage());
+                    return;
+                }
 
             } else
                 command = dataStr;
@@ -55,6 +88,8 @@ public abstract class EpochDAPPjson extends EpochDAPP implements DAPPTimed {
         this(id, PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id))), dataStr, status);
 
     }
+
+    public abstract EpochDAPPjson of(String dataStr, JSONObject jsonObject);
 
     public String getHTML(JSONObject langObj) {
         String out = super.getHTML(langObj) + "<br>";

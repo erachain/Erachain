@@ -57,6 +57,11 @@ public class TradeHistoryController extends Thread {
 
                 int height = dthSet.getDatabase().getAtomicInteger("height").get();
                 int myHeight = cnt.getMyHeight();
+                if (height >= myHeight) {
+                    // что-то с синхронизацией цепочки - выход
+                    break;
+                }
+
                 // оставим для сборки дневных графиков время - минус 150 дней
                 int toDailyHeight = myHeight - (int) (150L * 24L * 60L * 60000L / BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight));
                 int toSleep = 0;

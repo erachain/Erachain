@@ -181,7 +181,7 @@ public class OrderTestsMy {
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-        keyA = issueAssetTransaction.getAssetKey(dcSet);
+        keyA = issueAssetTransaction.getAssetKey();
         balanceA = accountA.getBalance(dcSet, keyA);
 
         assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
@@ -190,7 +190,7 @@ public class OrderTestsMy {
         issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
-        keyB = issueAssetTransaction.getAssetKey(dcSet);
+        keyB = issueAssetTransaction.getAssetKey();
 
         // CREATE ORDER TRANSACTION
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
