@@ -72,6 +72,7 @@ abstract public class ErachainBotCls implements Rechargeable {
     protected String botUserName;
     @Getter
     protected String botUserNameF;
+    protected String botUserNameFAndCommand;
     @Getter
     protected String botUserNameMD;
     protected String botUserNameMD1;
@@ -203,6 +204,7 @@ abstract public class ErachainBotCls implements Rechargeable {
         botUserName = meInfo.user().username();
         botTitle = meInfo.user().firstName();
         botUserNameF = "@" + botUserName;
+        botUserNameFAndCommand = botUserNameF + " /";
         botUserNameMD1 = "`" + botUserNameF + "`";
         botUserNameMD = "@" + botUserName.replace("_", "\\_");
         log.warn(botUserName + " started!");
@@ -456,7 +458,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                         return;
                     }
 
-                    if (text.startsWith("/")) {
+                    if (text.startsWith("/") || text.startsWith(botUserNameFAndCommand)) {
                         // это скорее всего команда боту быстрая
                         // если это ответ на другое - или есть общее обсуждение
                         if (message.replyToMessage() != null) {
@@ -473,7 +475,10 @@ abstract public class ErachainBotCls implements Rechargeable {
                             if (from.isBot()) {
                                 if ("GroupAnonymousBot".equals(from.username()) || "Channel_Bot".equals(from.username())) {
                                     // это админ канала - chatId не меняем
-                                    if (this.processChatReplyCommand(chatId, chat, message.messageId(), reply.chat(), reply.messageId(), reply.date(), reply, commands, lang))
+                                    if (this.processChatReplyCommand(
+                                            // Ответ о записи в блокчейн в том же чате на нашу команду будет:
+                                            chatId, chat, message.messageId(),
+                                            reply.chat(), reply.messageId(), reply.date(), reply, commands, lang))
                                         return;
                                 }
                             } else {
@@ -615,7 +620,7 @@ abstract public class ErachainBotCls implements Rechargeable {
 
             ////////// MY CHAT MEMBER
             ////////////////////
-            // приглашения удаления из групп
+            // приглашения и удаления из групп
             ChatMemberUpdated myChatMember = update.myChatMember();
             if (myChatMember != null) {
                 chat = myChatMember.chat(); // в каком чате действие произошло
@@ -636,7 +641,7 @@ abstract public class ErachainBotCls implements Rechargeable {
                 if (user.username().equals(botUserName)) {
 
                     if (newStatus.equals(ChatMember.Status.kicked) || newStatus.equals(ChatMember.Status.left)) {
-                        // Удалили из группы
+                        // нас удалили из группы
                         Integer untilDate = newChatMember.untilDate(); // 0 - просто удалили
                         log.error("kicked from " + chat.title() + " by User " + from.username());
 
@@ -645,7 +650,9 @@ abstract public class ErachainBotCls implements Rechargeable {
                             sendSimpleText(from.id(), from.username() + ", спасибо за использование наших услуг в чате \"" + chat.title() + "\". Надеемся на продолжение сотрудничества в будущем.");
 
                     } else if (newStatus.equals(ChatMember.Status.administrator)) {
-                        // Тут известен конкретны пользователь
+                        // нас сделали администратором
+
+                        // Тут известен конкретный пользователь кто пригласил
                         if (!from.isBot())
                             sendSimpleText(from.id(), from.username() + ", спасибо за допуск меня к работе в чате \"" + chat.title() + "\". Надеюсь быть полезным...");
 
@@ -657,17 +664,20 @@ abstract public class ErachainBotCls implements Rechargeable {
                         //sendAccountChatMessage(from.id(), chat, lang);
 
                     } else if (newStatus.equals(ChatMember.Status.member)) {
+                        // нас внесли в группу или понизили из админа до обычного пользователя
+
                         if (!oldStatus.equals(ChatMember.Status.administrator)) {
                             sendGreetingsMessage(chatId, lang);
                         }
                         // тут from.username() - это чат бот группы GroupAnonymousBot - бес толку ему что-то лично слать
-                        // если нас несли - до этого нас не было в группе:
                         sendOnSetMemberStatus(chatId, newChatMember);
 
                         if (!from.isBot())
                             sendSimpleText(from.id(), from.username() + ", моя работа в чате \"" + chat.title() + "\" прекращена. Жду назначения администраторам снова...");
 
                     }
+
+                    log.info("status:" + newStatus.name());
 
                     JSONObject chatSettings = getChatSettings(chatId, chat);
                     chatSettings.put("status", newStatus.name());
@@ -993,18 +1003,16 @@ abstract public class ErachainBotCls implements Rechargeable {
         return sendMessage(message);
     }
 
+    protected BaseResponse sendMarkdown(long chatId, String textToSend) {
+        SendMessage message = new SendMessage(chatId, textToSend);
+        message.parseMode(ParseMode.Markdown);
+        return sendMessage(message);
+    }
+
     protected BaseResponse replySimpleText(long chatId, String textToSend, int messageId) {
         SendMessage message = new SendMessage(chatId, textToSend);
         message.replyToMessageId(messageId);
         return sendMessage(message);
-    }
-
-    protected BaseResponse sendMarkdown(long chatId, String textToSend) {
-        SendMessage message = new SendMessage(chatId, textToSend);
-        message.parseMode(ParseMode.Markdown);
-
-        return sendMessage(message);
-
     }
 
     protected BaseResponse sendHtml(long chatId, String textToSend) {

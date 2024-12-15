@@ -88,6 +88,49 @@ public abstract class DAPPFactory {
             }
         }
 
+        if (transaction.getAssetKey() > 0) {
+            // Новый порядок выявления ДАПП - по активу - для любого вида транзакции
+            AssetCls asset = transaction.getAsset();
+            if (asset != null && asset.isUseDAPP()) {
+                JSONObject jsonObject;
+                String jsonStr = asset.getDescription();
+                if (jsonStr == null)
+                    return new ErrorDAPP("JSON is empty");
+
+                try {
+                    jsonObject = (JSONObject) jsonParser.parse(jsonStr);
+                } catch (ParseException e) {
+                    return new ErrorDAPP("JSON parse error: " + e.getMessage());
+                }
+
+                if (jsonObject == null) {
+                    return new ErrorDAPP("JSON parse error");
+                }
+
+                Integer dappID;
+                try {
+                    dappID = (Integer) jsonObject.get("id");
+                } catch (Exception e) {
+                    return new ErrorDAPP("JSON parse `id` error: " + e.getMessage());
+                }
+
+                DAPP dappInfo = dAppsById.get(dappID);
+                if (dappInfo == null)
+                    return new ErrorDAPP("DAPP `id` not found");
+                if (dappInfo.isDisabled())
+                    return new ErrorDAPP("DAPP is disabled");
+                if (!(dappInfo instanceof EpochDAPPjson))
+                    return new ErrorDAPP("DAPP not EpochDAPPjson class");
+
+                return ((EpochDAPPjson) dappInfo).of(jsonStr, jsonObject);
+            }
+        }
+
+        // далее только для RSend
+        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+            return null;
+        }
+
         RSend txSend = (RSend) transaction;
 
         if (transaction.getAssetKey() > 0) {
