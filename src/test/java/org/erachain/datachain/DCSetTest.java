@@ -8,7 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -30,7 +30,7 @@ public class DCSetTest {
             new int[]{DCSet.DBS_ROCK_DB};
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     String testsPath = Settings.getInstance().getDataTempDir();
     DCSet dcSet;

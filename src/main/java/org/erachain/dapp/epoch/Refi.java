@@ -10,15 +10,12 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.IssueItemRecord;
-import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.EpochDAPPjson;
+import org.erachain.core.transaction.*;
+import org.erachain.dapp.DApp;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.io.IOException;
@@ -26,15 +23,22 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
+import java.util.TreeMap;
+
+import static org.erachain.core.item.assets.AssetTypes.AS_INSIDE_ASSETS;
 
 // TODO выключен пока полностью
 
 /**
+ * Это пример для MoneyStaking
  * Описание тут https://docs.google.com/document/d/1I0AscIkvACigv-aViHf3uNcc1LXXNm3dd4pNd-w-xfE/edit#heading=h.b6s2qmv4aszg
- * Это стейкинг с рефералкой, причем % растет от числа приглашенных и суммы на их счеттах
+ * Это стейкинг с рефералкой, причем % растет от числа приглашенных и суммы на их счетах
  */
-public class Refi extends EpochDAPPjson {
+@Deprecated
+public class Refi extends EpochDAppJson {
 
 
     static public final int ID = 2012;
@@ -68,9 +72,9 @@ public class Refi extends EpochDAPPjson {
     static final int SKIP_BLOCKS = 10;
 
     /**
-     * por calculate reward - amount of blocks in one year
+     * Coefficient for calculate reward - amount of blocks in one year
      */
-    static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1.0d / (30.0d * 24.0d * 120.0d)).setScale(ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
+    static final BigDecimal STAKE_PERIOD_KOEFF = BigDecimal.ONE.divide(new BigDecimal(30 * 24 * 120), ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
     /**
      * Коэффициент доходности
      */
@@ -101,19 +105,30 @@ public class Refi extends EpochDAPPjson {
      */
     public static final int[] REFERRAL_LEVEL_KOEFFS = new int[]{1, 1, 1, 1, 1};
 
-    public Refi() {
-        super(ID, MAKER, null, null);
+    private Refi() {
+        super(ID, MAKER);
     }
 
-    public Refi(String data, String status) {
-        super(ID, MAKER, data, status);
+    public Refi(String dataStr, String status) {
+        super(ID, MAKER, dataStr, status);
     }
 
-    public static Refi initInfo(HashMap<Account, Integer> stocks) {
-        Refi dapp = new Refi();
-        dapp.accountsInfo.add(new Pair<>(MAKER, new String[]{"init"}));
-        stocks.put(MAKER, ID);
-        return dapp;
+    public Refi(String dataStr, Transaction commandTx, Block block) {
+        super(ID, MAKER, dataStr, null, commandTx, block);
+    }
+
+    @Override
+    public DApp of(String dataStr, Transaction commandTx, Block block) {
+        if (commandTx instanceof TransferredBalances)
+            return new Refi(dataStr, commandTx, block);
+        return null;
+    }
+
+    public static void setDAppFactory() {
+        Refi instance = new Refi();
+        instance.accountsInfo.add(new Pair<>(MAKER, new String[]{"init"}));
+        DAppFactory.STOCKS.put(MAKER, instance);
+        DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
     public String getName() {
@@ -392,13 +407,13 @@ public class Refi extends EpochDAPPjson {
         String recipientAddress = recipient.getAddress();
 
         if (asOrphan) {
-            Object[] state = removeState(dcSet, rSend.getDBRef());
+            Object[] state = removeState(rSend.getDBRef());
 
             // RESTORE OLD POINT
-            valuePut(dcSet, senderAddress, state[0]);
+            valuePut(senderAddress, state[0]);
 
             // RESTORE OLD POINT
-            valuePut(dcSet, recipientAddress, state[1]);
+            valuePut(recipientAddress, state[1]);
 
             BigDecimal stakeReward = (BigDecimal) state[2];
             if (stakeReward != null && stakeReward.signum() > 0) {
@@ -429,13 +444,13 @@ public class Refi extends EpochDAPPjson {
             } else {
                 /////////// RECIPIENT REWARDS
                 BigDecimal stake = recipient.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                recipientPoint = (Object[]) valueGet(dcSet, recipientAddress);
+                recipientPoint = (Object[]) valueGet(recipientAddress);
 
                 Object[] pointNew = makeNewPoint(assetKey, refDB, height, recipient, stake, recipientPoint);
                 status += " Receiver reward: " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 // STORE NEW POINT
-                valuePut(dcSet, recipientAddress, pointNew);
+                valuePut(recipientAddress, pointNew);
             }
 
             Object[] senderPoint;
@@ -448,7 +463,7 @@ public class Refi extends EpochDAPPjson {
             } else {
                 /////////// SENDER REWARDS
                 BigDecimal stake = sender.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                senderPoint = (Object[]) valueGet(dcSet, senderAddress);
+                senderPoint = (Object[]) valueGet(senderAddress);
 
                 Object[] pointNew = makeNewPoint(assetKey, refDB, height, sender, stake, senderPoint);
                 status += " Sender reward " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
@@ -488,12 +503,12 @@ public class Refi extends EpochDAPPjson {
 
 
                 // STORE NEW POINT
-                valuePut(dcSet, senderAddress, pointNew);
+                valuePut(senderAddress, pointNew);
 
             }
 
             // STORE STATE for ORPHAN
-            putState(dcSet, rSend.getDBRef(), new Object[]{senderPoint, recipientPoint, stakeReward});
+            putState(rSend.getDBRef(), new Object[]{senderPoint, recipientPoint, stakeReward});
 
         }
 
@@ -504,9 +519,9 @@ public class Refi extends EpochDAPPjson {
     //////////////////// ADMIN PROCESS
 
     /// INIT
-    private boolean init(DCSet dcSet, Block block, Transaction commandTX, boolean asOrphan) {
+    private boolean init(DCSet dcSet, Block block, Transaction commandTx, boolean asOrphan) {
 
-        Account adminAccount = commandTX.getCreator();
+        Account adminAccount = commandTx.getCreator();
         Long assetKey;
 
         /**
@@ -524,7 +539,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             // ORPHAN for ADMIN
-            transfer(dcSet, block, commandTX, stock, adminAccount, INIT_AMOUNT, assetKey, true, null, null);
+            transfer(dcSet, block, commandTx, stock, adminAccount, INIT_AMOUNT, assetKey, true, null, null);
 
             // orphan GRAVITA ASSET
             dcSet.getItemAssetMap().decrementDelete(assetKey);
@@ -542,8 +557,8 @@ public class Refi extends EpochDAPPjson {
             }
 
             AssetVenture asset = new AssetVenture(null, stock, ASSET_NAME, null, null,
-                    null, AssetCls.AS_INSIDE_ASSETS, ASSET_DECIMALS, ASSET_QUALITY);
-            asset.setReference(commandTX.getSignature(), commandTX.getDBRef());
+                    null, AS_INSIDE_ASSETS, ASSET_DECIMALS, ASSET_QUALITY);
+            asset.setReference(commandTx.getSignature(), commandTx.getDBRef());
 
             //INSERT INTO DATABASE
             assetKey = dcSet.getItemAssetMap().incrementPut(asset);
@@ -556,7 +571,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             // TRANSFER ASSET to ADMIN
-            transfer(dcSet, block, commandTX, stock, adminAccount, INIT_AMOUNT, assetKey, false, null, "init");
+            transfer(dcSet, block, commandTx, stock, adminAccount, INIT_AMOUNT, assetKey, false, null, "init");
 
             status = "done";
         }
@@ -565,47 +580,38 @@ public class Refi extends EpochDAPPjson {
     }
 
     @Override
-    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+    public boolean processByTime() {
         fail("unknown command");
         return false;
     }
 
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction commandTX) {
+    public boolean process() {
 
         /// ADMIN COMMANDS
-        if ("init".equals(command) && init(dcSet, block, commandTX, false))
+        if ("init".equals(command) && init(dcSet, block, commandTx, false))
             return true;
 
-        return job(dcSet, block, (RSend) commandTX, false);
+        return job(dcSet, block, (RSend) commandTx, false);
 
     }
 
     @Override
-    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
+    public void orphanByTime() {
     }
 
     @Override
-    public EpochDAPPjson of(String dataStr, JSONObject jsonObject) {
-        return null;
-    }
-
-    @Override
-    public void orphanBody(DCSet dcSet, Transaction commandTX) {
+    public void orphanBody() {
 
         /// ADMIN COMMANDS
-        if ("init".equals(command) && init(dcSet, null, commandTX, true))
+        if ("init".equals(command) && init(dcSet, null, commandTx, true))
             return;
 
-        job(dcSet, null, (RSend) commandTX, true);
+        job(dcSet, null, (RSend) commandTx, true);
 
     }
 
-    public static Refi make(RSend txSend, String dataStr) {
-        return new Refi(dataStr, "");
-    }
-
-    public static Refi tryMakeJob(RSend txSend) {
+    public static Refi tryMakeJob(RSend txSend, Block block) {
         DCSet dcSet = txSend.getDCSet();
         if (!txSend.hasAmount()
                 || txSend.balancePosition() != Account.BALANCE_POS_OWN || txSend.isBackward()) {
@@ -617,7 +623,7 @@ public class Refi extends EpochDAPPjson {
             return null;
         }
 
-        return assetKey.equals(txSend.getAssetKey()) ? new Refi("", "") : null;
+        return assetKey.equals(txSend.getAssetKey()) ? new Refi("", txSend, block) : null;
     }
 
     /// PARSE / TOBYTES

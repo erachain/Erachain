@@ -27,7 +27,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.IteratorCloseable;
@@ -35,6 +35,7 @@ import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -94,9 +95,8 @@ public class TransactionCreator {
         Transaction transaction;
 
         // здесь нужен протокольный итератор!
+        List<Account> accountMap = Controller.getInstance().getWalletAccounts();
         try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
-            List<Account> accountMap = Controller.getInstance().getWalletAccounts();
-
             while (iterator.hasNext()) {
                 transaction = transactionTab.get(iterator.next());
 
@@ -105,37 +105,33 @@ public class TransactionCreator {
                 }
             }
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
 
         //SORT THEM BY TIMESTAMP
         Collections.sort(accountTransactions, new TransactionTimestampComparator());
 
-        //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
-        for (Transaction transactionAccount : accountTransactions) {
+        int version = lastBlock.getNextBlockVersion(fork);
+        byte[] atBytes;
+        atBytes = new byte[0];
 
-            try {
-                transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
-                if (!transactionAccount.isSignatureValid(this.fork)) {
-                    //THE TRANSACTION BECAME INVALID LET
-                    this.fork.getTransactionTab().delete(transactionAccount);
-                } else {
-                    if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0L) == Transaction.VALIDATE_OK) {
-                        transactionAccount.process(null, Transaction.FOR_NETWORK);
-                    } else {
-                        //THE TRANSACTION BECAME INVALID LET
-                        this.fork.getTransactionTab().delete(transactionAccount);
-                    }
-                    // CLEAR for HEAP
-                    transactionAccount.resetDCSet();
-                }
-            } catch (java.lang.Throwable e) {
-                if (e instanceof java.lang.IllegalAccessError) {
-                    // налетели на закрытую таблицу
-                } else {
-                    logger.error(e.getMessage(), e);
-                }
-            }
+        //CREATE NEW BLOCK
+        Block newBlock = new Block(version, lastBlock, lastBlock.getCreator(),
+                new Fun.Tuple2<>(accountTransactions, accountTransactions.size()), atBytes,
+                0, 1000L, 1000L);
+        byte[] sign = lastBlock.getSignature();
+        // изменим подпись
+        sign[0]++;
+        sign[sign.length - 1]++;
+        newBlock.setSignature(lastBlock.getSignature());
+
+        //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
+        try {
+            newBlock.process(fork, true);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
+
     }
 
     public DCSet getFork() {
@@ -594,7 +590,7 @@ public class TransactionCreator {
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount creator, ExLink linkTo, DAPP dapp, Account recipient,
+    public Transaction r_Send(PrivateKeyAccount creator, ExLink linkTo, DApp dapp, Account recipient,
                               long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp_in) {
 
@@ -615,7 +611,7 @@ public class TransactionCreator {
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
                               Account recipient, long key, BigDecimal amount,
-                              int actionPackage, Object[][] assetsPackage, ExLink linkTo, DAPP dapp, int feePow, String title,
+                              int actionPackage, Object[][] assetsPackage, ExLink linkTo, DApp dapp, int feePow, String title,
                               byte[] message, byte[] isText, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -813,6 +809,8 @@ public class TransactionCreator {
 
     public Integer afterCreate(Transaction transaction, int forDeal, boolean tryFree, boolean notRelease) {
         //CHECK IF PAYMENT VALID
+
+        checkUpdate();
 
         boolean incremented = false;
         if (!this.fork.equals(transaction.getDCSet())) {

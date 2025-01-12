@@ -11,7 +11,8 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.dapp.DAPP;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -24,7 +25,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CancelOrderTransaction extends Transaction {
+import static org.erachain.core.transaction.CreateOrderTransaction.HAS_SMART_CONTRACT_MASK_ORDER;
+
+public class CancelOrderTransaction extends Transaction implements TransferredBalances {
 
     static Logger LOGGER = LoggerFactory.getLogger(CancelOrderTransaction.class.getName());
 
@@ -112,6 +115,10 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     //PARSE CONVERT
+    @Override
+    protected byte get_HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK_ORDER;
+    }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
@@ -160,9 +167,9 @@ public class CancelOrderTransaction extends Transaction {
             exLink = null;
         }
 
-        DAPP dApp;
-        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dApp = DAPP.Parses(data, position, forDeal);
+        DApp dApp;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK_ORDER) > 0) {
+            dApp = DApp.Parses(data, position, forDeal);
             position += dApp.length(forDeal);
         } else {
             dApp = null;
@@ -473,4 +480,8 @@ public class CancelOrderTransaction extends Transaction {
         return assetAmount;
     }
 
+    @Override
+    public TransferBalanceDto[] getTransfers() {
+        return new TransferBalanceDto[0];
+    }
 }

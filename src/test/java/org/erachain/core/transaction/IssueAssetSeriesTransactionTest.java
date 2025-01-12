@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -133,8 +134,8 @@ public class IssueAssetSeriesTransactionTest {
         Long startDate = System.currentTimeMillis();
         Long stopDate = null;
         itemAppData2 = AssetCls.makeAppData(iconAsURL, iconType, imageAsURL, imageType,
-                startDate, stopDate, "tag", null, true, true);
-        assetUnique = new AssetUnique(itemAppData2, maker, "NFT", icon2, image2, ".asd..", AssetCls.AS_NON_FUNGIBLE);
+                startDate, stopDate, "tag", null, true, true, false);
+        assetUnique = new AssetUnique(itemAppData2, maker, "NFT", icon2, image2, ".asd..", AS_NON_FUNGIBLE);
         assetUnique.setReference(Crypto.getInstance().digest(assetUnique.toBytes(forDeal, false, false)), dbRef2);
 
         assetVenture = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 10L);

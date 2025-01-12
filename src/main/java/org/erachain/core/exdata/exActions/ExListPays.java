@@ -12,6 +12,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
@@ -45,6 +47,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     /**
      * flags:
      * 0 - version; 1 - flags;
+     * shortAddress, Amount, Description
      */
 
     private final Tuple3<byte[], BigDecimal, String>[] addresses;
@@ -401,6 +404,49 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         }
 
         return out;
+    }
+
+    @Override
+    public TransferBalanceDto[] getTransfers(Account creator) {
+
+        TransferBalanceDto[] transfers = new TransferBalanceDto[results.size()];
+        long absKey = assetKey;
+
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        Long actionPayKey = signs.a * assetKey;
+        boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+
+        boolean isAmountNegate;
+        boolean backwardAction;
+
+        Tuple3<byte[], BigDecimal, String> item;
+        Account recipient;
+        for (int i = 0; i < addresses.length; i++) {
+            item = addresses[i];
+            recipient = new Account(item.a);
+            if (recipient == null)
+                break;
+
+            // сбросим направление от фильтра
+            BigDecimal actionPayAmount = item.b.abs();
+            // зададим направление от Действия нашего
+            actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+            isAmountNegate = item.b.signum() < 0;
+            backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+
+            //if (creator.equals(recipient))
+            //    // пропустим себя в любом случае
+            //    continue;
+
+            transfers[i] = new TransferBalanceDto(creator, asset, balancePos, backwardAction,
+                    new TransferRecipientDto[]{new TransferRecipientDto(recipient, actionPayAmount, balancePos)});
+
+        }
+
+        return transfers;
     }
 
     @Override

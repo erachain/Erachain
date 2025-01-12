@@ -41,8 +41,8 @@ public class AssetUniqueSeriesCopyTest {
         Long startDate = System.currentTimeMillis();
         Long stopDate = null;
         itemAppData = AssetCls.makeAppData(iconAsURL, iconType, imageAsURL, imageType,
-                startDate, stopDate, "tag", null, true, true);
-        AssetUnique origAsset = new AssetUnique(itemAppData, null, "String name", null, null, "String description", 3);
+                startDate, stopDate, "tag", null, true, true, true);
+        AssetUnique origAsset = new AssetUnique(itemAppData, maker, "String name", null, null, "String description", 3);
 
         IssueAssetTransaction issueTX = new IssueAssetTransaction(maker, origAsset, feePow, System.currentTimeMillis(), 0L);
         issueTX.sign(maker, Transaction.FOR_NETWORK);
@@ -75,6 +75,8 @@ public class AssetUniqueSeriesCopyTest {
             assertEquals(assetCopy.getDescription(), parsedAsset.getDescription());
 
             assertEquals(assetCopy.getQuantity(), parsedAsset.getQuantity());
+
+            assertEquals(assetCopy.isUseDApp(), parsedAsset.isUseDApp());
 
 
         } catch (Exception e) {

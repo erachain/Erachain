@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_INSIDE_ASSETS;
+
 public class GenesisBlock extends Block {
 
     public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
@@ -604,7 +606,7 @@ public class GenesisBlock extends Block {
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
             asset = new AssetVenture((byte) 0, itemAppData, asset.getMaker(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0L);
+                    asset.getIcon(), asset.getImage(), asset.getDescription(), AS_INSIDE_ASSETS, 8, 0L);
             transactions.add(new GenesisIssueAssetTransaction(asset));
         }
 
@@ -625,7 +627,7 @@ public class GenesisBlock extends Block {
         if (BlockChain.TEST_MODE) {
             for (String name : BlockChain.NOVA_ASSETS.keySet()) {
                 AssetVenture asset = new AssetVenture((byte) 0, itemAppData, creator, name,
-                        null, null, "", AssetCls.AS_INSIDE_ASSETS, 8, 0L);
+                        null, null, "", AS_INSIDE_ASSETS, 8, 0L);
                 transactions.add(new GenesisIssueAssetTransaction(asset));
             }
         }

@@ -313,10 +313,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
+    public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestampEnd, BlockChain bchain,
                                                                          long max_winned_value) {
 
-        LOGGER.debug("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestamp));
+        LOGGER.info("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestampEnd));
 
         long start = System.currentTimeMillis();
 
@@ -348,7 +348,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // так как иначе такой блок и сеткой остальной не успеет обработаться
                     if (BlockChain.TEST_DB == 0 && check_time++ > 300) {
                         if (System.currentTimeMillis() - start > max_time_gen) {
-                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by SPEND TIME[ms]: " + (System.currentTimeMillis() - start));
+                            LOGGER.warn("* * * * * COLLECT TRANSACTIONS BREAK by SPEND TIME[ms]: " + (System.currentTimeMillis() - start));
                             break;
                         }
                         check_time = 0;
@@ -367,7 +367,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     Transaction transaction = map.get(iterator.next());
 
                     if (transaction == null) {
-                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
+                        LOGGER.warn("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
                         break;
                     }
 
@@ -383,8 +383,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         testTime = transaction.getTimestamp();
                     }
 
-                    if (transaction.getTimestamp() > timestamp) {
-                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by UTX TIMESTAMP: " + new Timestamp(transaction.getTimestamp()));
+                    if (transaction.getTimestamp() > timestampEnd) {
+                        LOGGER.warn("* * * * * COLLECT TRANSACTIONS BREAK by UTX TIMESTAMP: " + new Timestamp(transaction.getTimestamp()));
                         break;
                     }
 
@@ -401,7 +401,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         // здесь уже может быть ошибка если Ордер не найден например для Отмена ордера
                         transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
-                        if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                        if (false // вообще-то все внутренние транзакции уже проверены на подпись!
                                 && !transaction.isSignatureValid(newBlockDC)) {
                             needRemoveInvalids.add(transaction.getSignature());
                             continue;
@@ -409,7 +409,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         if (false && // тут нельзя пока удалять - может она будет включена
                                 // и пусть удаляется только если невалидная будет
-                                timestamp > transaction.getDeadline()) {
+                                transaction.getDeadline() < timestampEnd) {
                             needRemoveInvalids.add(transaction.getSignature());
                             continue;
                         }
@@ -417,7 +417,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
                             if (BlockChain.CHECK_BUGS > 1) {
-                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0L));
+                                LOGGER.warn(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0L));
                             }
                             continue;
                         }
@@ -425,14 +425,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //CHECK IF ENOUGH ROOM
                         if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
                             counter--;
-                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX COUNT: " + counter);
+                            LOGGER.info("* * * * * COLLECT TRANSACTIONS BREAK by MAX COUNT: " + counter);
                             break;
                         }
 
                         totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
                         if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
                             counter--;
-                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX BYTES: " + totalBytes);
+                            LOGGER.info("* * * * * COLLECT TRANSACTIONS BREAK by MAX BYTES: " + totalBytes);
                             break;
                         }
 
@@ -546,7 +546,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     try {
 
-                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
                             continue;
                         }
@@ -729,7 +729,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             Block waitWin = null;
             while (!ctrl.isOnStopping()) {
 
-                int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
+                int timeStartBroadcast = BlockChain.WIN_TIME_POINT(height);
 
                 Block solvingBlock;
                 Peer peer = null;
@@ -755,7 +755,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (BlockChain.TEST_DB > 0) {
                     pointPing = 0;
                 } else if (NTP.getTime() - pointPing > blockTimeMS >> 1) {
-                    // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
+                    // нужно просматривать пинги для синхронизации так же - если там -ХХ то не будет синхронизации
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(false);
                 }
@@ -794,12 +794,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
 
                         // обязательно нужно чтобы память освобождать
-                        // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                        // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавалось
                         // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
                         dcSet.clearCache();
 
                         // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
-                        // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                        // не было остатков в пакетах RocksDB и транзакциях MapDB
                         dcSet.flush(0, true, true);
 
                         while (bchain.getHeight(dcSet) >= this.orphanto) {
@@ -815,7 +815,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                         if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
-                            // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
+                            // TODO тут нужно обновить за последние 3-10 блоков значения если проверка используется
                             ReferenceMapImpl map = dcSet.getReferenceMap();
 
                             return;
@@ -837,7 +837,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS(height);
+                    timePointForValidTX = timePoint;
                     betterPeer = null;
                     needRequestWinBlock = false;
 
@@ -849,7 +849,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.solvingReference = null;
                     local_status = 0;
 
-                    // пинганем тут все чтобы знать кому слать вобедный блок
+                    // пинганем тут все чтобы знать кому слать победный блок
                     // а так же чтобы знать с кем мы в синхре или кто лучше нас в checkWeightPeers
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(true);
@@ -903,16 +903,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                         /*
-                         * нужно сразу взять транзакции которые бедум в блок класть - чтобы
-                         * значть их ХЭШ -
+                         * нужно сразу взять транзакции которые будем в блок класть - чтобы
+                         * знать их ХЭШ -
                          * тоже самое и AT записями поидее
-                         * и эти хэши закатываем уже в заголвок блока и подписываем
+                         * и эти хэши закатываем уже в заголовок блока и подписываем
                          * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
-                         * если победа случиласть то
-                         * далее сами трнзакции кладем в тело блока и закрываем его
+                         * если победа случилась то
+                         * далее сами транзакции кладем в тело блока и закрываем его
                          */
                         /*
-                         * нет не  так - вычисляеи победное значение и если оно выиграло то
+                         * нет не  так - вычисляем победное значение и если оно выиграло то
                          * к нему транзакции собираем
                          * и время всегда одинаковое
                          *
@@ -1189,12 +1189,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         ctrl.requestLastBlock();
                     }
 
-                    // если мы догоняем время и быстро генерирум цепочку
+                    // если мы догоняем время и быстро генерируем цепочку
                     if (!bchain.isEmptyWaitWinBuffer()
                             && NTP.getTime() - timePoint < blockTimeMS << 4) {
                         // то если уже почти догнали время, то начинаем большие задержки ожидания делать
                         try {
-                            Thread.sleep(blockTimeMS >> 2);
+                            long sleep = blockTimeMS >> 2;
+                            if (sleep > 30000)
+                                sleep = 30000;
+
+                            Thread.sleep(sleep);
                         } catch (InterruptedException e) {
                             return;
                         }
@@ -1356,7 +1360,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 /// CHECK PEERS HIGHER
-                // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
+                // так как в девелопе все гоняют свои цепочки то посмотреть самую жирную а не длинную
                 ctrl.checkStatusAndObserve(shift_height);
                 //CHECK IF WE ARE NOT UP TO DATE
                 if (betterPeer != null || ctrl.needUpToDate()) {

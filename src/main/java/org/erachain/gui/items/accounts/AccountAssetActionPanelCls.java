@@ -16,7 +16,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
@@ -63,7 +63,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public ExLink exLink;
 
-    public DAPP dapp;
+    public DApp dapp;
 
     public int feePow;
 

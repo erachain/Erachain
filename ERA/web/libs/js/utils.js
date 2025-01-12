@@ -29,6 +29,9 @@ return htmlFilter(wordwrap(text, 0, '\n', true));
 }
 
 function fformat(text_in) {
+    if (text_in === null || !(text_in instanceof String))
+            return text_in;
+
     if (text_in.startsWith('@TGM{')) {
         return telegramView(text_in, JSON.parse(text_in.substring(4)));
     }
@@ -67,24 +70,28 @@ function convertTimestamp(timestamp, withYear) {
 
 }
 
-var entityMap = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-  '/': '&#x2F;',
-  '`': '&#x60;',
-  '=': '&#x3D;'
+const map = {
+    '\n': '<br>',
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
 };
 
-function escapeHtml(string) {
-  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-    return entityMap[s];
-  });
+function escapeHtml(text) {
+    if (text !== null && text instanceof String)
+        return text.replace(/[&<>"'`\n=/]/g, function(m) { return map[m]; });
+    return text;
 }
 
 function cut(string, max) {
+    if (string === null || !(string instanceof String))
+        return string;
+
     if (string.length > max)
         return string.substring(0,max) + '.';
 

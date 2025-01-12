@@ -157,7 +157,9 @@ public class Lang {
     }
 
     public void setLangForNode() {
-        langObj = langList.get(Settings.getInstance().getLang()).getLangJson();
+        LangFile langFile = langList.get(Settings.getInstance().getLang());
+        langObj = langFile == null ? new JSONObject()
+                : langFile.getLangJson();
     }
 
     public static String T(String message, JSONObject langObj) {
