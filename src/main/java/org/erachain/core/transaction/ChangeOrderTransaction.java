@@ -12,7 +12,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.dapp.DAPP;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -24,11 +25,13 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.erachain.core.transaction.CreateOrderTransaction.HAS_SMART_CONTRACT_MASK_ORDER;
+
 /**
  * Закрывает родительский Заказ и создает новый.
  * При этом создает Сделку  с типом Измена Заказа, в которую вставляет новое Хочу
  */
-public class ChangeOrderTransaction extends Transaction {
+public class ChangeOrderTransaction extends Transaction implements TransferredBalances {
     public static final byte TYPE_ID = (byte) Transaction.CHANGE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Change Order";
 
@@ -235,6 +238,11 @@ public class ChangeOrderTransaction extends Transaction {
         return json;
     }
 
+    @Override
+    protected byte get_HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK_ORDER;
+    }
+
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
@@ -284,9 +292,9 @@ public class ChangeOrderTransaction extends Transaction {
             exLink = null;
         }
 
-        DAPP dapp;
-        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+        DApp dapp;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK_ORDER) > 0) {
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;
@@ -647,4 +655,8 @@ public class ChangeOrderTransaction extends Transaction {
         return assetAmount;
     }
 
+    @Override
+    public TransferBalanceDto[] getTransfers() {
+        return new TransferBalanceDto[0];
+    }
 }

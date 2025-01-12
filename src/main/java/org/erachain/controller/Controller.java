@@ -43,7 +43,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
@@ -103,8 +103,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.4.11";
-    public static String buildTime = "2024-12-08 12:00:00 UTC";
+    public static String version = "6.5.01";
+    public static String buildTime = "2025-01-01 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -2271,7 +2271,7 @@ public class Controller extends Observable {
                         }
                     }
 
-                    // сохранимся - хотя может и заря - раньше то работало и так
+                    // сохранимся - хотя может и зря - раньше то работало и так
                     // по размеру файла смотрим - если уже большой то сольем
                     // хотя все равно при каждом ново поиске 300 блоков приостанавливается синхра
                     File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
@@ -3780,7 +3780,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DAPP dApp, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DApp dApp, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3900,7 +3900,7 @@ public class Controller extends Observable {
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
@@ -3910,7 +3910,7 @@ public class Controller extends Observable {
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, int actionPackage, Object[][] assetsPackage, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {

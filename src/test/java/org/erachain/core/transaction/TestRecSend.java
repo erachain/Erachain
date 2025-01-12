@@ -15,7 +15,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class TestRecSend {
     long dbRef = 0L;
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;

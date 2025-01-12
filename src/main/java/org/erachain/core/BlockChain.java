@@ -223,7 +223,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 5396170; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 5840000; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2152137;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000;
@@ -234,9 +234,6 @@ public class BlockChain {
      * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
     public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 0;
-    /**
-     * {@link LEFT_PRICE_HEIGHT} as SeqNo
-     */
 
     //public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
@@ -460,10 +457,10 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            !MAIN_MODE ? 0 : 2199400,
+            !MAIN_MODE ? 0 : 5840000,
             Base58.decode(
                     !MAIN_MODE ? ""
-                            : "oC44uRVVb79Qw6K9dftvihVZQomzkFTjBh11AUDuC3opw3ZW1AMj1zvGDRsrprfBV2uBqnN5uCX9Unm5jtop7Rf"));
+                            : "2HvuPvAPnZaMRhw2Q8JSfy7QqxampfgPQHZ7WsdkMHB5sNmL8NoHTRr4HBKDEwBbAjMfM4bxrmYAK5cZp3Y2E2VK"));
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
@@ -691,6 +688,14 @@ public class BlockChain {
             // TODO добавить потом
             WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("Xq48dimwhwkXRkFun6pSQFHDSmrDnNqpUbFMkvQHC26nAyoQ3Srip3gE42axNWi5cXSPfTX5yrFkK6R4Hinuq6V")));
 
+            // Изьять Долг по Фильтру - проверки еще не было - удалим их
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("2Gpa5maHjKFZqaFFSBEF7FpvdHZ7PCHr6hwm47cyxBdHJ86LwWCfqisCahaDdg9bMWYgJmn6ygrRKn69p5pAxp73")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("5YFgE7zQGr4gCRnmSvpmxfeP2Zr59ERNrYwHFRxcKo8Y11vwvmovcgitXurHTUihjUX58Nom2HTvWg4TbbiDRCDX")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("3QE5th5dRuTLMQcBXK8Q5QDR5ggb6p9VtRC3P9iLLDQDPRuvXWY1UQ3qqnYWqntbjZuAHxf4C3iLyqwpHN2sAypK")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("ENAeCkxTpmPxuxyN12Ty6gv9aFc8hUHAuh4f2HnY54314sN4FYf3QcUrkk5imDgoqwmnhduWoKT3kgH6Zh3SzGN")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("4ukyxvv4eMHrBrRSsQuMR2EpVMnU6BLRSnQByUCM9jUZjh7DmBTSiRJHmbT7PV898aNgpm6Sr3tJiP4maSw37nzs")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("5q3VvxbebJC8WDYN7DdaWcYe9kVuNpkvXknegy7Lt3TmxLoEhXrn7BvF67nhAag3TgxrPiFDoEdNKxSrNk42CRWt")));
+
 
             // GENERAL TRUST
             TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -857,6 +862,8 @@ public class BlockChain {
             return BLOCKS_PERIOD;
         else if (TEST_MODE && !DEMO_MODE)
             return 7000;
+        else if (DEMO_MODE)
+            return 30000;
 
         if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288000; // old MainNet
@@ -868,17 +875,6 @@ public class BlockChain {
     public static int GENERATING_MIN_BLOCK_TIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
         return GENERATING_MIN_BLOCK_TIME_MS(height);
-    }
-
-    public static int FLUSH_TIMEPOINT(int height) {
-        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
-    }
-
-    public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
-        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
-            return -GENERATING_MIN_BLOCK_TIME_MS(height);
-        }
-        return 0;
     }
 
     public static AssetCls ERA_ASSET;
@@ -907,17 +903,13 @@ public class BlockChain {
         return 24 * 60 * 60000 / GENERATING_MIN_BLOCK_TIME_MS(height); // 300 PER DAY
     }
 
-    public static int WIN_TIMEPOINT(int height) {
-        return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+    public static int WIN_TIME_POINT(int height) {
+        int time = GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+        return time > 60000 ? 60000 : time;
     }
 
-    public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
-        int height = timestamp < VERS_30SEC_TIME ? 1 : VERS_30SEC + 1;
-        if (TEST_DB > 0) {
-            return GENERATING_MIN_BLOCK_TIME_MS(height);
-        } else {
-            return TEST_MODE ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
-        }
+    public static int FLUSH_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
     }
 
     public static int VALID_PERSON_REG_ERA(Transaction transaction, int height, BigDecimal totalERA, BigDecimal totalLIA) {

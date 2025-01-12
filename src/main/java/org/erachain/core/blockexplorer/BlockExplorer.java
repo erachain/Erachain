@@ -23,7 +23,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
-import org.erachain.dapp.DAPPFactory;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.Pageable;
 import org.erachain.database.PairMapImpl;
@@ -2386,8 +2386,8 @@ public class BlockExplorer {
 
                     output.put("Label_Desc", Lang.T("Description", langObj));
 
-                } else if (playId.startsWith("DAPP.")) {
-                    output.put("play", DAPPFactory.dAppsById.get(Integer.parseInt(playId.substring(5))).getInfo(langObj));
+                } else if (playId.startsWith("DApp.")) {
+                    output.put("play", DAppFactory.DAPP_BY_ID.get(Integer.parseInt(playId.substring(5))).getInfo(langObj));
 
                     output.put("Label_Accounts", Lang.T("Accounts", langObj));
                     output.put("Label_Commands", Lang.T("Commands", langObj));
@@ -2407,7 +2407,7 @@ public class BlockExplorer {
             listBuId.put("BOT.5", ErachainStorageBot.getInfoShort(langObj));
 
             // dApps list
-            DAPPFactory.dAppsById.values().forEach(dapp -> listBuId.put("DAPP." + dapp.getID(), dapp.getInfoShort(langObj)));
+            DAppFactory.DAPP_BY_ID.values().forEach(dapp -> listBuId.put("DApp." + dapp.getID(), dapp.getInfo(langObj)));
             output.put("pageItemsByID", listBuId);
 
             output.put("Label_Head", Lang.T("Play_Scanner_Head", langObj));

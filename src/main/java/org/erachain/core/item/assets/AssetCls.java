@@ -12,8 +12,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
-import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
+import org.erachain.dapp.epoch.memoCards.MemoCardsDApp;
+import org.erachain.dapp.epoch.shibaverse.ShibaVerseDApp;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
@@ -28,6 +28,8 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static org.erachain.core.item.assets.AssetTypes.*;
 
 
 /**
@@ -50,6 +52,9 @@ public abstract class AssetCls extends ItemCls {
     protected static final long APP_DATA_UNTRANSFERABLE_MASK = 2L;
     // anonimouse protection
     protected static final long APP_DATA_ANONIM_PROTECT_MASK = 4L;
+    /**
+     * Это актив для смарт-контракта = см. EpochDAppJson например
+     */
     protected static final long APP_DATA_USE_DAPP_MASK = 8L;
 
     //
@@ -109,215 +114,6 @@ public abstract class AssetCls extends ItemCls {
     public static final int INITIAL_FAVORITES = 100;
 
     ///////////////////////////////////////////////////
-    /**
-     * GOODS
-     * передача в собственность, взять на хранение
-     * 0 : движимая вещь вовне - может быть доставлена и передана на хранение (товары)
-     */
-    public static final int AS_OUTSIDE_GOODS = 0; // movable
-
-    /**
-     * ASSETS
-     * передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
-     * Требования не предъявляются.
-     * 3 : цифровое имущество - не требует действий вовне и исполняется внутри платформы (токены, цифровые валюты, цифровые билеты, цифровые права и т.д.)
-     */
-    public static final int AS_INSIDE_ASSETS = 1;
-
-    /**
-     * IMMOVABLE
-     * передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
-     * 1 : недвижимая вещь вовне - может быть передана в аренду (недвижимость)
-     */
-
-    public static final int AS_OUTSIDE_IMMOVABLE = 2;
-
-    /**
-     * outside CURRENCY
-     * +++ деньги вовне - можно истребовать вернуть и подтвердить получение денег
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_OUTSIDE_CURRENCY = 11;
-
-    /**
-     * outside SERVICE
-     * +++ услуги во вне
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_OUTSIDE_SERVICE = 12; // UTILITY
-
-    /**
-     * outside SHARE
-     * +++ акция предприятия вовне
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_OUTSIDE_SHARE = 13;
-
-    /**
-     * outside BILL - вексель - promissory note
-     * +++ вексель на оплату во вне
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_OUTSIDE_BILL = 14;
-
-    /**
-     * outside BILL - вексель переводной (тратта) - bill of exchange
-     * +++ вексель на оплату во вне
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_OUTSIDE_BILL_EX = 15;
-
-    /**
-     * my debt
-     * +++ мой долг перед другим лицом - это обязательство
-     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_MY_DEBT = 26;
-
-    /**
-     * 🕐🕜🕑🕝🕒🕞🕓🕟🕔🕠🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦🕛🕧
-     * outside WORK TIME - рабочее время, которое можно купить и потребовать потратить и учесть как затрата
-     */
-    public static final int AS_OUTSIDE_WORK_TIME_MINUTES = 34;
-    public static final int AS_OUTSIDE_WORK_TIME_HOURS = 35;
-
-    /**
-     * outside CLAIMS
-     * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
-     * <p>
-     * учет обязательств прав и требований на услуги и действия во внешнем мире - в том числе займы, ссуды, кредиты, фьючерсы и т.д.
-     * нельзя вернуть эмитенту - но можно потребовать исполнение прав и можно подтвердить исполнение (погасить требование)
-     * это делается теми же трнзакциями что выдать и забрать долг у внутренних активов
-     * И в момент погашения одновременно передается как имущество эмитенту
-     */
-    public static final int AS_OUTSIDE_OTHER_CLAIM = 49;
-
-    ///////////////
-    /**
-     * inside CURRENCY
-     * +++ деньги
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INSIDE_CURRENCY = 51;
-
-    /**
-     * inside CLAIMS
-     * +++ требования и обязательства
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INSIDE_UTILITY = 52; // SERVICE
-
-    /**
-     * inside CLAIMS
-     * +++ требования и обязательства
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INSIDE_SHARE = 53;
-
-    /**
-     * inside BONUS
-     * +++ бонусы - для анонимов так же платежи возможны
-     * === ASSET - без обмена на бирже и можно анонимам переводить
-     */
-    public static final int AS_INSIDE_BONUS = 54;
-
-    /**
-     * inside RIGHTS
-     * +++ права и доступы
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     * можно вернуть право себе создателю и справо дается не в долг а как на харанение - и потом любой может забрать с хранения
-     * 2 баланса - имущечтыо и хранение - при передаче? короче каждый может кто имеет право выдавать или назначать право
-     * потом забирать назначение с баланса Хранить - получается как с движимым товарос
-     */
-    public static final int AS_INSIDE_ACCESS = 55;
-
-    /**
-     * inside VOTE
-     * +++ права и доступы
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INSIDE_VOTE = 56;
-
-    /**
-     * bank guarantee - банковская гарантия
-     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
-     */
-
-    public static final int AS_BANK_GUARANTEE = 60;
-    /**
-     * bank guarantee total - банковская гарантия общая сумма - так как не требует действий 2-й стороны - скорее бухгалтерская единица?
-     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_BANK_GUARANTEE_TOTAL = 61;
-
-    /**
-     * NFT - Non Fungible Token. невзаимозаменяемый токен
-     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_NON_FUNGIBLE = 65;
-    public static final int AS_RELEASED_FUNGIBLE = 67;
-
-    /**
-     * INDEXES (FOREX etc.)
-     * +++ требования и обязательства
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INDEX = 100;
-
-    /**
-     * inside CLAIMS
-     * +++ требования и обязательства
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
-     */
-    public static final int AS_INSIDE_OTHER_CLAIM = 119;
-
-    /**
-     * ACCOUNTING
-     * учетные единицы - нельзя на бирже торговать - они ничего не стоят, можно делать любые действия от своего имени
-     * 4 : учетные единицы - не имеет стоимости и не может быть продано (бухгалтерский учет)
-     */
-    public static final int AS_ACCOUNTING = 123;
-
-    /**
-     * self-managed
-     * === Не может управляться ни кем кроме обладателя актива
-     * === доступны 4-ре баланса и у каждого работает Возврат - backward
-     */
-    public static final int AS_SELF_MANAGED_ACCOUNTING = 124;
-
-    /**
-     * accounting loan
-     * +++ мой займ другому лицу - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED_ACCOUNTING - но долговой баланс - отражает требование к оплате
-     */
-    public static final int AS_SELF_ACCOUNTING_LOAN = 125;
-
-    /**
-     * mutual aid fund
-     * +++ фонд взаимопомощи - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED_ACCOUNTING - по-идее тут без требований к оплате
-     */
-    public static final int AS_SELF_ACCOUNTING_MUTUAL_AID_FUND = 126;
-
-    /**
-     * cash fund
-     * +++ денежный фонд - для учета взносов ТСЖ например - учетный, бухгалтерский учет
-     * === подобно AS_SELF_MANAGED_ACCOUNTING - c требованиями к оплате и с автоматическим снятием требования (DEBT) при погашении
-     */
-    public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
-
-    /**
-     * self-managed - direct OWN balances
-     * === Не может управляться ни кем кроме обладателя актива
-     * === доступны 4-ре баланса и у каждого работает Возврат - backward
-     */
-    public static final int AS_SELF_MANAGED_DIRECT_SEND = 128;
-    /**
-     * self-managed - direct OWN balances
-     * === Не может управляться ни кем кроме обладателя актива
-     * === доступны 4-ре баланса и у каждого работает Возврат - backward
-     */
-    public static final int AS_SELF_MANAGED_SHARE = 129;
 
     protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, appData, maker, name, icon, image, description);
@@ -374,14 +170,20 @@ public abstract class AssetCls extends ItemCls {
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
                                      Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards,
-                                     boolean isUnTransferable, boolean isAnonimDenied) {
+                                     boolean isUnTransferable, boolean isAnonimDenied, boolean isForDApp) {
         long flags = dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK;
         if (isUnTransferable)
             flags |= APP_DATA_UNTRANSFERABLE_MASK;
         if (isAnonimDenied)
             flags |= APP_DATA_ANONIM_PROTECT_MASK;
-        if (isAnonimDenied)
+        if (isForDApp) {
             flags |= APP_DATA_USE_DAPP_MASK;
+            if (tags == null || tags.isEmpty())
+                tags = "dapp";
+            else {
+                tags = "dapp," + tags;
+            }
+        }
 
         byte[] appData = ItemCls.makeAppData(flags,
                 iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags);
@@ -629,10 +431,10 @@ public abstract class AssetCls extends ItemCls {
                 return "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.";
         }
 
-        if (maker.equals(ShibaVerseDAPP.MAKER))
-            return ShibaVerseDAPP.viewDescription(this, description);
-        else if (maker.equals(MemoCardsDAPP.MAKER))
-            return MemoCardsDAPP.viewDescription(this, description);
+        if (maker.equals(ShibaVerseDApp.MAKER))
+            return ShibaVerseDApp.viewDescription(this, description);
+        else if (maker.equals(MemoCardsDApp.MAKER))
+            return MemoCardsDApp.viewDescription(this, description);
 
         return this.description;
     }
@@ -642,8 +444,9 @@ public abstract class AssetCls extends ItemCls {
         String tagType = ":" + viewAssetTypeAbbrev().toLowerCase();
 
         String[] tagsArray = super.getTags();
-        if (tagsArray == null)
+        if (tagsArray == null) {
             return new String[]{tagType};
+        }
 
         String[] tagsArrayNew = new String[tagsArray.length + 1];
         System.arraycopy(tagsArray, 0, tagsArrayNew, 0, tagsArray.length);
@@ -882,9 +685,9 @@ public abstract class AssetCls extends ItemCls {
 
     public static boolean isUnSpendable(long key, int assetType) {
         return key < 100
-                || assetType == AssetCls.AS_INDEX
-                || assetType == AssetCls.AS_INSIDE_ACCESS
-                || assetType == AssetCls.AS_INSIDE_BONUS;
+                || assetType == AS_INDEX
+                || assetType == AS_INSIDE_ACCESS
+                || assetType == AS_INSIDE_BONUS;
     }
 
     public boolean isUnSpendable() {
@@ -905,7 +708,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public boolean validPair(long pairAssetKey) {
-        if (assetType == AssetCls.AS_NON_FUNGIBLE) {
+        if (assetType == AS_NON_FUNGIBLE) {
             if (pairAssetKey != AssetCls.ERA_KEY
                 //&& pairAssetKey != AssetCls.FEE_KEY && pairAssetKey != AssetCls.BTC_KEY
             ) {
@@ -917,8 +720,8 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isUnDebtable(long key, int assetType) {
-        return assetType == AssetCls.AS_INDEX
-                || assetType == AssetCls.AS_INSIDE_BONUS;
+        return assetType == AS_INDEX
+                || assetType == AS_INSIDE_BONUS;
     }
 
     public boolean isUnDebtable() {
@@ -969,10 +772,10 @@ public abstract class AssetCls extends ItemCls {
 
     public boolean isSendPersonProtected() {
         return (key <= AssetCls.ERA_KEY || key > getStartKey()) // GATE Assets
-                && assetType != AssetCls.AS_NON_FUNGIBLE
+                && assetType != AS_NON_FUNGIBLE
                 && !isAccounting()
-                && assetType != AssetCls.AS_INSIDE_BONUS
-                && assetType != AssetCls.AS_INSIDE_VOTE;
+                && assetType != AS_INSIDE_BONUS
+                && assetType != AS_INSIDE_VOTE;
     }
 
     /**
@@ -989,7 +792,7 @@ public abstract class AssetCls extends ItemCls {
      *
      * @return
      */
-    public boolean isUseDAPP() {
+    public boolean isUseDApp() {
         return (flags & APP_DATA_USE_DAPP_MASK) != 0;
     }
 
@@ -2245,6 +2048,8 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T("isOutsideOtherClaim", langObj));
         if (isReverseSend())
             joiner.add(Lang.T("isReverseSend", langObj));
+        if (isUseDApp())
+            joiner.add(Lang.T("isUseDApp", langObj));
 
         return joiner.toString();
     }
@@ -2330,6 +2135,7 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("isNotReDebted", this.isNotReDebted());
         assetJSON.put("isOutsideOtherClaim", this.isOutsideOtherClaim());
         assetJSON.put("isReverseSend", this.isReverseSend());
+        assetJSON.put("isUseDApp", this.isUseDApp());
 
         JSONObject revPos = new JSONObject();
         for (int pos = Account.BALANCE_POS_OWN; pos <= Account.BALANCE_POS_6; pos++) {

@@ -17,7 +17,7 @@ public class PublicKeyAccount extends Account {
     }
 
     /**
-     * for make DAPP publick key
+     * for make DApp publick key
      *
      * @param type
      * @param publicKey

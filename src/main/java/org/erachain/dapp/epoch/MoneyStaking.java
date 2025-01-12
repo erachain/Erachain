@@ -2,102 +2,101 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
-import org.erachain.core.transaction.IssueItemRecord;
-import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
+import org.erachain.core.transaction.HasDataString;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.EpochDAPPjson;
-import org.erachain.datachain.*;
-import org.erachain.dbs.IteratorCloseable;
-import org.json.simple.JSONArray;
+import org.erachain.core.transaction.TransferredBalances;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
+import org.erachain.dapp.DApp;
+import org.erachain.dapp.DAppFactory;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.erachain.core.account.Account.BALANCE_POS_OWN;
 
 /**
- * Описание тут https://docs.google.com/document/d/1I0AscIkvACigv-aViHf3uNcc1LXXNm3dd4pNd-w-xfE/edit#heading=h.b6s2qmv4aszg
- * Это стейкинг с рефералкой, причем % растет от числа приглашенных и суммы на их счетах
+ * Это простой стейкинг для активов. Проценты начисляются как плательщику в момент передачи актива в собственность
+ * {"id":1012, "%":"7.5"} {"dApp":1012, "%":"7.5"}
+ * По умолчанию 10%
  */
-public class MoneyStaking extends EpochDAPPjson {
+public class MoneyStaking extends EpochDAppItemJson {
 
+    static Logger LOGGER = LoggerFactory.getLogger(MoneyStaking.class.getSimpleName());
 
-    // TODO увеличить комиисию с таких трнзакций - от периода стейка но не более? И используется ли подсчет рефералов?
     static public final int ID = 1012;
-    static public final String NAME = "Money Staking";
+    static public final String NAME = "Smart Staking";
     static public final boolean DISABLED = false;
-    static public final String SHORT = "Get reward by your deposit and by your Referrals";
-    static public final String DESC = "This is financial Decentralized Application (smart-contract). It give a Reward to You by your deposit and by your Referrals";
+    static public final String SHORT = "Get rewards or demerrage for your deposit on account";
+    static public final String DESC = "This is financial Decentralized Application (smart-contract). It give a Reward or Demerrage to You by your deposit";
 
-    // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
+    // Формальный счёт админа - он не имеет никакой силы и не исполняет команды
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     /**
      * Число блоков между последней обработкой и текущей - чтобы часто не пересчитывать и не спамить
      */
-    static final int SKIP_BLOCKS = BlockChain.TEST_MODE ? BlockChain.DEMO_MODE ? 100 : 1000 : 10;
+    static final int SKIP_SECONDS = BlockChain.TEST_MODE ? BlockChain.DEMO_MODE ? 30 : 5 : 86400;
 
     /**
-     * For calculate reward - amount of blocks in one year
+     * Коэффициент на 1 секунду для 1% в банковский год (360 дней)
      */
-    static final BigDecimal STAKE_PERIOD_MULTI = new BigDecimal(1.0d).divide(new BigDecimal(30.0d * 24.0d * 120.0d * 3600), 10, RoundingMode.HALF_DOWN);
+    static final BigDecimal STAKE_PERIOD_MULTI = BigDecimal.ONE.divide(new BigDecimal(360L * 86400L * 100L), 10, RoundingMode.HALF_DOWN);
 
-    static final String CALC_STAKE_KEY = "CALC_STAKE";
     /**
-     * Множитель доходности STAKE_MULTI[[Total Referals, Total referals Stake, Reward multiplier as a Percentage per year], ...] -
-     * "STAKE_MULTI":[[5, "150.0", "2.5"], [20, "1500", 5], [50, 15000, "7.5"]] - 3 уровня наград у каждого свой множитель награды, по числу приглашенных перефералов и общей сумме актива на их счетах. Рефералы учитываются только ваши личные (без подсчета в глубь)
-     * Если заданы уровни по рефералам то нагрузка больше - и комиссия тоже
+     * Постоянный множитель доходности annualPercentage - Reward multiplier as a Percentage per year. По умолчанию 10% годовых
+     * Пример: {"id":1012, "%":"2.5"} {"dApp":1012, "%":"7.5"}
      */
-    static final String STAKE_MULTI_BY_REFERALS_KEY = "STAKE_MULTI_BY_REFERALS";
-    static final String STAKE_MULTI_KEY = "STAKE_MULTI";
-    /**
-     * Сдвиг по модулю 2 дохода от процентам пользователю - какая доля идет в рефералку - сдвиг на 3 по умолчанию - это одна восьмая. Эта доля эмитируется контрактом вдобавок к доходу от процентов.
-     */
-    public static final String REFERRAL_SHARE_2_KEY = "REFERRAL_SHARE_2";
-    /**
-     * Максимальное число приглашенных, которое учитывается для расчета множителя доходности
-     */
-    public static final String MAX_REFERRALS_COUNT_KEY = "MAX_REFERRALS_COUNT";
-    /**
-     * Максимальная сумма актива на всех счетах приглашенных, которое учитывается для расчета множителя доходности
-     */
-    public static final String MAX_REFERRALS_STAKE_KEY = "MAX_REFERRALS_STAKE";
+    static final String STAKE_MULTI_KEY = "%";
+
+    BlockChain blockChain = Controller.getInstance().getBlockChain();
 
     public MoneyStaking() {
-        super(ID, MAKER, null, null);
+        super(ID, MAKER);
     }
 
-    public MoneyStaking(String dataStr, String status) {
-        super(ID, MAKER, dataStr, status);
+    private MoneyStaking(int itemType, long itemKey, String itemDescription, String dataStr, String status) {
+        super(ID, MAKER, itemType, itemKey, itemDescription, dataStr, status);
     }
 
-    public MoneyStaking(String dataStr, JSONObject values) {
-        super(ID, MAKER, dataStr, values, "");
+    private MoneyStaking(ItemCls item, String itemDescription, JSONObject itemPars, Transaction commandTx, Block block) {
+        super(ID, MAKER, item, itemDescription, itemPars, commandTx, block);
     }
 
     @Override
-    public MoneyStaking of(String dataStr, JSONObject values) {
-        return new MoneyStaking(dataStr, values);
+    public DApp of(String itemDescription, JSONObject jsonObject, ItemCls item, Transaction commandTx, Block block) {
+        if (commandTx instanceof TransferredBalances) {
+            if (commandTx instanceof HasDataString) {
+                String dataStr = ((HasDataString) commandTx).getDataString();
+                // TODO это в других контрактах можно использовать еще команды из самой транзакции
+            }
+            return new MoneyStaking(item, itemDescription, jsonObject, commandTx, block);
+        }
+
+        return new ErrorDApp("Wrong Transaction type: need 'TransferredBalances' - transfers of asset not found");
     }
 
-    public static MoneyStaking initInfo(HashMap<Account, Integer> stocks) {
-        MoneyStaking dapp = new MoneyStaking();
-        stocks.put(MAKER, ID);
-        return dapp;
+    public static void setDAppFactory() {
+        MoneyStaking instance = new MoneyStaking();
+        DAppFactory.STOCKS.put(MAKER, instance);
+        DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
     public String getName() {
@@ -109,387 +108,295 @@ public class MoneyStaking extends EpochDAPPjson {
     }
 
     /**
-     * Вычисляем множитель для награды от Рефералов и общего количества актива на руках у них
+     * Берем множитель для награды
      *
-     * @param referrals
      * @return
      */
-    private BigDecimal stakeMulti(Tuple2<Integer, BigDecimal> referrals) {
-
-        // Если задан постоянный множитель
-        if (values.containsKey(STAKE_MULTI_KEY))
-            return new BigDecimal(values.get(STAKE_MULTI_KEY).toString());
-
-        // определим множитель для пустой точки
-        if (referrals == null) {
-            return new BigDecimal(((JSONArray) values.get(STAKE_MULTI_BY_REFERALS_KEY)).get(0).toString());
-        }
-
-        // TODO
-        JSONArray stakesMulti = (JSONArray) values.get(STAKE_MULTI_BY_REFERALS_KEY);
-
-        stakesMulti.iterator();
-
-        return null;
+    protected BigDecimal stakeMulti() {
+        // Если задан постоянный множитель - в параметрах у Актива
+        if (itemPars.containsKey(STAKE_MULTI_KEY))
+            return new BigDecimal(itemPars.get(STAKE_MULTI_KEY).toString());
+        return BigDecimal.TEN;
 
     }
 
+    BigDecimal getReward(TransferBalanceDto transfer, Transaction commandTx) {
+        return null;
+    }
+
     /**
-     * point[height of withdraw, current reward, Timestamp of calculating rewards Block (ms), multi, total referrals and stakes]
-     *
-     * @param assetKey
-     * @param blockTimestamp
-     * @param height
+     * @param stateSubPoints содердит точки состония для данного счета или пару балансов для данного актива - для откатов
      * @param account
-     * @param stake
-     * @param point
-     * @return
+     * @param assetKey
+     * @param asset
+     * @param asSender
+     * @param sideAccount
      */
-    private Object[] makeNewPoint(RSend rSend, Long assetKey, Long blockTimestamp, Integer height,
-                                  Account account, BigDecimal stake, Object[] point) {
+    // TODO нужно начисление и снятие стаскивать с Владельца - и если не хватает тут то передавать на получателя демередж
+    // а если актив конечный - то надо общий баланс у владельца пересчитывать
+    // короче надо делать транзакцию со счета владельца - тогда учет будет автоматом
+    void makePointTransfer(List<Object[]> stateSubPoints, Account account, Long assetKey, AssetCls asset,
+                           boolean asSender, Account sideAccount) {
 
-        Object[] pointNew;
+        if (asset.getItemType() != itemType || asset.getKey() != itemKey)
+            return;
 
-        if (point == null) {
-            pointNew = new Object[]{height, BigDecimal.ZERO, blockTimestamp, stakeMulti(null), null};
-        } else if (blockTimestamp.equals(point[2])) {
-            // не пересчитываем - только множитель
-            pointNew = new Object[]{point[0], point[1], blockTimestamp, stakeMulti((Tuple2<Integer, BigDecimal>) point[4]), point[4]};
-        } else {
+        PublicKeyAccount assetMaker = asset.getMaker();
+        if (account.equals(assetMaker)) {
+            status += " Ignore " + (asSender ? " sender " : " recipient ") + account.getAddress() + " as Owner.";
+            return;
+        }
+
+        BigDecimal balanceOwnNew = account.getBalanceForPosition(asset.getKey(), BALANCE_POS_OWN).b;
+
+        Object[] point = (Object[]) valueGet(account.getAddress());
+        // NULL тоже заносим для стирания при откате. И баланс старый
+        stateSubPoints.add(new Object[]{account.getAddress(), point});
+
+        // Накопленный, время, Депозит
+        Object[] pointNew = new Object[]{BigDecimal.ZERO, blockTimestamp, balanceOwnNew};
+        try {
+            if (point == null) {
+                // него считать еще, просто запомним ниже новую точку
+                return;
+            }
+
+            if (blockTimestamp.equals(point[1])) {
+                // блок тот же что был, просто запомним ниже новую точку - ничего не считаем
+                pointNew[0] = point[0];
+                return;
+            }
+
+            // В точке находится предыдущий баланс (всего и остаток в позиции ИМЕЮ)
+            BigDecimal stake = (BigDecimal) point[2];
+            int stakeSignum = stake.signum();
+            if (stakeSignum == 0) {
+                return;
+            }
+
+            // Был какой-то баланс в предыдущей точке - начинаем считать
+            BigDecimal multi = stakeMulti();
+            int multiSignum = multi.signum();
             // расчет новой ожидающей награды у получателя и обновление даты для нового начала отсчета потом
-            BigDecimal pendingReward = (BigDecimal) point[1];
-            Long pendingRewardTimestamp = (Long) point[2];
-            BigDecimal rewardMulti = (BigDecimal) point[3];
-
-            BigDecimal reward = stake.multiply(new BigDecimal((blockTimestamp - pendingRewardTimestamp) / 1000)).multiply(rewardMulti)
-                    .multiply(STAKE_PERIOD_MULTI).setScale(rSend.getAsset().getScale(), RoundingMode.HALF_DOWN);
+            BigDecimal pendingReward = (BigDecimal) point[0];
+            Long pendingRewardTimestamp = (Long) point[1];
+            BigDecimal reward = stake.multiply(new BigDecimal((blockTimestamp - pendingRewardTimestamp) / 1000)).multiply(multi)
+                    .multiply(STAKE_PERIOD_MULTI);
+            reward = reward.setScale(asset.getScale() + 3,
+                    // так как добавили к точности 3, то полное округление без HALF_
+                    multiSignum > 0 ? RoundingMode.DOWN : RoundingMode.UP);
 
             BigDecimal pendingRewardNew = pendingReward.add(reward);
+            pointNew = new Object[]{pendingRewardNew, blockTimestamp, balanceOwnNew};
 
-            int ASSET_QUALITY = (Integer) values.get("ASSET_QUALITY");
-            if (ASSET_QUALITY > 0) {
-                BigDecimal totalLeft = MAKER.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                if (totalLeft.compareTo(pendingRewardNew) < 0) {
-                    pendingRewardNew = totalLeft;
-                }
+            // округлим теперь до точности актива
+            reward = pendingRewardNew.setScale(asset.getScale(),
+                    multiSignum > 0 ? RoundingMode.DOWN : RoundingMode.UP);
+            int rewardSignum = reward.signum();
+            if (rewardSignum == 0) {
+                return;
             }
 
-            pointNew = new Object[]{point[0], pendingRewardNew, blockTimestamp, stakeMulti((Tuple2<Integer, BigDecimal>) point[4]), point[4]};
-        }
+            BigDecimal rewardAbs;
+            if (multiSignum < 0) {
+                // снимем знак минуса - чтобы не влиял на Позиции Баланса
+                rewardAbs = reward.negate(); // ниже используется
+                // это Демерредж - надо проверить на остаток
+                if (balanceOwnNew.compareTo(rewardAbs) <= 0) {
+                    // сделаем перенос Демерреджа на получателя
+                    if (sideAccount == null) {
+                        // Поидее таких ситуаций не должно быть
+                        LOGGER.warn("Recipients is Null for demerrage sender with ZERO balance - seqNo: {} demerrage: {}",
+                                commandTx.viewHeightSeq(), rewardAbs.toPlainString());
+                        status += " Recipients is Null for demerrage sender with ZERO balance.";
+                        /// тогда продолжим расчеты ниже как обычно - без выхода тут
 
-        return pointNew;
-    }
+                    } else {
+                        BigDecimal diff = balanceOwnNew.add(reward);
+                        if (diff.signum() < 0) {
+                            // Перенос остатков с минусом которые на счет получателя платежа
+                            Object[] pointSideAccount = (Object[]) valueGet(sideAccount.getAddress());
+                            // Для Отката их запомним
+                            stateSubPoints.add(new Object[]{sideAccount.getAddress(), pointSideAccount});
+                            status += "transfer demerrage to aSide: " + diff.abs().toString();
+                            Object[] pointSideAccountNew;
+                            if (pointSideAccount == null) {
+                                pointSideAccountNew = new Object[]{diff, pointNew[1], BigDecimal.ZERO};
+                            } else {
+                                pointSideAccountNew = new Object[]{((BigDecimal) pointSideAccount[0]).add(diff), pointSideAccount[1], pointSideAccount[2]};
+                            }
+                            valuePut(sideAccount.getAddress(), pointSideAccountNew);
+                        }
 
-    /**
-     * how many referrals invite that person.
-     * Учитывает число приглашенных первого уровня и сумму актива на всех из счетах
-     *
-     * @param dcSet
-     * @param person
-     * @param calcStake
-     * @return
-     */
-    private Tuple2<Integer, BigDecimal> calcReferrals(DCSet dcSet, Long assetKey, PersonCls person, boolean calcStake) {
+                        pointNew[0] = BigDecimal.ZERO;
 
-        BigDecimal MAX_REFERRALS_STAKE = (BigDecimal) values.get(MAX_REFERRALS_STAKE_KEY);
-        int MAX_REFERRALS_COUNT = (Integer) values.getOrDefault(MAX_REFERRALS_COUNT_KEY, 100);
-        if (MAX_REFERRALS_COUNT > 100) MAX_REFERRALS_COUNT = 100;
+                        // Сперва запомним балансы для отката
+                        Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                        Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                        stateSubPoints.add(new Object[]{assetKey,
+                                assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
+                                account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
 
-        int count = 0;
-        BigDecimal totalStake = BigDecimal.ZERO;
-        boolean maxReached = false;
-
-        ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
-        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
-        PersonAddressMap personAddresses = dcSet.getPersonAddressMap();
-        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
-        try (IteratorCloseable<Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(person.getKey(), ItemCls.PERSON_TYPE, false)) {
-            Tuple3<Long, Byte, byte[]> key;
-            Long dbRef;
-            IssueItemRecord tx;
-            Long personKey;
-            TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses;
-            BigDecimal referralStake;
-            while (iterator.hasNext()) {
-                key = iterator.next();
-                dbRef = Longs.fromByteArray(issuesMap.get(key));
-                tx = (IssueItemRecord) txMap.get(dbRef);
-                if (tx.isWiped())
-                    continue;
-
-                personKey = tx.getKey();
-                addresses = personAddresses.getItems(personKey);
-                if (addresses == null || addresses.isEmpty())
-                    continue;
-
-                if (calcStake)
-                    for (String address : addresses.keySet()) {
-                        referralStake = balancesMap.get(crypto.getShortBytesFromAddress(address), assetKey).a.b;
-                        totalStake = totalStake.add(referralStake);
+                        // теперь снимем со счета отправителя все что у него осталось
+                        transfer(dcSet, block, commandTx, assetMaker, account, balanceOwnNew, assetKey, true, null, "Smart Stake demurrage");
+                        status += (asSender ? " Sender " : " Recipient ") + "demurrage " + balanceOwnNew.toPlainString() + ".";
+                        return; // выход - так как остатки уже перенесли
                     }
+                }
+            } else {
+                rewardAbs = reward; // ниже используется
+                // это Доход - надо проверить на перевод всей суммы - если ДА то доход тоже на получателя скинем
+                if (balanceOwnNew.compareTo(BigDecimal.ZERO) == 0) {
+                    // надо передать получателю весь доход
+                    if (sideAccount == null) {
+                        // Поидее таких ситуаций не должно быть
+                        LOGGER.warn("Recipients is Null for reward sender with ZERO balance - seqNo: {} reward: {}",
+                                commandTx.viewHeightSeq(), reward.toPlainString());
+                        status += " Recipients is Null for reward sender with ZERO balance.";
+                        /// тогда продолжим расчеты ниже как обычно - без выхода тут
 
-                count++;
-
-                if (count >= MAX_REFERRALS_COUNT && (MAX_REFERRALS_STAKE == null || totalStake.compareTo(MAX_REFERRALS_STAKE) >= 0)) {
-                    // MAX MULTI REACHED
-                    maxReached = true;
-                    break;
+                    } else {
+                        // Перенос всего Дохода на счет получателя платежа
+                        Object[] pointSideAccount = (Object[]) valueGet(sideAccount.getAddress());
+                        // Для Отката их запомним
+                        stateSubPoints.add(new Object[]{sideAccount.getAddress(), pointSideAccount});
+                        status += "transfer reward to aSide: " + pointNew[0].toString();
+                        Object[] pointSideAccountNew;
+                        if (pointSideAccount == null) {
+                            pointSideAccountNew = new Object[]{pointNew[0], pointNew[1], BigDecimal.ZERO};
+                        } else {
+                            pointSideAccountNew = new Object[]{((BigDecimal) pointSideAccount[0]).add((BigDecimal) pointNew[0]), pointSideAccount[1], pointSideAccount[2]};
+                        }
+                        valuePut(sideAccount.getAddress(), pointSideAccountNew);
+                        pointNew[0] = BigDecimal.ZERO;
+                        pointNew[2] = BigDecimal.ZERO;
+                        return; // выход - так как остатки уже перенесли
+                    }
                 }
             }
-        } catch (IOException e) {
-            Long error = null;
-            error++;
-        }
 
-        if (maxReached)
-            status += " Referrals count: >=" + MAX_REFERRALS_COUNT + (MAX_REFERRALS_STAKE == null ? "" : ", stake: >=" + MAX_REFERRALS_STAKE.toPlainString()) + ".";
-        else
-            status += " Referrals count: " + count + ", stake: " + totalStake.toPlainString() + ".";
+            ////////////////////// Сюда дошло - обычная передача актива без крайних состояний баланса
 
-        return new Tuple2<>(count, totalStake);
+            long lastTimeAction = (Long) point[1];
+            if ((blockTimestamp - lastTimeAction) / 1000 >= SKIP_SECONDS) {
+                // Выплату сделать
+                // Сперва запомним балансы для отката
+                Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                stateSubPoints.add(new Object[]{assetKey,
+                        assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
+                        account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
 
-    }
+                if (multiSignum > 0) {
+                    // прибавим
+                    transfer(dcSet, block, commandTx, assetMaker, account, rewardAbs, assetKey, false, null, "Smart Stake reward");
+                    // запишем в сообщение
+                    status += (asSender ? " Sender " : " Recipient ") + "reward " + rewardAbs.toPlainString() + ".";
+                } else {
+                    // вычтем - демерредж с отрицательным %%
+                    transfer(dcSet, block, commandTx, assetMaker, account, rewardAbs, assetKey, true, null, "Smart Stake demurrage");
+                    // запишем в сообщение
+                    status += (asSender ? " Sender " : " Recipient ") + "demurrage " + rewardAbs.toPlainString() + ".";
+                }
 
-    private static void processReferralLevel(int MAX_LEVEL, DCSet dcSet, int level, BigInteger referralGift, Account invitedAccount,
-                                             long invitedPersonKey, boolean asOrphan,
-                                             long royaltyAssetKey, int royaltyAssetScale,
-                                             List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
+                // reset pending reward
+                pointNew[0] = BigDecimal.ZERO;
+                status += " Withdraw.";
+            } else {
+                status += " Pending.";
+            }
 
-        if (referralGift.signum() <= 0)
             return;
 
-        String messageLevel;
-
-        // CREATOR is PERSON
-        // FIND person
-        Account issuerAccount = PersonCls.getIssuer(dcSet, invitedPersonKey);
-        Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(dcSet);
-        long issuerPersonKey;
-        if (issuerPersonDuration == null) {
-            // в тестовой сети возможно что каждый создает с неудостоверенного
-            issuerPersonKey = -1;
-        } else {
-            issuerPersonKey = issuerPersonDuration.a;
+        } finally {
+            // STORE NEW POINT
+            valuePut(account.getAddress(), pointNew);
         }
-
-        if (issuerPersonKey < 0 // это возможно только для первой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
-                || issuerPersonKey == invitedPersonKey // зацикливание - это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
-                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
-        ) {
-            // break loop
-            BigDecimal giftBG = new BigDecimal(referralGift, royaltyAssetScale);
-            invitedAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
-                    giftBG, false, false, false);
-
-            if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " top level";
-                txCalculated.add(new RCalculated(invitedAccount, royaltyAssetKey, giftBG,
-                        messageLevel, 0L, dbRef));
-
-            }
-            return;
-        }
-
-        // IS INVITER ALIVE ???
-        PersonCls issuer = (PersonCls) dcSet.getItemPersonMap().get(issuerPersonKey);
-        if (!issuer.isAlive(timestamp)) {
-            // SKIP this LEVEL for DEAD persons
-            processReferralLevel(MAX_LEVEL, dcSet, level, referralGift, issuerAccount, issuerPersonKey, asOrphan,
-                    royaltyAssetKey, royaltyAssetScale,
-                    txCalculated, message, dbRef, timestamp);
-            return;
-        }
-
-        int directLevel = MAX_LEVEL - level;
-
-        if (level > 1) {
-
-            BigInteger giftNext = referralGift.shiftRight(1);
-
-            BigDecimal giftBG = new BigDecimal(referralGift.subtract(giftNext), royaltyAssetScale);
-            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey, giftBG,
-                    false, false, false);
-
-            if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
-                txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
-                        messageLevel, 0L, dbRef));
-            }
-
-            if (giftNext.signum() > 0) {
-                processReferralLevel(MAX_LEVEL, dcSet, --level, giftNext, issuerAccount, issuerPersonKey, asOrphan,
-                        royaltyAssetKey, royaltyAssetScale,
-                        txCalculated, message, dbRef, timestamp);
-            }
-
-        } else {
-            // this is END LEVEL
-            // GET REST of GIFT
-            BigDecimal giftBG = new BigDecimal(referralGift, royaltyAssetScale);
-            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
-                    new BigDecimal(referralGift, royaltyAssetScale), false, false, false);
-
-            if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
-                txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
-                        messageLevel, 0L, dbRef));
-            }
-        }
-    }
-
-    private static Long processReferral(DCSet dcSet, int level, int REFERRAL_SHARE_2, BigDecimal stakeReward, Account creator, boolean asOrphan,
-                                        AssetCls royaltyAsset,
-                                        Block block,
-                                        String message, long dbRef, long timestamp) {
-
-        if (stakeReward.signum() <= 0)
-            return null;
-
-        BigInteger referralGift = stakeReward.setScale(royaltyAsset.getScale(), BigDecimal.ROUND_DOWN).unscaledValue().shiftRight(REFERRAL_SHARE_2);
-        if (referralGift.signum() <= 0)
-            return null;
-
-        List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
-        long royaltyAssetKey = royaltyAsset.getKey();
-        int royaltyAssetScale = royaltyAsset.getScale();
-
-        Fun.Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
-        if (personDuration == null
-                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
-
-            // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
-            royaltyAsset.getMaker().changeBalance(dcSet, !asOrphan, false, royaltyAssetKey,
-                    new BigDecimal(referralGift, royaltyAssetScale), false, false, true);
-
-            return null;
-        }
-
-        processReferralLevel(level, dcSet, level, referralGift, creator, personDuration.a, asOrphan,
-                royaltyAssetKey, royaltyAssetScale,
-                txCalculated, message, dbRef, timestamp);
-
-        return personDuration.a;
-
     }
 
     ///////// COMMANDS
-    private boolean job(DCSet dcSet, Block block, RSend rSend, boolean asOrphan) {
+    // Может несколько платежей обработать - список списков
 
-        int REFERRAL_SHARE_2 = (Integer) values.getOrDefault(REFERRAL_SHARE_2_KEY, 3);
-        boolean calcStake = (Boolean) values.getOrDefault(CALC_STAKE_KEY, Boolean.FALSE);
-        JSONArray levelsMilti = (JSONArray) values.get(STAKE_MULTI_BY_REFERALS_KEY);
-        int REFERRAL_LEVEL_DEEP = levelsMilti.size();
-
-        PublicKeyAccount sender = rSend.getCreator();
-        String senderAddress = sender.getAddress();
-
-        Account recipient = rSend.getRecipient();
-        String recipientAddress = recipient.getAddress();
+    /**
+     * Для восстановления состояния при откатах - запоминаем готовые значения предыдущие.
+     * Состояние = Счет, Точка вычисления, Баланс. Тогда очень просто восстанавливать при откате.
+     * Если значение Точка или Баланс = НУЛЬ - значит удалить
+     *
+     * @param asOrphan
+     * @return
+     */
+    private boolean job(boolean asOrphan) {
 
         if (asOrphan) {
-            Object[] state = removeState(dcSet, rSend.getDBRef());
+            Object[][][] statePoints = (Object[][][]) removeState(commandTx.getDBRef());
+            Object[][] stateSubPoints;
+            Object[] stateSubPoint;
+            ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+            Long assetKey;
+            byte[] shortAddress;
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance;
+            // Разворачиваем в обратном порядке
+            for (int ii = statePoints.length - 1; ii >= 0; ii--) {
+                stateSubPoints = statePoints[ii];
+                // Разворачиваем в обратном порядке
+                for (int kk = stateSubPoints.length - 1; kk >= 0; kk--) {
+                    stateSubPoint = stateSubPoints[kk];
+                    if (stateSubPoint[0] instanceof String) {
+                        // это просто точка состояния для счета
+                        if (stateSubPoint[1] == null)
+                            valuesDelete((String) stateSubPoint[0]);
+                        else
+                            valuePut((String) stateSubPoint[0], stateSubPoint[1]);
+                    } else {
+                        // это балансы для 2-х счетов так как была выплата
+                        assetKey = (Long) stateSubPoint[0];
+                        shortAddress = (byte[]) stateSubPoint[1];
+                        balance = map.get(shortAddress, assetKey);
+                        map.put(shortAddress, assetKey,
+                                Account.makeBalanceOWN(balance, (Object[]) stateSubPoint[2]));
+                        shortAddress = (byte[]) stateSubPoint[3];
+                        balance = map.get(shortAddress, assetKey);
+                        map.put(shortAddress, assetKey,
+                                Account.makeBalanceOWN(balance, (Object[]) stateSubPoint[4]));
 
-            // RESTORE OLD POINT
-            valuePut(dcSet, senderAddress, state[0]);
-
-            // RESTORE OLD POINT
-            valuePut(dcSet, recipientAddress, state[1]);
-
-            BigDecimal stakeReward = (BigDecimal) state[2];
-            if (stakeReward != null && stakeReward.signum() > 0) {
-                transfer(dcSet, block, rSend, stock, sender, stakeReward, rSend.getAssetKey(), true, null, null);
-
-                // ORPHAN REFERRALS
-                AssetCls asset = rSend.getAsset();
-                processReferral(dcSet, REFERRAL_LEVEL_DEEP, REFERRAL_SHARE_2, stakeReward, sender, asOrphan,
-                        asset, null, null, rSend.getDBRef(), rSend.getTimestamp());
-
+                    }
+                }
             }
 
         } else {
 
             status = "";
+            TransferBalanceDto[] transfers = ((TransferredBalances) commandTx).getTransfers();
+            if (transfers == null || transfers.length == 0)
+                return false;
 
-            Long assetKey = rSend.getAssetKey();
-            Long blockTimestamp = block.getTimestamp();
-            Integer height = rSend.getBlockHeight();
+            Object[][][] statePoints = new Object[transfers.length][][];
+            int i = 0;
+            for (TransferBalanceDto transfer : transfers) {
+                if (transfer.getPosition() != BALANCE_POS_OWN)
+                    continue;
 
-            BigDecimal stakeReward;
+                Account sender = transfer.getSender();
+                AssetCls asset = transfer.getAsset();
+                Long assetKey = asset.getKey();
+                TransferRecipientDto[] transferRecipients = transfer.getRecipients();
 
-            Object[] recipientPoint;
-            if (recipient.equals(rSend.getAsset().getMaker())) {
-                recipientPoint = null;
-                status += " Ignore recipient sender.";
+                List<Object[]> stateSubPoints = new ArrayList<>();
+                makePointTransfer(stateSubPoints, sender, assetKey, asset, true,
+                        transferRecipients.length == 0 ? null : transferRecipients[0].getAccount());
 
-            } else {
-                /////////// RECIPIENT REWARDS
-                BigDecimal stake = recipient.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                recipientPoint = (Object[]) valueGet(dcSet, recipientAddress);
+                for (TransferRecipientDto transferRecipient : transferRecipients) {
+                    if (transferRecipient.getBalancePos() != BALANCE_POS_OWN)
+                        continue;
 
-                Object[] pointNew = makeNewPoint(rSend, assetKey, blockTimestamp, height, recipient, stake, recipientPoint);
-                status += " Receiver reward: " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
-
-                // STORE NEW POINT
-                valuePut(dcSet, recipientAddress, pointNew);
-            }
-
-            Object[] senderPoint;
-
-            if (sender.equals(rSend.getAsset().getMaker())) {
-                senderPoint = null;
-                stakeReward = null;
-                status += " Ignore admin sender.";
-
-            } else {
-                /////////// SENDER REWARDS
-                BigDecimal stake = sender.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                senderPoint = (Object[]) valueGet(dcSet, senderAddress);
-
-                Object[] pointNew = makeNewPoint(rSend, assetKey, blockTimestamp, height, sender, stake, senderPoint);
-                status += " Sender reward " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
-
-                int lastHeightAction = (Integer) pointNew[0];
-                if (height - lastHeightAction >= SKIP_BLOCKS) {
-                    stakeReward = (BigDecimal) pointNew[1];
-                    transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, "REFI Stake reward");
-
-                    // PROCESS REFERRALS
-                    AssetCls asset = rSend.getAsset();
-                    Long personKey = processReferral(dcSet, REFERRAL_LEVEL_DEEP, REFERRAL_SHARE_2, stakeReward, sender, asOrphan,
-                            asset, block,
-                            "REFI referral bonus " + "@" + rSend.viewHeightSeq(),
-                            rSend.getDBRef(), rSend.getTimestamp());
-
-                    // CALC new REFERRALS COUNT
-                    if (personKey != null) {
-                        PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(personKey);
-                        if (person.isAlive(block == null ? rSend.getTimestamp() : block.getTimestamp()) // block may be NULL on test unconfirmed
-                        ) {
-                            // Нет рефеларных множителей - пропустим подсчет сумм по рефералке
-                            Tuple2<Integer, BigDecimal> referrals = values.containsKey(STAKE_MULTI_KEY) ? new Tuple2(null, null) : calcReferrals(dcSet, assetKey, person, calcStake);
-                            BigDecimal newMulti = stakeMulti(referrals);
-                            status += " New Multi: " + newMulti.toPlainString() + ".";
-                            pointNew[3] = newMulti;
-                            pointNew[4] = referrals;
-                        }
-                    }
-
-                    // reset pending reward
-                    pointNew[0] = height;
-                    pointNew[1] = BigDecimal.ZERO;
-                    status += " Withdraw.";
-                } else {
-                    stakeReward = null;
+                    makePointTransfer(stateSubPoints, transferRecipient.getAccount(), assetKey, asset, false, sender);
                 }
 
-
-                // STORE NEW POINT
-                valuePut(dcSet, senderAddress, pointNew);
-
+                statePoints[i++] = (Object[][]) stateSubPoints.toArray(new Object[stateSubPoints.size()][]);
             }
 
             // STORE STATE for ORPHAN
-            putState(dcSet, rSend.getDBRef(), new Object[]{senderPoint, recipientPoint, stakeReward});
+            putState(commandTx.getDBRef(), statePoints);
 
         }
 
@@ -498,27 +405,27 @@ public class MoneyStaking extends EpochDAPPjson {
     }
 
     @Override
-    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+    public boolean processByTime() {
         fail("unknown command");
         return false;
     }
 
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction commandTX) {
-        return job(dcSet, block, (RSend) commandTX, false);
+    public boolean process() {
+        if (block == null) {
+            // Это еще неподтвержденная - нечего исполнять или не Послать
+            return true;
+        }
+        return job(false);
     }
 
     @Override
-    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
+    public void orphanByTime() {
     }
 
     @Override
-    public void orphanBody(DCSet dcSet, Transaction commandTX) {
-        job(dcSet, null, (RSend) commandTX, true);
-    }
-
-    public static MoneyStaking make(RSend txSend, String dataStr) {
-        return new MoneyStaking(dataStr, "");
+    public void orphanBody() {
+        job(true);
     }
 
     /// PARSE / TOBYTES
@@ -530,14 +437,8 @@ public class MoneyStaking extends EpochDAPPjson {
 
         String data;
         String status;
+        String itemDesc;
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
-            int dataSize = Ints.fromByteArray(dataSizeBytes);
-            pos += 4;
-            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
-            pos += dataSize;
-            data = new String(dataBytes, StandardCharsets.UTF_8);
-
             byte[] statusSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
             pos += 4;
@@ -545,16 +446,37 @@ public class MoneyStaking extends EpochDAPPjson {
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
 
+            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
+            int dataSize = Ints.fromByteArray(dataSizeBytes);
+            pos += 4;
+            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
+            pos += dataSize;
+            data = new String(dataBytes, StandardCharsets.UTF_8);
         } else {
             data = "";
             status = "";
         }
 
-        return new MoneyStaking(data, status);
-    }
+        byte[] itemTypeBytes = Arrays.copyOfRange(bytes, pos, pos + 2);
+        int itemType = Shorts.fromByteArray(itemTypeBytes);
+        pos += 2;
 
-    public String getCommandInfo(String command, String format) {
-        return format;
+        byte[] itemKeyBytes = Arrays.copyOfRange(bytes, pos, pos + 8);
+        long itemKey = Longs.fromByteArray(itemKeyBytes);
+        pos += 8;
+
+        if (forDeal == Transaction.FOR_DB_RECORD) {
+            byte[] itemDescSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
+            int itemDescLen = Ints.fromByteArray(itemDescSizeBytes);
+            pos += 4;
+            byte[] itemDescBytes = Arrays.copyOfRange(bytes, pos, pos + itemDescLen);
+            pos += itemDescLen;
+            itemDesc = new String(itemDescBytes, StandardCharsets.UTF_8);
+        } else {
+            itemDesc = "";
+        }
+
+        return new MoneyStaking(itemType, itemKey, itemDesc, data, status);
     }
 
 }

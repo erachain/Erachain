@@ -4,7 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
+import org.erachain.dapp.DApp;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
@@ -12,20 +12,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * Для отображения ошибок распознания DAPP
+ * Для отображения ошибок распознания DApp
  */
-public class ErrorDAPP extends EpochDAPP {
+public class ErrorDApp extends DApp {
 
     static public final int ID = 6;
-    static public final String NAME = "Errors DAPP";
-    static public final String SHORT = "Errors DAPP";
+    static public final String NAME = "Errors DApp";
+    static public final String SHORT = "Errors DApp";
     static public final String DESC = "Used for error messages";
 
     private String message;
 
-    public ErrorDAPP(String message) {
+    public ErrorDApp(String message) {
         super(ID);
         this.message = message;
+    }
+
+    @Override
+    public DApp of(Transaction commandTx, Block block) {
+        throw new RuntimeException("Wrong OF(...)");
     }
 
     public String getName() {
@@ -41,7 +46,7 @@ public class ErrorDAPP extends EpochDAPP {
     }
 
     public String getHTML(JSONObject langObj) {
-        return Lang.T("DAPP error", langObj) + ": <b>" + message + "</b>";
+        return Lang.T("DApp error", langObj) + ": <b>" + message + "</b>";
     }
 
     /// PARSE / TOBYTES
@@ -79,7 +84,7 @@ public class ErrorDAPP extends EpochDAPP {
 
     }
 
-    public static ErrorDAPP Parse(byte[] bytes, int pos, int forDeal) {
+    public static ErrorDApp Parse(byte[] bytes, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
@@ -96,16 +101,16 @@ public class ErrorDAPP extends EpochDAPP {
             message = "";
         }
 
-        return new ErrorDAPP(message);
+        return new ErrorDApp(message);
     }
 
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction transaction) {
+    public boolean process() {
         return false;
     }
 
     @Override
-    public void orphan(DCSet dcSet, Transaction commandTX) {
+    public void orphan() {
     }
 
 }

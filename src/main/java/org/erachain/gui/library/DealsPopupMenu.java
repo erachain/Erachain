@@ -29,6 +29,9 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_BANK_GUARANTEE;
+import static org.erachain.core.item.assets.AssetTypes.AS_BANK_GUARANTEE_TOTAL;
+
 public class DealsPopupMenu extends JPopupMenu {
 
     protected Logger logger;
@@ -508,7 +511,7 @@ public class DealsPopupMenu extends JPopupMenu {
         // SET by this ASSET TYPE etc
         switch (this.asset.getAssetType()) {
 
-            case AssetCls.AS_BANK_GUARANTEE:
+            case AS_BANK_GUARANTEE:
 
                 balance = creator.getBalance(asset.getKey());
                 if (balance.a.b.signum() > 0) {
@@ -535,7 +538,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
-            case AssetCls.AS_BANK_GUARANTEE_TOTAL:
+            case AS_BANK_GUARANTEE_TOTAL:
 
                 balance = creator.getBalance(asset.getKey());
                 if (creator.equals(asset.getMaker()) || balance.a.b.signum() > 0) {

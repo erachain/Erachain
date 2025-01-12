@@ -10,7 +10,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Test;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_OUTSIDE_OTHER_CLAIM;
 import static org.junit.Assert.assertEquals;
 
 
@@ -39,7 +40,7 @@ public class TestRecSendOutsideClaims {
     byte prop2 = 0;
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
@@ -96,7 +97,7 @@ public class TestRecSendOutsideClaims {
         recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
         recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
+        assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 
         // set SCALABLE assets ++
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);

@@ -10,15 +10,14 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.EpochDAPPjson;
-import org.erachain.datachain.DCSet;
+import org.erachain.core.transaction.TransferredBalances;
+import org.erachain.dapp.DApp;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Игра в рулетку. Смарт-контракт ожидает случайное число из будущего - по подписи блока через 3 от блока в который попала ваша транзакция со ставкой на игру.
@@ -36,7 +35,7 @@ import java.util.HashMap;
  * Результат розыгрыша виден в самой транзакции - в блокэксплорере (сканере блоков).
  * Найти все выигрыши можно если в сканере (блокэксплорере) в разделе Транзакции сделать поиск по размеру выигрыша, например: x77
  */
-public class OddEvenDAPP extends EpochDAPPjson {
+public class OddEvenDApp extends EpochDAppJson {
 
     int WAIT_RAND = 3;
 
@@ -46,7 +45,7 @@ public class OddEvenDAPP extends EpochDAPPjson {
     static public final String SHORT = "Roulette game \"Odd-Even\"";
     static public final String DESC = "Игра в рулетку. Смарт-контракт ожидает случайное число из будущего - по подписи блока через 3 от блока в который попала ваша транзакция со ставкой на игру.";
 
-    // DAPP ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
+    // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     static public final BigDecimal MIN_BET_ERA = new BigDecimal("1");
@@ -56,30 +55,33 @@ public class OddEvenDAPP extends EpochDAPPjson {
     static public final BigDecimal BINGO_MULTI = new BigDecimal("77");
     static public final BigDecimal MAJOR_MULTI = new BigDecimal("12");
 
-    public OddEvenDAPP() {
-        super(ID, MAKER, null, null);
+    private OddEvenDApp() {
+        super(ID, MAKER);
     }
 
-    public OddEvenDAPP(String dataStr, String status) {
+    public OddEvenDApp(String dataStr, String status) {
         super(ID, MAKER, dataStr, status);
     }
 
-    public OddEvenDAPP(String dataStr, JSONObject values) {
-        super(ID, MAKER, dataStr, values, "");
+    public OddEvenDApp(String dataStr, Transaction commandTx, Block block) {
+        super(ID, MAKER, dataStr, "", commandTx, block);
     }
 
     @Override
-    public EpochDAPPjson of(String dataStr, JSONObject values) {
-        return new OddEvenDAPP(dataStr, values);
+    public DApp of(String dataStr, Transaction commandTx, Block block) {
+        if (commandTx instanceof TransferredBalances)
+            return new OddEvenDApp(dataStr, commandTx, block);
+
+        return new ErrorDApp("Wrong Transaction type: need 'TransferredBalances' - transfers of asset not found");
     }
 
-    public static OddEvenDAPP initInfo(HashMap<Account, Integer> stocks) {
-        OddEvenDAPP dapp = new OddEvenDAPP();
-        dapp.accountsInfo.add(new Pair<>(MAKER, new String[]{"0", "1", "2"}));
-        for (Pair<PublicKeyAccount, ?> pair : dapp.accountsInfo) {
-            stocks.put(pair.getA(), ID);
+    public static void setDAppFactory() {
+        OddEvenDApp instance = new OddEvenDApp();
+        instance.accountsInfo.add(new Pair<>(MAKER, new String[]{"0", "1", "2"}));
+        for (Pair<PublicKeyAccount, ?> pair : instance.accountsInfo) {
+            DAppFactory.STOCKS.put(pair.getA(), instance);
         }
-        return dapp;
+        DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
     public String getName() {
@@ -87,38 +89,34 @@ public class OddEvenDAPP extends EpochDAPPjson {
     }
 
     public boolean isDisabled() {
-        return true;//DISABLED;
-    }
-
-    public static OddEvenDAPP make(String data) {
-        return new OddEvenDAPP(data, "");
+        return DISABLED;
     }
 
     @Override
-    public boolean isValid(DCSet dcSet, Transaction transaction) {
+    public boolean isValid() {
 
-        RSend commandTX = (RSend) transaction;
+        RSend rSend = (RSend) commandTx;
         if (false) {
             return false;
-        } else if (commandTX.hasPacket()) {
+        } else if (rSend.hasPacket()) {
             fail("Wrong amount. Packet not accepted");
             return false;
-        } else if (!commandTX.hasAmount()) {
+        } else if (!rSend.hasAmount()) {
             fail("Empty amount.");
             return false;
-        } else if (commandTX.getAssetKey() != AssetCls.FEE_KEY && commandTX.getAssetKey() != AssetCls.ERA_KEY) {
+        } else if (rSend.getAssetKey() != AssetCls.FEE_KEY && rSend.getAssetKey() != AssetCls.ERA_KEY) {
             fail("Wrong asset. Use only " + AssetCls.FEE_NAME + " or " + AssetCls.ERA_NAME);
             return false;
-        } else if (commandTX.getAssetKey() == AssetCls.FEE_KEY && commandTX.getAmount().compareTo(MIN_BET_COMPU) < 0) {
+        } else if (rSend.getAssetKey() == AssetCls.FEE_KEY && rSend.getAmount().compareTo(MIN_BET_COMPU) < 0) {
             fail("Wrong amount. Need >= " + MIN_BET_COMPU.toPlainString());
             return false;
-        } else if (commandTX.getAssetKey() == AssetCls.ERA_KEY && commandTX.getAmount().compareTo(MIN_BET_ERA) < 0) {
+        } else if (rSend.getAssetKey() == AssetCls.ERA_KEY && rSend.getAmount().compareTo(MIN_BET_ERA) < 0) {
             fail("Wrong amount. Need >= " + MIN_BET_ERA.toPlainString());
             return false;
-        } else if (commandTX.isBackward()) {
+        } else if (rSend.isBackward()) {
             fail("Wrong direction - backward");
             return false;
-        } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
+        } else if (rSend.balancePosition() != Account.BALANCE_POS_OWN) {
             fail("Wrong balance position. Need OWN[1]");
             return false;
         } else if (command == null || !command.equals("0") && !command.equals("1") && !command.equals("2")) {
@@ -131,7 +129,7 @@ public class OddEvenDAPP extends EpochDAPPjson {
 
     /// PARSE / TOBYTES
 
-    public static OddEvenDAPP Parse(byte[] bytes, int pos, int forDeal) {
+    public static OddEvenDApp Parse(byte[] bytes, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
@@ -158,7 +156,7 @@ public class OddEvenDAPP extends EpochDAPPjson {
             status = "";
         }
 
-        return new OddEvenDAPP(data, status);
+        return new OddEvenDApp(data, status);
     }
 
     ///////// COMMANDS
@@ -197,17 +195,15 @@ public class OddEvenDAPP extends EpochDAPPjson {
     }
 
     /**
-     * @param dcSet
-     * @param rSend
      * @param asOrphan
      */
-    private boolean catchWin(DCSet dcSet, Block block, RSend rSend, boolean asOrphan) {
+    private boolean catchWin(boolean asOrphan) {
         // рождение выигрыша
 
-        PublicKeyAccount creator = rSend.getCreator();
+        PublicKeyAccount creator = commandTx.getCreator();
 
-        int choice = Integer.parseInt(rSend.getTitle());
-        BigDecimal bet = rSend.getAmount();
+        int choice = commandTx.getTitle() == null || commandTx.getTitle().isEmpty() ? 0 : Integer.parseInt(commandTx.getTitle());
+        BigDecimal bet = commandTx.getAmount();
         BigDecimal win = null;
         String tag = null;
 
@@ -232,7 +228,7 @@ public class OddEvenDAPP extends EpochDAPPjson {
 
         if (win != null) {
             // TRANSFER ASSET
-            transfer(dcSet, block, rSend, stock, creator, win, rSend.getAssetKey(), asOrphan, null, "WIN " + tag + " by DAPP: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj");
+            transfer(dcSet, block, commandTx, stock, creator, win, commandTx.getAssetKey(), asOrphan, null, "WIN " + tag + " by DApp: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj");
         }
 
 
@@ -251,40 +247,40 @@ public class OddEvenDAPP extends EpochDAPPjson {
     }
 
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction transaction) {
+    public boolean process() {
 
-        if (!isValid(dcSet, transaction))
+        if (!isValid())
             return true;
 
-        if (transaction instanceof RSend) {
+        if (commandTx instanceof RSend) {
             if (
                 // это не проверка вне блока - в ней блока нет
                     block != null) {
                 // рождение комет
-                dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                dcSet.getTimeTXWaitMap().put(commandTx.getDBRef(), block.heightBlock + WAIT_RAND);
                 status = "wait";
                 return false;
             }
         }
 
-        fail("unknown command");
+        fail("Wrong Transaction type: need 'RSend'");
         return false;
 
     }
 
     @Override
-    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
-        return catchWin(dcSet, block, (RSend) transaction, false);
+    public boolean processByTime() {
+        return catchWin(false);
     }
 
     @Override
-    public void orphanBody(DCSet dcSet, Transaction transaction) {
-        dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
+    public void orphanBody() {
+        dcSet.getTimeTXWaitMap().remove(commandTx.getDBRef());
     }
 
     @Override
-    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
-        catchWin(dcSet, block, (RSend) transaction, true);
+    public void orphanByTime() {
+        catchWin(true);
     }
 
 }
