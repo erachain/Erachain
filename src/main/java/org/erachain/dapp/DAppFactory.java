@@ -46,22 +46,19 @@ public abstract class DAppFactory {
         OddEvenDApp.setDAppFactory();
         DAPP_BY_POPULARITY.put(2000, DAPP_BY_ID.get(OddEvenDApp.ID));
 
-        if (!BlockChain.MAIN_MODE) {
-            MoneyStaking.setDAppFactory();
-            DAPP_BY_POPULARITY.put(100, DAPP_BY_ID.get(MoneyStaking.ID));
+        MoneyStaking.setDAppFactory();
+        DAPP_BY_POPULARITY.put(100, DAPP_BY_ID.get(MoneyStaking.ID));
 
-            // Пример
-            if (false) {
-                // пока не будем показывать
-                MoneyStakingReferal.setDAppFactory();
-                DAPP_BY_POPULARITY.put(1000, DAPP_BY_ID.get(MoneyStakingReferal.ID));
-            }
-
-            ShibaVerseDApp.setDAppFactory();
-            MemoCardsDApp.setDAppFactory();
-            DogePlanet.setDAppFactory();
-
+        // Пример
+        if (false) {
+            // пока не будем показывать
+            MoneyStakingReferal.setDAppFactory();
+            DAPP_BY_POPULARITY.put(1000, DAPP_BY_ID.get(MoneyStakingReferal.ID));
         }
+
+        ShibaVerseDApp.setDAppFactory();
+        MemoCardsDApp.setDAppFactory();
+        DogePlanet.setDAppFactory();
 
     }
 
