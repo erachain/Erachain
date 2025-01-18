@@ -2402,7 +2402,7 @@ public class BlockExplorer {
             }
 
         } else {
-            JSONObject listBuId = new JSONObject();
+            TreeMap<String, JSONObject> listBuId = new TreeMap<>();
             // bots list
             listBuId.put("BOT.5", ErachainStorageBot.getInfoShort(langObj));
 
