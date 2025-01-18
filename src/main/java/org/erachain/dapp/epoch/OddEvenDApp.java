@@ -41,9 +41,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-    static public final boolean DISABLED = BlockChain.MAIN_MODE;
-    static public final String SHORT = "Roulette game \"Odd-Even\"";
-    static public final String DESC = "Игра в рулетку. Смарт-контракт ожидает случайное число из будущего - по подписи блока через 3 от блока в который попала ваша транзакция со ставкой на игру.";
+    static public final boolean DISABLED = false;
 
     // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -84,10 +82,12 @@ public class OddEvenDApp extends EpochDAppJson {
         DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
+    @Override
     public String getName() {
         return NAME;
     }
 
+    @Override
     public boolean isDisabled() {
         return DISABLED;
     }
