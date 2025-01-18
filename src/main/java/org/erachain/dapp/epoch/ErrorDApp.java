@@ -18,8 +18,6 @@ public class ErrorDApp extends DApp {
 
     static public final int ID = 6;
     static public final String NAME = "Errors DApp";
-    static public final String SHORT = "Errors DApp";
-    static public final String DESC = "Used for error messages";
 
     private String message;
 
@@ -33,6 +31,7 @@ public class ErrorDApp extends DApp {
         throw new RuntimeException("Wrong OF(...)");
     }
 
+    @Override
     public String getName() {
         return NAME;
     }
@@ -41,6 +40,7 @@ public class ErrorDApp extends DApp {
         return message;
     }
 
+    @Override
     public boolean isDisabled() {
         return false;
     }

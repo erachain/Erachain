@@ -43,8 +43,6 @@ public class MoneyStakingReferal extends EpochDAppItemJson {
     static public final int ID = 1022;
     static public final String NAME = "Staking REFI";
     static public final boolean DISABLED = true;
-    static public final String SHORT = "Get smart rewards by your deposit and by your Referrals";
-    static public final String DESC = "This is financial Decentralized Application (smart-contract). It give a Reward to You by your deposit and by your Referrals";
 
     // Формальный счёт админа - он не имеет никакой силы и не исполняет команды
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -123,10 +121,12 @@ public class MoneyStakingReferal extends EpochDAppItemJson {
         DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
+    @Override
     public String getName() {
         return NAME;
     }
 
+    @Override
     public boolean isDisabled() {
         return DISABLED;
     }

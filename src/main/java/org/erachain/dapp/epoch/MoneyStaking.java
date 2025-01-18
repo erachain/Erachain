@@ -44,8 +44,6 @@ public class MoneyStaking extends EpochDAppItemJson {
     static public final int ID = 1012;
     static public final String NAME = "Smart Staking";
     static public final boolean DISABLED = false;
-    static public final String SHORT = "Get rewards or demerrage for your deposit on account";
-    static public final String DESC = "This is financial Decentralized Application (smart-contract). It give a Reward or Demerrage to You by your deposit";
 
     // Формальный счёт админа - он не имеет никакой силы и не исполняет команды
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -99,10 +97,12 @@ public class MoneyStaking extends EpochDAppItemJson {
         DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
+    @Override
     public String getName() {
         return NAME;
     }
 
+    @Override
     public boolean isDisabled() {
         return DISABLED;
     }

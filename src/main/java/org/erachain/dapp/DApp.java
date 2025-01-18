@@ -211,8 +211,6 @@ public abstract class DApp {
                 return ShibaVerseDApp.Parse(data, position, forDeal);
             case MemoCardsDApp.ID:
                 return MemoCardsDApp.Parse(data, position, forDeal);
-            case Refi.ID:
-                return Refi.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);

@@ -34,8 +34,6 @@ public class LeafFall extends EpochDApp {
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     static public final String NAME = "Magic Leaf";
     static public final boolean DISABLED = BlockChain.MAIN_MODE;
-    static public final String SHORT = "Награды для тех кто торгует на бирже";
-    static public final String DESC = "Награды для тех кто торгует на бирже";
 
     // global values - save in smart-contracts maps
     private int count;
@@ -81,10 +79,12 @@ public class LeafFall extends EpochDApp {
         DAppFactory.DAPP_BY_ID.put(ID, new LeafFall());
     }
 
+    @Override
     public String getName() {
         return NAME;
     }
 
+    @Override
     public boolean isDisabled() {
         return DISABLED;
     }
