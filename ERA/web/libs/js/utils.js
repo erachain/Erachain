@@ -1,35 +1,35 @@
 // select view format 
 function preFormat(text){
 
-if (text == null || text.length == 0) return "";
-text = text.toString();
-if (text.length <5) return text;
+    if (text == null || text.length == 0) return "";
+    text = text.toString();
+    if (text.length <5) return text;
 
-var pref1 = text.substring(0,1);
-var pref2 = text.substring(1,2);
+    var pref1 = text.substring(0,1);
+    var pref2 = text.substring(1,2);
 
-if (pref1 =="<"){
-// return HTML
-if (pref2 =="\n"){
-return text.substring(2);
-}
-return text;
-} else if (pref1=="#"){
-// return MarkDown
-if (pref2=="\n"){
-// return MarkDown
-return marked(text.substring(2));
-}
-return marked(text);
-}
+    if (pref1 =="<"){
+        // return HTML
+        if (pref2 =="\n" || pref2 =="\r"){
+            return text.substring(2);
+        }
+        return text;
+    } else if (pref1=="#"){
+        // return MarkDown
+        if (pref2=="\n" || pref2 =="\r"){
+            // return MarkDown
+            return marked(text.substring(2));
+        }
+        return marked(text);
+    }
 
-//  return plain text
-return htmlFilter(wordwrap(text, 0, '\n', true));
+    //  return plain text
+    return htmlFilter(wordwrap(text, 0, '\n', true));
 
 }
 
 function fformat(text_in) {
-    if (text_in === null || !(text_in instanceof String))
+    if (text_in === null || !(typeof text_in === "string"))
             return text_in;
 
     if (text_in.startsWith('@TGM{')) {
@@ -83,13 +83,13 @@ const map = {
 };
 
 function escapeHtml(text) {
-    if (text !== null && text instanceof String)
+    if (text !== null && typeof text === "string")
         return text.replace(/[&<>"'`\n=/]/g, function(m) { return map[m]; });
     return text;
 }
 
 function cut(string, max) {
-    if (string === null || !(string instanceof String))
+    if (string === null || !(typeof string === "string"))
         return string;
 
     if (string.length > max)
