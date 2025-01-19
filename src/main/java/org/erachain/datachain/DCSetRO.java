@@ -14,6 +14,7 @@ import java.io.IOError;
 public class DCSetRO extends DCSet {
 
     private BlocksMapImpl blockMap;
+    // Нужно для размера - height
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
 
@@ -26,7 +27,7 @@ public class DCSetRO extends DCSet {
                     , this, database);
 
             this.blockSignsMap = new BlockSignsMap(this, database);
-            this.blocksHeadsMap = new BlocksHeadsMap(this, database);
+            //this.blocksHeadsMap = new BlocksHeadsMap(this, database);
 
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
@@ -52,6 +53,7 @@ public class DCSetRO extends DCSet {
     @Override
     public BlockSignsMap getBlockSignsMap() {
         return this.blockSignsMap;
+        //throw new RuntimeException("not implemented");
     }
 
     /**
@@ -63,7 +65,8 @@ public class DCSetRO extends DCSet {
      */
     @Override
     public BlocksHeadsMap getBlocksHeadsMap() {
-        return this.blocksHeadsMap;
+        //return this.blocksHeadsMap;
+        throw new RuntimeException("not implemented");
     }
 
     @Override
