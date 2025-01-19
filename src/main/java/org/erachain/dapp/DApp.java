@@ -74,17 +74,27 @@ public abstract class DApp {
         out.put("type", "DApp");
         out.put("name", Lang.T(key + "NAME", langObj));
         out.put("short", Lang.T(key + "SHORT", langObj));
-        if (isDisabled())
+        if (isDisabled(height))
             out.put("disabled", Lang.T("Disabled in this Chain", langObj));
 
         return out;
+    }
+
+    public JSONObject getInfo(JSONObject langObj, int height) {
+        this.height = height;
+        return getInfo(langObj);
     }
 
     public Object[][] getItemsKeys() {
         return new Object[0][0];
     }
 
-    public boolean isDisabled() {
+    /**
+     * Можно использовать даже если в нем еще не задана породившая его транзакция
+     * @param height
+     * @return
+     */
+    public boolean isDisabled(int height) {
         return true;
     }
 

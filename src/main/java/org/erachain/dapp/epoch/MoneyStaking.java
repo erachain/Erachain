@@ -103,7 +103,7 @@ public class MoneyStaking extends EpochDAppItemJson {
     }
 
     @Override
-    public boolean isDisabled() {
+    public boolean isDisabled(int height) {
         return DISABLED;
     }
 

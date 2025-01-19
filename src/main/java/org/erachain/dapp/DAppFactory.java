@@ -175,7 +175,7 @@ public abstract class DAppFactory {
             }
         }
 
-        if (dAppInfo == null || dAppInfo.isDisabled())
+        if (dAppInfo == null || dAppInfo.isDisabled(commandTx.getBlockHeight()))
             return null;
 
         return dAppInfo.of(commandTx, block);
