@@ -41,7 +41,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-    static public final boolean DISABLED = false;
+    static public final int DISABLED_BEFORE = 5899999;
 
     // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -87,9 +87,12 @@ public class OddEvenDApp extends EpochDAppJson {
         return NAME;
     }
 
+
     @Override
-    public boolean isDisabled() {
-        return DISABLED;
+    public boolean isDisabled(int height) {
+        if (BlockChain.MAIN_MODE)
+            return DISABLED_BEFORE > height;
+        return false;
     }
 
     @Override

@@ -92,7 +92,7 @@ public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTim
         DApp dAppInfo = DAppFactory.DAPP_BY_ID.get(dAppID);
         if (dAppInfo == null)
             return new ErrorDApp("DApp not found for ID: " + dAppID);
-        if (dAppInfo.isDisabled())
+        if (dAppInfo.isDisabled(commandTx.getBlockHeight()))
             return new ErrorDApp("DApp is disabled");
         if (!(dAppInfo instanceof EpochDAppItemJson))
             return new ErrorDApp("DApp with that ID is not EpochDAppJson class");

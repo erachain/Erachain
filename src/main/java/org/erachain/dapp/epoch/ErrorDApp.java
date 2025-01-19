@@ -41,7 +41,7 @@ public class ErrorDApp extends DApp {
     }
 
     @Override
-    public boolean isDisabled() {
+    public boolean isDisabled(int height) {
         return false;
     }
 

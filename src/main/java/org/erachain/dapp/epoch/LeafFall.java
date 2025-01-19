@@ -85,7 +85,7 @@ public class LeafFall extends EpochDApp {
     }
 
     @Override
-    public boolean isDisabled() {
+    public boolean isDisabled(int height) {
         return DISABLED;
     }
 
