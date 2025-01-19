@@ -3,6 +3,7 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Setter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -21,7 +22,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
@@ -85,6 +86,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     // FACE
     protected int version;
     protected PublicKeyAccount creator;
+    @Setter
     protected byte[] signature;
     protected int transactionCount;
     //protected long timestamp;
@@ -1499,7 +1501,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
+            long timestampEnd = this.getTimestamp();
 
             // RESET forging Info Updates
             this.forgingInfoUpdate = null;
@@ -1519,7 +1521,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             makeHoldRoyalty(dcSetPlace, false);
-            DAPP.processByBlock(dcSetPlace, this, false);
+            DApp.processByBlock(dcSetPlace, this, false);
 
             this.getTransactions();
 
@@ -1667,7 +1669,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     //SET PARENT
                     //REMOVE FROM UNCONFIRMED DATABASE
                     processTimingLocal = System.nanoTime();
-                    if (txMemPool != null)
+                    if (txMemPool != null && !dcSetPlace.isFork())
                         txMemPool.offerMessage(transactionSignature);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
@@ -2316,7 +2318,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
-            throw new Exception("on stoping");
+            throw new Exception("on stopping");
 
         long timerStart;
         long start = System.currentTimeMillis();
@@ -2343,7 +2345,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         makeHoldRoyalty(dcSet, false);
-        DAPP.processByBlock(dcSet, this, false);
+        DApp.processByBlock(dcSet, this, false);
 
         this.getTransactions();
 
@@ -2450,7 +2452,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     /**
-     * Обязательно надо это вызвать после того как удалили все Вычисленные транзакции - так как иначе удалени активов тут вызовет крах в них
+     * Обязательно надо это вызвать после того как удалили все Вычисленные транзакции - так как иначе удаление активов тут вызовет крах в них
      *
      * @param dcSet
      */
@@ -2462,9 +2464,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
         Transaction tx;
         Tuple2<Integer, Long> key;
-        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeDoneMap.getTXIterator(true)) {
-            while (iteraator.hasNext()) {
-                key = iteraator.next();
+        try (IteratorCloseable<Tuple2<Integer, Long>> iterator = timeDoneMap.getTXIterator(true)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
                 // reversed pair - key = <Block, dbRef>
                 if (key.a < heightBlock)
                     break;
@@ -2531,7 +2533,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         //PROCESS ASSETS FEE - after orphanTransactions! - так как тут они будут вычислены
         assetsFeeProcess(dcSet, true);
 
-        DAPP.processByBlock(dcSet, this, true);
+        DApp.processByBlock(dcSet, this, true);
         makeHoldRoyalty(dcSet, true);
 
         if (this.forgingInfoUpdate != null) {
@@ -2595,7 +2597,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         Controller cnt = Controller.getInstance();
 
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
-        TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+        TransactionFinalMapSigns transFinalMapSins = dcSet.getTransactionFinalMapSigns();
         TransactionsPool pool = Controller.getInstance().transactionsPool;
 
         boolean calculatedBefore = true;
@@ -2627,13 +2629,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                         transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
                     }
 
-                    transFinalMapSinds.delete(transaction.getSignature());
+                    transFinalMapSins.delete(transaction.getSignature());
 
                     // Обязательно надо делать иначе некоторые транзакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.delete(itemSignature);
+                            transFinalMapSins.delete(itemSignature);
                         }
                     }
 

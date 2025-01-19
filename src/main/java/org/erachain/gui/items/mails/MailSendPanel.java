@@ -14,7 +14,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
@@ -695,7 +695,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             exLink = new ExLinkAppendix(linkRef);
         }
 
-        DAPP dapp = null;
+        DApp dapp = null;
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(creator, exLink, dapp, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);

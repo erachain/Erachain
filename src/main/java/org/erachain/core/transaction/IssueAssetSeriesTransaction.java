@@ -12,7 +12,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONObject;
@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
 
 /**
  * Здесь item - это Шаблон - в ней данные по обертки (если задан Оригинал) или активов, а все остальное а Оригинале.
@@ -238,9 +240,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             linkTo = null;
         }
 
-        DAPP dapp;
+        DApp dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;
@@ -368,7 +370,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
                 return ITEM_ASSET_NOT_EXIST;
             }
 
-            if (origAsset.getAssetType() != AssetCls.AS_NON_FUNGIBLE) {
+            if (origAsset.getAssetType() != AS_NON_FUNGIBLE) {
                 errorValue = "original not NFT";
                 return INVALID_ASSET_TYPE;
             }

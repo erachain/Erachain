@@ -23,7 +23,7 @@ public final class NTP {
             updateOffSet();
             lastUpdate = System.currentTimeMillis();
 
-            if (offset != 0l) {
+            if (offset != 0L) {
                 //LOG OFFSET
                 LOGGER.info(Lang.T("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
             }

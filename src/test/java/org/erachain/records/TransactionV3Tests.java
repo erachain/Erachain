@@ -12,7 +12,7 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransactionV3;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Ignore;
@@ -42,7 +42,7 @@ public class TransactionV3Tests {
     long timestamp = NTP.getTime();
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;

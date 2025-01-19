@@ -15,6 +15,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
+
 /**
  * @author Саша
  */
@@ -35,7 +37,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         quantityJLabel.setText(Lang.T("Series Size") + ":");
         // всегда NFT - для правильного выбора Роялти по умолчанию
-        assetTypeJComboBox.setSelectedItem(new AssetType(AssetCls.AS_NON_FUNGIBLE));
+        assetTypeJComboBox.setSelectedItem(new AssetType(AS_NON_FUNGIBLE));
 
         initComponents();
 
@@ -88,7 +90,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
     protected boolean checkValues() {
 
-        assetType = AssetCls.AS_NON_FUNGIBLE;
+        assetType = AS_NON_FUNGIBLE;
 
         if (hasOriginal.isSelected()) {
             AssetCls asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();

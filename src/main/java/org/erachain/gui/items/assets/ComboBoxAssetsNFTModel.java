@@ -5,6 +5,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
+
 @SuppressWarnings("serial")
 public class ComboBoxAssetsNFTModel extends ComboBoxAssetsModel {
 
@@ -28,7 +30,7 @@ public class ComboBoxAssetsNFTModel extends ComboBoxAssetsModel {
 
     @Override
     public boolean filter(ItemCls item) {
-        return item != null && ((AssetCls) item).getAssetType() == AssetCls.AS_NON_FUNGIBLE && !(item instanceof AssetUniqueSeriesCopy);
+        return item != null && ((AssetCls) item).getAssetType() == AS_NON_FUNGIBLE && !(item instanceof AssetUniqueSeriesCopy);
     }
 
 }

@@ -13,7 +13,9 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.dapp.DAPP;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalUtil;
@@ -31,15 +33,17 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static org.erachain.core.item.assets.AssetTypes.*;
+
 /**
 
-## typeBytes
-0 - record type
-1 - record version
-2 - property 1
-3 = property 2
+ ## typeBytes
+ 0 - record type
+ 1 - record version
+ 2 - property 1
+ 3 = property 2
 
-## version 0
+ ## version 0
  // typeBytes[2] = -128 if NO AMOUNT (NO_AMOUNT_MASK)
  // typeBytes[3] = -128 if NO DATA
 
@@ -61,14 +65,14 @@ typeBytes[3].7 = -128 if NO DATA - check sign
  typeBytes[2].7 = -128 if NO AMOUNT - check sign (NO_AMOUNT_MASK)
  typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
 
-#### PROPERTY 2
-typeBytes[3].7 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
-typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
+ #### PROPERTY 2
+ typeBytes[3].7 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
+ typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
 
  Transaction.FLAGS = 1 (USE_PACKET_MASK) - use PACET instead single Amount+AssetKey
  */
 
-public abstract class TransactionAmount extends Transaction implements Itemable{
+public abstract class TransactionAmount extends Transaction implements Itemable, TransferredBalances {
     public static final byte[][] VALID_REC = new byte[][]{
     };
 
@@ -144,6 +148,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     // + 1 to len for memo
     protected static final int PACKET_ROW_LENGTH = KEY_LENGTH + 5 * (1 + AMOUNT_LENGTH) + 1;
     protected static final int PACKET_ROW_MEMO_NO = 6;
+    public static final int PACKET_ROW_ASSET_NO = 7;
 
     /**
      * see Account.BALANCE_POS_OWN etc. BACKWARD < 0. Used in case PACKET
@@ -151,7 +156,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected int balancePos;
 
     // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DApp dapp, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, long flags) {
         super(typeBytes, name, creator, exLink, dapp, feePow, timestamp, flags);
         this.recipient = recipient;
@@ -187,7 +192,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * @param timestamp
      * @param extFlags
      */
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DApp dapp, byte feePow, Account recipient,
                                 int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long extFlags) {
         super(typeBytes, name, creator, exLink, dapp, feePow, timestamp, extFlags);
         this.recipient = recipient;
@@ -966,9 +971,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // VALIDATE by ASSET TYPE
                         switch (assetType) {
                             // HOLD GOODS, CHECK myself DEBT for CLAIMS
-                            case AssetCls.AS_INSIDE_OTHER_CLAIM:
+                            case AS_INSIDE_OTHER_CLAIM:
                                 break;
-                            case AssetCls.AS_ACCOUNTING:
+                            case AS_ACCOUNTING:
                                 //if (actionType == ACTION_SEND && absKey >= 1000 && !creator.equals(asset.getOwner())) {
                                 //    return INVALID_CREATOR;
                                 //}
@@ -1020,8 +1025,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                 // CLAIMS DEBT - only for OWNER except BILL
                                 if (asset.isOutsideType()
-                                        && assetType != AssetCls.AS_OUTSIDE_BILL
-                                        && assetType != AssetCls.AS_OUTSIDE_BILL_EX) {
+                                        && assetType != AS_OUTSIDE_BILL
+                                        && assetType != AS_OUTSIDE_BILL_EX) {
                                     if (!recipient.equals(asset.getMaker())) {
                                         return new Fun.Tuple2<>(INVALID_CLAIM_DEBT_RECIPIENT, "recipient != asset maker");
                                     } else if (creator.equals(asset.getMaker())) {
@@ -1724,6 +1729,51 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     }
 
+    /**
+     * см. как делается в processBody
+     *
+     * @return
+     */
+    @Override
+    public TransferBalanceDto[] getTransfers() {
+        if (hasPacket()) {
+
+            boolean backward = isBackward();
+            BigDecimal assetFeeRow;
+            BigDecimal amountRow;
+            Long assetKeyRow;
+            Fun.Tuple2<Integer, Integer> signs;
+            // ROW:
+            // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
+
+            Object[] row;
+            TransferBalanceDto[] transfers = new TransferBalanceDto[packet.length];
+            for (int i = 0; i < packet.length; i++) {
+                row = packet[i];
+                // see core.exdata.exActions.ExFilteredPays.makeFilterPayList
+                signs = Account.getSignsForBalancePos(balancePos);
+                amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();
+
+                TransferRecipientDto[] recipients = new TransferRecipientDto[]{new TransferRecipientDto(recipient, amountRow,
+                        // у пакетов тут Позиция
+                        balancePos)};
+                transfers[i] = new TransferBalanceDto(creator, asset, balancePos, backward, recipients);
+            }
+            return transfers;
+
+        } else if (hasAmount()) {
+            boolean isDirect = asset.isDirectBalances();
+            int balancePosition = Account.balancePosition(key, amount, isBackward(), isDirect);
+            TransferRecipientDto[] recipients = new TransferRecipientDto[]{new TransferRecipientDto(recipient, amount,
+                    // у одиночных ут вычисляется
+                    balancePosition)};
+            return new TransferBalanceDto[]{
+                    new TransferBalanceDto(creator, asset, balancePosition, isBackward(), recipients)};
+        }
+
+        return null;
+    }
+
     @Override
     public void processBody(Block block, int forDeal) {
 
@@ -1860,13 +1910,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
         
         if (this.amount != null) {
-            
+
             assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-            
+
             assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
             assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
         }
-        
+
         return assetAmount;
     }
 

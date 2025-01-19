@@ -22,6 +22,7 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
     protected final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("NOT_TRANSFERABLE"));
     protected final JCheckBox isAnonimDenied = new JCheckBox(Lang.T("ANONIM_OWN_DENIED"));
+    protected final JCheckBox isForDApp = new JCheckBox(Lang.T("FOR_DAPP"));
     protected MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
 
     protected JTextPane textAreasAssetTypeDescription;
@@ -54,6 +55,10 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(isAnonimDenied, fieldGBC);
 
+        isForDApp.setToolTipText(Lang.T("IssueAssetPanel.isForDApp.tip"));
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(isForDApp, fieldGBC);
+
         fieldGBC.gridy = gridy++;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -77,7 +82,7 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
                 !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
                 !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
                 tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(),
-                isUnTransferable.isSelected(), isAnonimDenied.isSelected());
+                isUnTransferable.isSelected(), isAnonimDenied.isSelected(), isForDApp.isSelected());
 
     }
 

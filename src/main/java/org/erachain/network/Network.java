@@ -1,5 +1,6 @@
 package org.erachain.network;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * основной класс модуля Сети
  */
+@Slf4j
 public class Network extends Observable {
 
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
@@ -708,7 +710,7 @@ public class Network extends Observable {
                     break;
                 case Message.WIN_BLOCK_TYPE:
                     // может быть это повтор?
-                    exclude = (HashSet<Peer>)this.handledWinBlockMessages.get(message.getHandledID());
+                    exclude = (HashSet<Peer>) this.handledWinBlockMessages.get(message.getHandledID());
                     break;
                 default:
                     exclude = null;
@@ -717,8 +719,8 @@ public class Network extends Observable {
             exclude = null;
         }
 
-        //if (exclude != null && !exclude.isEmpty())
-        //    logger.debug(message + " exclude: " + exclude.size());
+        if (exclude != null && !exclude.isEmpty() && logger.isDebugEnabled())
+            logger.debug("Exclude {} from peers, list size: {}", message, exclude.size());
 
         for (Peer peer : this.knownPeers) {
 

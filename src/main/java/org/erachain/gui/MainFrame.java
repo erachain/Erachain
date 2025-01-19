@@ -309,6 +309,7 @@ public class MainFrame extends JFrame implements Observer {
                     try {
                         transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
                         if (transaction != null) {
+                            transaction.setDC(Controller.getInstance().getDCSet());
                             WebTransactionsHTML webHTML = new WebTransactionsHTML(DCSet.getInstance(), Lang.getInstance().getLangForNode());
                             JSONObject outJson = webHTML.get_HTML_Body(transaction, "");
                             String htmlDescr = (String) outJson.get("head");

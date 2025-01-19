@@ -126,6 +126,10 @@ public class Trade {
         return dcSet.getTransactionFinalMap().get(this.initiator);
     }
 
+    public Transaction getTargetTX(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.target);
+    }
+
     public long getTarget() {
         return this.target;
     }

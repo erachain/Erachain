@@ -12,6 +12,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
@@ -466,6 +468,45 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         return Transaction.VALIDATE_OK;
     }
 
+    /**
+     * см. processBody
+     *
+     * @param creator
+     * @return
+     */
+    @Override
+    public TransferBalanceDto[] getTransfers(Account creator) {
+
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+
+        // сбросим направление от фильтра
+        BigDecimal actionPayAmount = amount.abs();
+        // зададим направление от Действия нашего
+        actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+        boolean isAmountNegate = amount.signum() < 0;
+        boolean backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+
+        Account recipient;
+        TransferBalanceDto[] transfers = new TransferBalanceDto[addresses.length];
+        for (int i = 0; i < addresses.length; i++) {
+            recipient = new Account(addresses[i]);
+            if (recipient == null)
+                break; // ??
+
+            //if (creator.equals(recipient))
+            //    // пропустим себя в любом случае
+            //    continue;
+
+            transfers[i] = new TransferBalanceDto(creator, asset, balancePos, backwardAction,
+                    new TransferRecipientDto[]{new TransferRecipientDto(recipient, actionPayAmount, balancePos)});
+        }
+
+        return transfers;
+    }
+
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {
         PublicKeyAccount creator = rNote.getCreator();
 
@@ -543,5 +584,4 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         }
         return false;
     }
-
 }

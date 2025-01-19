@@ -714,7 +714,7 @@ public class DCSet extends DBASet implements Closeable {
 
                 if (n == JOptionPane.YES_OPTION) {
                     Controller.getInstance().reBuildChain = true;
-                    Controller.getInstance().reBuilChain();
+                    Controller.getInstance().reBuilChainCopy();
                 }
 
                 if (n == JOptionPane.YES_OPTION || n == JOptionPane.NO_OPTION) {

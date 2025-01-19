@@ -43,9 +43,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.*;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -65,10 +66,13 @@ import org.erachain.webserver.WebService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
+import org.mapdb.HTreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,10 +80,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -103,8 +104,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.4.11";
-    public static String buildTime = "2024-12-08 12:00:00 UTC";
+    public static String version = "6.5.03";
+    public static String buildTime = "2025-01-19 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -661,7 +662,7 @@ public class Controller extends Observable {
         }
 
         if (reBuildChain && !Settings.simpleTestNet) {
-            reBuilChain();
+            reBuilChainCopy();
         }
 
         if (dcSet == null) {
@@ -1032,10 +1033,10 @@ public class Controller extends Observable {
         return this.dlSet;
     }
 
-    public void reBuilChain() {
+    public void reBuilChainCopy() {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
-        LOGGER.warn("\n\nStart rebuilding the chain database\n");
+        LOGGER.warn("Start rebuilding the chain database\n");
 
         File dataDir = new File(Settings.getInstance().getDataChainPath());
         File dataBackDir = new File(dataDir.getPath() + "TMP");
@@ -1048,6 +1049,34 @@ public class Controller extends Observable {
             } else {
                 try {
                     FileUtils.moveDirectory(dataDir, dataBackDir);
+
+                    if (false) {
+                        File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
+                        LOGGER.warn("Open backup {}", dataBackFile.getName());
+                        DCSet dcSetBackUp = new DCSet(dataBackFile, false, false, false, DCSet.DBS_MAP_DB);
+                        dcSetBackUp.getDatabase().getAll().forEach((key, elem) -> {
+                            if (!key.equals("blocks") && !key.equals("height") && !key.equals("blocks_heads")) {
+                                if (elem instanceof HTreeMap) {
+                                    //((HTreeMap)elem).clear(); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
+                                    //dcSetBackUp.getDatabase().delete(key); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
+                                    // не пашет dcSetBackUp.getDatabase().catPut(key, dcSetBackUp.getDatabase().createHashMap(key));
+                                    // не пашет dcSetBackUp.getDatabase().namedPut(key, dcSetBackUp.getDatabase().createTreeMap(key));
+                                } else if (elem instanceof BTreeMap) {
+                                    //((BTreeMap)elem).clear(); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
+                                    //dcSetBackUp.getDatabase().delete(key); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
+                                    // не пашетdcSetBackUp.getDatabase().catPut(key, dcSetBackUp.getDatabase().createHashMap(key));
+                                    // не пашет dcSetBackUp.getDatabase().namedPut(key, dcSetBackUp.getDatabase().createTreeMap(key));
+                                }
+                            }
+                        });
+                        LOGGER.warn("Try commit {}", dataBackFile.getName());
+                        dcSetBackUp.database.commit();
+                        LOGGER.warn("Try compact {}", dataBackFile.getName());
+                        dcSetBackUp.database.compact();
+                        LOGGER.warn("Try close {}", dataBackFile.getName());
+                        dcSetBackUp.close();
+                    }
+
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     System.exit(-11);
@@ -1068,19 +1097,19 @@ public class Controller extends Observable {
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database. Please do not turn off the program!!"));
-        LOGGER.warn("\n\nStart rebuilding the chain database. Please do not turn off the program!!\n");
+        LOGGER.warn("Start rebuilding the chain database. Please do not turn off the program!!\n");
 
         // OPEN BACKUP CHaIN
-        // на UNIX тут очень большая задержка и файл начинает расти - трнзакционный больше данных в несколько раз!!
-        LOGGER.warn("\n\nOpen backup {}", dataBackFile.getName());
+        // на UNIX тут очень большая задержка и файл начинает расти - транзакционный больше данных в несколько раз!!
+        LOGGER.warn("Open backup {}", dataBackFile.getName());
         DCSetRO dcSetBackUp = new DCSetRO(dataBackFile, databaseSystem);
 
-        LOGGER.warn("\n\nCheck backup BlockMap");
+        LOGGER.warn("Check backup BlockMap");
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
         BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
         // Размер определяется по getBlockSignsMap!
         int startHeight = blocksMap.size() + 1;
-        LOGGER.warn("\n\nnew BlockMap size: {}", startHeight);
+        LOGGER.warn("new BlockMap size: {}", startHeight);
         if (startHeight > 2) {
             LOGGER.info("Restart rebuild chain from block " + startHeight);
         }
@@ -2271,7 +2300,7 @@ public class Controller extends Observable {
                         }
                     }
 
-                    // сохранимся - хотя может и заря - раньше то работало и так
+                    // сохранимся - хотя может и зря - раньше то работало и так
                     // по размеру файла смотрим - если уже большой то сольем
                     // хотя все равно при каждом ново поиске 300 блоков приостанавливается синхра
                     File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
@@ -3780,7 +3809,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DAPP dApp, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DApp dApp, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3900,7 +3929,7 @@ public class Controller extends Observable {
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
@@ -3910,7 +3939,7 @@ public class Controller extends Observable {
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, int actionPackage, Object[][] assetsPackage, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {

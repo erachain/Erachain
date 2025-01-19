@@ -30,16 +30,16 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * <hr>
  * Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
  * см. typeKey и recipientKey. Они используются для API RPC block explorer.
- * Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
+ * Нужно ограничивать размер выдаваемого списка чтобы не перегружать ноду.
  * <br>
  * Так же вторичный индекс по времени, который используется в ГУИ TIMESTAMP_INDEX = 0 (default)
- * - он оргнизыется внутри DCMap в списке индексов для сортировок в ГУИ
- *
+ * - он организуется внутри DCMap в списке индексов для сортировок в ГУИ
+ * <p>
  * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
  *
- *  <hr>
- *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
- *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
+ * <hr>
+ * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работает, а почему в Ордерах не работало?
+ * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 @Slf4j
 public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
@@ -124,13 +124,13 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
+     *
      * @param timestamp
-     * @param cutMaximum - образать список только по максимальному размеру, инаяе образать список и по времени протухания
+     * @param cutMaximum - обрезать список только по максимальному размеру, иначе обрезать список и по времени протухания
      */
     protected long pointClear;
     public int clearByDeadTimeAndLimit(long keepTime, boolean cutMaximum) {
 
-        // займем просецц или установим флаг
         if (isClearProcessedAndSet())
             return 0;
 
@@ -154,7 +154,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
                     tickerIter = System.currentTimeMillis() - tickerIter;
                     if (tickerIter > 10) {
-                        LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+                        LOGGER.debug("TAKE ITERATOR: {} ms", tickerIter);
                     }
 
                     Transaction transaction;
@@ -162,8 +162,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     tickerIter = System.currentTimeMillis();
                     long size = this.map.size();
                     tickerIter = System.currentTimeMillis() - tickerIter;
-                    if (tickerIter > 10) {
-                        LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+                    if (tickerIter > 10 && logger.isDebugEnabled()) {
+                        LOGGER.debug("TAKE ITERATOR.SIZE: {} ms", tickerIter);
                     }
                     while (iterator.hasNext()) {
                         Long key = iterator.next();
@@ -191,7 +191,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
                 long ticker = System.currentTimeMillis() - realTime;
                 if (ticker > 100 || deletions > 0) {
-                    LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
+                    LOGGER.info("------ CLEAR DEAD UTXs: {} ms, for deleted: {}", ticker, deletions);
                 }
 
                 return deletions;
