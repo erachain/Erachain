@@ -1,6 +1,7 @@
 package org.erachain.database;
 // 30/03 ++
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.dbs.DBTab;
@@ -17,6 +18,7 @@ abstract public class DBASet implements IDB {
 
     protected File DATA_FILE;
     public DB database;
+    @Getter
     protected List<DBTab> tables = new ArrayList<>();
 
     protected int uses;

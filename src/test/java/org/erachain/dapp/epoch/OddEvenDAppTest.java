@@ -17,6 +17,13 @@ public class OddEvenDAppTest extends TestCase {
     }
 
     @Test
+    public void testIsDisabled() {
+        OddEvenDApp contract = new OddEvenDApp("1", "wait");
+        assertEquals(contract.isDisabled(OddEvenDApp.DISABLED_BEFORE - 1), true);
+        assertEquals(contract.isDisabled(OddEvenDApp.DISABLED_BEFORE + 1), false);
+    }
+
+    @Test
     public void testParse() {
 
         OddEvenDApp contract = new OddEvenDApp("1", "wait");

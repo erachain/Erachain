@@ -90,9 +90,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
     @Override
     public boolean isDisabled(int height) {
-        if (BlockChain.MAIN_MODE)
-            return DISABLED_BEFORE > height;
-        return false;
+        return BlockChain.MAIN_MODE && DISABLED_BEFORE > height;
     }
 
     @Override
