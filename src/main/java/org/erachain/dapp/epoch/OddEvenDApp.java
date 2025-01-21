@@ -41,7 +41,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-    static public final int DISABLED_BEFORE = 5899999;
+    static public final int DISABLED_BEFORE = 5910000;
 
     // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -99,6 +99,9 @@ public class OddEvenDApp extends EpochDAppJson {
         RSend rSend = (RSend) commandTx;
         if (false) {
             return false;
+        } else if (rSend.isEncrypted()) {
+            fail("Wrong command. Text is encrypted!!!");
+            return false;
         } else if (rSend.hasPacket()) {
             fail("Wrong amount. Packet not accepted");
             return false;
@@ -121,7 +124,7 @@ public class OddEvenDApp extends EpochDAppJson {
             fail("Wrong balance position. Need OWN[1]");
             return false;
         } else if (command == null || !command.equals("0") && !command.equals("1") && !command.equals("2")) {
-            fail("Wrong choice. Need set only one digit: 0, 1 or 2 in transaction Title");
+            fail("Wrong choice. Need set only one digit: 0, 1 or 2 in transaction Text (not encrypted!!!)");
             return false;
         }
 
@@ -203,7 +206,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
         PublicKeyAccount creator = commandTx.getCreator();
 
-        int choice = commandTx.getTitle() == null || commandTx.getTitle().isEmpty() ? 0 : Integer.parseInt(commandTx.getTitle());
+        int choice = Integer.parseInt(command);
         BigDecimal bet = commandTx.getAmount();
         BigDecimal win = null;
         String tag = null;
