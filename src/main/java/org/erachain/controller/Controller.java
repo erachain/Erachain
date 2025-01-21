@@ -46,7 +46,6 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.dapp.DApp;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.*;
-import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -67,7 +66,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.BTreeMap;
-import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -80,7 +78,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -104,7 +105,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.5.03";
+    public static String version = "6.5.04";
     public static String buildTime = "2025-01-19 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
