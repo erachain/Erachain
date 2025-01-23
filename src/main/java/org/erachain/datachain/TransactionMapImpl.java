@@ -5,6 +5,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
@@ -14,6 +15,7 @@ import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -69,15 +71,19 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public void openMap()
     {
         if (parent == null) {
-            switch (dbsUsed) {
-                case DBS_ROCK_DB:
-                    map = new TransactionSuitRocksDB(databaseSet, database);
-                    break;
-                case DBS_MAP_DB_IN_MEM:
-                    map = new TransactionSuitMapDBinMem(databaseSet, database);
-                    break;
-                default:
-                    map = new TransactionSuitMapDB(databaseSet, database);
+            if (Controller.getInstance().uTxInMemory) {
+                map = new TransactionSuitMapDBinMem(databaseSet, database);
+            } else {
+                switch (dbsUsed) {
+                    case DBS_ROCK_DB:
+                        map = new TransactionSuitRocksDB(databaseSet, database);
+                        break;
+                    case DBS_MAP_DB_IN_MEM:
+                        map = new TransactionSuitMapDBinMem(databaseSet, database);
+                        break;
+                    default:
+                        map = new TransactionSuitMapDB(databaseSet, database);
+                }
             }
         } else {
             switch (dbsUsed) {
@@ -136,7 +142,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
         try { // для освобождения ресурса
 
-            long realTime = System.currentTimeMillis();
+            long realTime = NTP.getTime();
 
             if (realTime - pointClear < 10000) {
                 return 0;
@@ -152,16 +158,16 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                  * - дале COMPACT не помогает
                  */
                 try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
-                    tickerIter = System.currentTimeMillis() - tickerIter;
+                    tickerIter = NTP.getTime() - tickerIter;
                     if (tickerIter > 10) {
                         LOGGER.debug("TAKE ITERATOR: {} ms", tickerIter);
                     }
 
                     Transaction transaction;
 
-                    tickerIter = System.currentTimeMillis();
+                    tickerIter = NTP.getTime();
                     long size = this.map.size();
-                    tickerIter = System.currentTimeMillis() - tickerIter;
+                    tickerIter = NTP.getTime() - tickerIter;
                     if (tickerIter > 10 && logger.isDebugEnabled()) {
                         LOGGER.debug("TAKE ITERATOR.SIZE: {} ms", tickerIter);
                     }
@@ -169,7 +175,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                         Long key = iterator.next();
                         transaction = this.map.get(key);
                         if (transaction == null) {
-                            // такая ошибка уже было
+                            // такая ошибка уже была
                             continue;
                         }
 
@@ -180,6 +186,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                                         : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
                             // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
                             this.deleteDirect(key);
+                            LOGGER.debug("deleteDirect: {}", Transaction.viewDBRef(key));
                             deletions++;
                         } else {
                             break;
@@ -189,7 +196,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     LOGGER.error(e.getMessage(), e);
                 }
 
-                long ticker = System.currentTimeMillis() - realTime;
+                long ticker = NTP.getTime() - realTime;
                 if (ticker > 100 || deletions > 0) {
                     LOGGER.info("------ CLEAR DEAD UTXs: {} ms, for deleted: {}", ticker, deletions);
                 }
@@ -198,7 +205,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
             } finally {
                 // учтем новое время в точке
-                pointClear = System.currentTimeMillis();
+                pointClear = NTP.getTime();
             }
         } finally {
             databaseSet.clearCache();

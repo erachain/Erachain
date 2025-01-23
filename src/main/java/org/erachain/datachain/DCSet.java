@@ -88,10 +88,13 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
      * нельзя делать DBS_NATIVE_MAP !!! - так как он не удаляет транзакции по вторичному индексу
-     * И трнзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
+     * И транзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
      * блока на проверке и исполнении
+     * По умолчанию ставим DBS_MAP_DB - чтобы сохранялись при выходе - для надежности
+     * Но при старт ноду можно задать ключ -utx-in-memory - тогда включится DBS_MAP_DB_IN_MEM
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;;
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB;
+    ;
     public static final int UNCONF_TX_MAP_FORK = DBS_MAP_DB_IN_MEM;
 
     /**

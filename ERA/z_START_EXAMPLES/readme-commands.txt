@@ -33,6 +33,9 @@ Start forging pool
 See RPC and API fpool commands for control and statistic.
 Send in DEBT some forging stake to pool address (setted in settings_pool.json) for start forging. You may confiscate that DEBT (backward) later.
 
+-utx-in-memory
+Set this key for quickly process a large number of unconfirmed transactions. But they will not be saved when exiting the program.
+
 -backup
 
 -rechain

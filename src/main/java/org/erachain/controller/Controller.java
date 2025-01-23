@@ -105,7 +105,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.5.04";
+    public static String version = "6.5.05";
     public static String buildTime = "2025-01-19 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -128,6 +128,7 @@ public class Controller extends Observable {
     public static int HARD_WORK = 0;
     public static String CACHE_DC = "hard";
     public boolean useGui = true;
+    public boolean uTxInMemory = false;
     public boolean useNet = true;
 
 
@@ -1704,18 +1705,23 @@ public class Controller extends Observable {
             }
         }
 
-        if (this.status == STATUS_NO_CONNECTIONS) {
+        if (this.status == STATUS_NO_CONNECTIONS || this.status == STATUS_SYNCHRONIZING) {
             // UPDATE STATUS
-            int myHeight = getMyHeight();
-            if (blockChain.getTimestamp(myHeight)
-                    + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight) >> 1)
-                    < NTP.getTime()) {
-                // мы не во воремени - надо синхронизироваться
-                this.status = STATUS_SYNCHRONIZING;
-                LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
+            if (true) {
+                checkStatus(0);
             } else {
-                // время не ушло вперед - можно не синронизироваться
-                this.status = STATUS_OK;
+                int myHeight = getMyHeight();
+                if (blockChain.getTimestamp(myHeight)
+                        // на полтора блока сдвинем - это считается в синхронизации
+                        + (15 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight) / 10)
+                        < NTP.getTime()) {
+                    // мы не во воремени - надо синхронизироваться
+                    this.status = STATUS_SYNCHRONIZING;
+                    LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
+                } else {
+                    // время не ушло вперед - можно не синронизироваться
+                    this.status = STATUS_OK;
+                }
             }
 
             // NOTIFY
@@ -1725,7 +1731,9 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        if (!this.broadcastUnconfirmedToPeer(peer)) {
+        if (!this.broadcastUnconfirmedToPeer(peer)
+                && false // нет не баним - иначе на каждый чих бан будет
+        ) {
             peer.ban(network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
             return;
         }
@@ -4300,6 +4308,11 @@ public class Controller extends Observable {
 
             if (arg.equals("-nogui")) {
                 useGui = false;
+                continue;
+            }
+
+            if (arg.equals("-utx-in-memory")) {
+                uTxInMemory = true;
                 continue;
             }
 
