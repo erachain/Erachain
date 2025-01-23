@@ -180,11 +180,11 @@ public class TransactionsPool extends MonitoredThread {
             // ALREADY EXIST
             byte[] signature = transaction.getSignature();
 
-            long latency = System.currentTimeMillis();
+            long latency = NTP.getTime();
             // проверка на двойной ключ в таблице ожидания транзакций
             if (utxMap.contains(signature)) {
                 if (LOG_UNCONFIRMED_PROCESS) {
-                    latency = System.currentTimeMillis() - latency;
+                    latency = NTP.getTime() - latency;
                     if (latency > 20 && LOGGER.isDebugEnabled()) {
                         LOGGER.debug("utxMap CONTAINS latency: {}", latency);
                     }
@@ -214,11 +214,11 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             if (LOG_UNCONFIRMED_PROCESS) {
-                latency = System.currentTimeMillis() - latency;
+                latency = NTP.getTime() - latency;
                 if (latency > 20 && LOGGER.isDebugEnabled()) {
                     LOGGER.debug("isSignatureValid latency: {}", latency);
                 }
-                latency = System.currentTimeMillis();
+                latency = NTP.getTime();
             }
 
             // проверка на двойной ключ в основной таблице транзакций
@@ -230,11 +230,11 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             if (LOG_UNCONFIRMED_PROCESS) {
-                latency = System.currentTimeMillis() - latency;
+                latency = NTP.getTime() - latency;
                 if (latency > 30 && LOGGER.isDebugEnabled()) {
                     LOGGER.debug("getTransactionFinalMapSigns CONTAINS latency: {}", latency);
                 }
-                latency = System.currentTimeMillis();
+                latency = NTP.getTime();
             }
 
 
@@ -253,7 +253,7 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             if (LOG_UNCONFIRMED_PROCESS) {
-                latency = System.currentTimeMillis() - latency;
+                latency = NTP.getTime() - latency;
                 if (latency > 30 && LOGGER.isDebugEnabled()) {
                     LOGGER.debug("utxMap ADD latency: {}", latency);
                 }
@@ -292,7 +292,7 @@ public class TransactionsPool extends MonitoredThread {
 
         int clearedUTXs = 0;
 
-        long minorClear = 0;
+        long minorClear = NTP.getTime();
 
         runned = true;
         //Message message;
@@ -309,7 +309,7 @@ public class TransactionsPool extends MonitoredThread {
             ntpTimestamp = blockChain.getTimestamp(blockChain.getHeightOnTimestampMS(NTP.getTime()));
             ntpFutureTimestamp = blockChain.getTimestamp(2 + blockChain.getHeightOnTimestampMS(NTP.getTime()));
 
-            if (NTP.getTime() - ntpTimestamp > 100L * blockPeriod || clearCount > 10000) {
+            if (NTP.getTime() - ntpTimestamp > 4L * blockPeriod || clearCount > 10000) {
 
                 /////// CLEAR
                 try {
@@ -349,22 +349,22 @@ public class TransactionsPool extends MonitoredThread {
                                 clearedUTXs += utxMap.clearByDeadTimeAndLimit(keepTime, true);
                             }
                         }
-                    } else if (isStatusOK && System.currentTimeMillis() - minorClear > blockPeriod) {
+                    } else if (isStatusOK && NTP.getTime() - minorClear > blockPeriod * 4) {
                         // each block
-                        minorClear = System.currentTimeMillis();
+                        minorClear = NTP.getTime();
                         long keepTime = heightTimestamp - blockPeriod;
                         clearedUTXs += utxMap.clearByDeadTimeAndLimit(keepTime, true);
                     }
 
                     boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (isStatusOK ? 0 : 3)
-                            //|| System.currentTimeMillis() - poinClear - 1000 > blockPeriod << 3
+                            //|| NTP.getTime() - poinClear - 1000 > blockPeriod << 3
                             ;
                     // reset Map & repopulate UTX table
                     if (needReset) {
 
                         clearedUTXs = 0;
                         LOGGER.debug("try RESET POOL UTXs");
-                        ntpTimestamp = System.currentTimeMillis();
+                        ntpTimestamp = NTP.getTime();
                         LOGGER.debug("try RESET POOL UTXs, size: " + sizeUTX);
                         // нужно скопировать из таблицы, иначе после закрытия ее ошибка обращения
                         // так .values() выдает не отдельный массив а объект базы данных!
@@ -381,7 +381,7 @@ public class TransactionsPool extends MonitoredThread {
                                 utxMap.put(item);
                             }
                             clearCount += countDeleted;
-                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - ntpTimestamp)
+                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (NTP.getTime() - ntpTimestamp)
                                     + " ms, DELETED by Deadlime:  " + countDeleted);
                         } else {
                             // переполненение - удалим все старые
@@ -395,7 +395,7 @@ public class TransactionsPool extends MonitoredThread {
                             } while (sizeUTX - i < BlockChain.MAX_UNCONFIGMED_MAP_SIZE);
                             countDeleted = sizeUTX - utxMap.size();
                             clearCount += countDeleted;
-                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - ntpTimestamp)
+                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (NTP.getTime() - ntpTimestamp)
                                     + " ms, DELETED by oversize:  " + countDeleted);
                         }
                     }
