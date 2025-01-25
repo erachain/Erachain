@@ -666,7 +666,7 @@ public class RSignNote extends Transaction implements Itemable, TransferredBalan
             base_len -= SIGNATURE_LENGTH;
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

@@ -11,6 +11,7 @@ import org.mapdb.DBMaker;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 //import org.mapdb.Serializer;
 
@@ -67,6 +68,7 @@ public class DGSet extends DBASet {
             logger.error(e.getMessage(), e);
             try {
                 Files.walkFileTree(dbFile.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e.getMessage(), e1);
             }

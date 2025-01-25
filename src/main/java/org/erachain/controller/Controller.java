@@ -87,7 +87,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -105,8 +107,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.5.05";
-    public static String buildTime = "2025-01-19 12:00:00 UTC";
+    public static String version = "6.6.01";
+    public static String buildTime = "2025-01-26 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -659,8 +661,9 @@ public class Controller extends Observable {
             // удалим все в папке Temp
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (Throwable e) {
-            ////LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         if (reBuildChain && !Settings.simpleTestNet) {
@@ -756,17 +759,25 @@ public class Controller extends Observable {
                 this.webService.start();
             }
 
-            reBuildChainThread = new Thread(() -> {
+            if (useGui) {
                 reBuilChainProcess();
-            });
-            reBuildChainThread.start();
+                stopAndExit(0);
 
-            Runtime.getRuntime()
-                    .addShutdownHook(
-                            new Thread(
-                                    () -> {
-                                        reBuilChainHalt();
-                                    }));
+            } else {
+                reBuildChainThread = new Thread(() -> {
+                    reBuilChainProcess();
+                });
+
+                Runtime.getRuntime()
+                        .addShutdownHook(
+                                new Thread(
+                                        () -> {
+                                            reBuilChainHalt();
+                                        }));
+
+                reBuildChainThread.start();
+
+            }
 
             return;
 
@@ -993,8 +1004,9 @@ public class Controller extends Observable {
             if (dataChain.exists()) {
                 try {
                     Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (NoSuchFileException e) {
                 } catch (IOException e) {
-                    //LOGGER.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
             // copy Back dir to DataChain
@@ -1026,8 +1038,9 @@ public class Controller extends Observable {
         if (dataLocal.exists()) {
             try {
                 Files.walkFileTree(dataLocal.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
             } catch (IOException e) {
-                //LOGGER.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
 
@@ -1131,7 +1144,7 @@ public class Controller extends Observable {
                 int blockSizeOld = blocksMapOld.size();
                 LOGGER.warn("\nRechain started... backup block height: {}", blockSizeOld);
                 int count = 0;
-                for (int i = ++startHeight; i < blockSizeOld; ++i) {
+                for (int i = ++startHeight; i <= blockSizeOld; ++i) {
                     block = blocksMapOld.get(i);
 
                     // need for calculate WIN Value
@@ -1192,8 +1205,8 @@ public class Controller extends Observable {
             int size = blocksMap.size();
 
             setChanged();
-            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-            LOGGER.info("Closing database");
+            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database at size: " + size)));
+            LOGGER.info("Closing database at size: " + size);
             dcSet.close();
             dlSet.close();
 
@@ -1201,7 +1214,7 @@ public class Controller extends Observable {
             if (sizeOld > size) {
                 LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
             } else {
-                LOGGER.info("Rechain  is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
+                LOGGER.info("Rechain is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
             }
 
         }
@@ -1209,7 +1222,7 @@ public class Controller extends Observable {
 
     }
 
-    private void reBuilChainHalt() {
+    public void reBuilChainHalt() {
 
         isStopping = true;
 
@@ -1237,6 +1250,7 @@ public class Controller extends Observable {
                 if (dataBakDC.exists()) {
                     try {
                         Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (NoSuchFileException e) {
                     } catch (IOException e) {
                         LOGGER.error(e.getMessage(), e);
                     }
@@ -1300,14 +1314,20 @@ public class Controller extends Observable {
         this.isStopping = true;
 
         if (reBuildChain) {
-            reBuilChainHalt();
+            if (reBuildChainThread != null)
+                reBuilChainHalt();
+
+            System.exit(par);
             return;
         }
 
-        botsManager.cancel();
-        if (!onlyProtocolIndexing) {
+        if (botsManager != null)
+            botsManager.cancel();
+
+        if (!onlyProtocolIndexing && tradeHistoryController != null) {
             tradeHistoryController.close();
         }
+
         botsErachain.forEach(bot -> bot.stop());
 
         if (transactionsPool == null) {
@@ -1348,7 +1368,9 @@ public class Controller extends Observable {
         try {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
 
         if (fPool != null) {
@@ -4230,6 +4252,11 @@ public class Controller extends Observable {
     }
 
     public void startApplication(String args[]) {
+
+        if (java.nio.file.Files.exists(Paths.get(System.getProperty("user.dir"),"src", "main"))) {
+            throw new RuntimeException("Wrong directory - set to /ERA");
+        }
+
         boolean cli = false;
 
         // get GRADLE bild time

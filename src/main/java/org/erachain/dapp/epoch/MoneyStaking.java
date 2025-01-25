@@ -452,6 +452,7 @@ public class MoneyStaking extends EpochDAppItemJson {
             byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
             pos += dataSize;
             data = new String(dataBytes, StandardCharsets.UTF_8);
+
         } else {
             data = "";
             status = "";

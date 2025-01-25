@@ -54,7 +54,7 @@ public class LeafFallTest {
         CreateOrderTransaction orderCreationParse = (CreateOrderTransaction) CreateOrderTransaction.Parse(data, Transaction.FOR_NETWORK);
         assertEquals(orderCreation.getAmountWant(), orderCreationParse.getAmountWant());
         assertEquals(orderCreation.getWantKey(), orderCreationParse.getWantKey());
-        orderCreation.resetEpochDApp();
+        orderCreation.resetNotOwnedDApp();
 
         dApp = new LeafFall(123);
         data = dApp.toBytes(Transaction.FOR_DB_RECORD);
@@ -69,7 +69,7 @@ public class LeafFallTest {
         orderCreationParse = (CreateOrderTransaction) CreateOrderTransaction.Parse(data, Transaction.FOR_DB_RECORD);
         assertEquals(orderCreation.getWantKey(), orderCreationParse.getWantKey());
         assertEquals(orderCreation.getAmountWant(), orderCreationParse.getAmountWant());
-        orderCreation.resetEpochDApp();
+        orderCreation.resetNotOwnedDApp();
 
     }
 

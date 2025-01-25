@@ -316,6 +316,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestampEnd, BlockChain bchain,
                                                                          long max_winned_value) {
 
+        List<Transaction> transactionsList = new ArrayList<Transaction>();
+        if (false) // для отладки не включаем в блок их
+            return new Tuple2<List<Transaction>, Integer>(transactionsList, 0);
+
         LOGGER.info("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestampEnd));
 
         long start = System.currentTimeMillis();
@@ -324,8 +328,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         DCSet newBlockDC = null;
 
         Block waitWin;
-
-        List<Transaction> transactionsList = new ArrayList<Transaction>();
 
         //	boolean transactionProcessed;
         long totalBytes = 0;

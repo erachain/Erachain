@@ -36,7 +36,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "6.5.05"
+String versionEra = "6.6.01"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -152,6 +152,8 @@ sourceSets {
         }
     }
 
+    run
+
 }
 
 build {
@@ -168,6 +170,8 @@ task CopyResourse {
         include 'peers*'
         include 'start*'
         include 'makePreview*'
+        exclude 'startARGS.txt'
+        exclude 'wallet*'
     }
 
     copy {

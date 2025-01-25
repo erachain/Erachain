@@ -31,6 +31,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.Random;
 
 /**
@@ -44,7 +45,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 542;
+    final static int CURRENT_VERSION = 543;
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -684,6 +685,7 @@ public class DCSet extends DBASet implements Closeable {
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -691,12 +693,14 @@ public class DCSet extends DBASet implements Closeable {
         }
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
+            logger.warn("New Version of DB: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
+            logger.warn("Closing Current DB...");
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
+            logger.warn("Current DB closed");
 
             if (Controller.getInstance().useGui) {
-                Object[] options = {Lang.T("Rebuild locally"),
-                        Lang.T("Clear chain"),
+                Object[] options = {Lang.T("Rebuild from old DB locally (Fast)"),
+                        Lang.T("Clear DB and reload from Network (Slow)"),
                         Lang.T("Exit")};
 
                 //As the JOptionPane accepts an object as the message
@@ -724,12 +728,17 @@ public class DCSet extends DBASet implements Closeable {
                     try {
                         Files.walkFileTree(dbFile.getParentFile().toPath(),
                                 new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (NoSuchFileException e) {
                     } catch (Throwable e) {
                         logger.error(e.getMessage(), e);
                     }
+
+                    //reCreateDB(withObserver, dynamicGUI);
                     database = makeFileDB(dbFile);
+
                 } else {
-                    Controller.getInstance().stopAndExit(-22);
+                    logger.warn("Please rebuild chain local by use '-rechain' parameter (quick case) or delete folder " + dbFile.getParentFile().toPath() + " for full synchronize chain from network (slow case).");
+                    System.exit(-22);
                 }
 
             } else {
@@ -1928,8 +1937,9 @@ public class DCSet extends DBASet implements Closeable {
                     if (tempDir.exists()) {
                         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
                     }
+                } catch (NoSuchFileException e) {
                 } catch (Throwable e) {
-                    ///logger.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
 
             }
