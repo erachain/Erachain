@@ -963,8 +963,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return BASE_LENGTH;
     }
 
-    public void resetEpochDApp() {
-        if (dApp != null && dApp.isEpoch()) {
+    /**
+     * Сбросим если он не Эпохальный и не Ошибка - то есть не принадлежит этой конкретной транззакции
+     */
+    public void resetNotOwnedDApp() {
+        if (dApp != null && !dApp.isTxOwned()) {
             typeBytes[2] &= ~get_HAS_SMART_CONTRACT_MASK();
             dApp = null;
         }
@@ -1901,10 +1904,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void sign(PrivateKeyAccount creator, int forDeal) {
 
+        if (forDeal > FOR_NETWORK) {
+            throw new RuntimeException("Wrong forDeal in SIGN - > FOR_NETWORK: " + forDeal);
+        }
+
         // use this.reference in any case and for Pack too
         // but not with SIGN
         boolean withSign = false;
-        byte[] data = this.toBytes(forDeal, false);
+        byte[] data = toBytes(forDeal, false);
         if (data == null)
             return;
 
@@ -1960,7 +1967,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, exLink.toBytes());
         }
 
-        if (dApp != null && (forDeal == FOR_DB_RECORD || !dApp.isEpoch())) {
+        if (dApp != null && (forDeal == FOR_DB_RECORD || dApp.isTxOwned())) {
             data[2] |= get_HAS_SMART_CONTRACT_MASK();
             data = Bytes.concat(data, dApp.toBytes(forDeal));
         } else {
@@ -2027,7 +2034,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

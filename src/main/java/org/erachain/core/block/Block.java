@@ -8,6 +8,7 @@ import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
+import org.erachain.controller.errors.RuntimeExceptionNoTrace;
 import org.erachain.core.BlockChain;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
@@ -2318,7 +2319,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
-            throw new Exception("on stopping");
+            throw new RuntimeExceptionNoTrace("on stopping");
 
         long timerStart;
         long start = System.currentTimeMillis();

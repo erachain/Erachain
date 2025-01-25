@@ -36,6 +36,8 @@ public abstract class EpochDAppJson extends EpochDAppStatus implements DAppTimed
     public EpochDAppJson(int id, PublicKeyAccount maker, String dataStr, String status) {
         super(id, maker, status);
         this.dataStr = dataStr;
+        // для отката отката нужен резолв и для API
+        resolveJson();
     }
 
     public EpochDAppJson(int id, PublicKeyAccount maker, String dataStr, String status, Transaction commandTx, Block block) {

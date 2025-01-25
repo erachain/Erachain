@@ -449,7 +449,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

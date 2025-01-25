@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -39,6 +40,7 @@ public class DBRocksDBTableDBTest {
         File tempDir = new File(Settings.getInstance().getDataChainPath() + ROCKS_DB_FOLDER);
         try {
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (Throwable e) {
         }
 

@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -17,6 +16,7 @@ import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
@@ -131,84 +131,63 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
      *
-     * @param timestamp
-     * @param cutMaximum - обрезать список только по максимальному размеру, иначе обрезать список и по времени протухания
+     * @param heightTimestamp
      */
-    protected long pointClear;
-    public int clearByDeadTimeAndLimit(long keepTime, boolean cutMaximum) {
+    @Override
+    public int clearByDeadTime(long heightTimestamp) {
 
         if (isClearProcessedAndSet())
             return 0;
 
         try { // для освобождения ресурса
 
-            long realTime = NTP.getTime();
+            long startTime = NTP.getTime();
 
-            if (realTime - pointClear < 10000) {
-                return 0;
-            }
+            long tickerIter = startTime;
+            int deletions = 0;
 
-            try { // для запоминания времени точки
-
-                long tickerIter = realTime;
-                int deletions = 0;
-
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
-                    tickerIter = NTP.getTime() - tickerIter;
-                    if (tickerIter > 10) {
-                        LOGGER.debug("TAKE ITERATOR: {} ms", tickerIter);
-                    }
-
-                    Transaction transaction;
-
-                    tickerIter = NTP.getTime();
-                    long size = this.map.size();
-                    tickerIter = NTP.getTime() - tickerIter;
-                    if (tickerIter > 10 && logger.isDebugEnabled()) {
-                        LOGGER.debug("TAKE ITERATOR.SIZE: {} ms", tickerIter);
-                    }
-                    while (iterator.hasNext()) {
-                        Long key = iterator.next();
-                        transaction = this.map.get(key);
-                        if (transaction == null) {
-                            // такая ошибка уже была
-                            continue;
-                        }
-
-                        long deadline = transaction.getDeadline();
-                        if (deadline < keepTime
-                                || size - deletions >
-                                (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
-                                        : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                            // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
-                            this.deleteDirect(key);
-                            LOGGER.debug("deleteDirect: {}", Transaction.viewDBRef(key));
-                            deletions++;
-                        } else {
-                            break;
-                        }
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
+            /*
+             * по несколько секунд итератор берется - при том что таблица пустая -
+             * - дале COMPACT не помогает
+             */
+            try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
+                tickerIter = NTP.getTime() - tickerIter;
+                if (tickerIter > 100) {
+                    LOGGER.debug("TAKE ITERATOR: {} ms", tickerIter);
                 }
 
-                long ticker = NTP.getTime() - realTime;
-                if (ticker > 100 || deletions > 0) {
-                    LOGGER.info("------ CLEAR DEAD UTXs: {} ms, for deleted: {}", ticker, deletions);
+                Transaction transaction;
+
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
+                    transaction = this.map.get(key);
+                    if (transaction == null) {
+                        // такая ошибка уже была
+                        continue;
+                    }
+
+                    long deadline = transaction.getDeadline();
+                    if (deadline < heightTimestamp) {
+                        // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
+                        this.deleteDirect(key);
+                        ////LOGGER.debug("deleteDirect: {}", Transaction.viewDBRef(key));
+                        deletions++;
+                    } else {
+                        break;
+                    }
                 }
-
-                return deletions;
-
-            } finally {
-                // учтем новое время в точке
-                pointClear = NTP.getTime();
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
+
+            long ticker = NTP.getTime() - startTime;
+            if (ticker > 1000 || deletions > 0) {
+                LOGGER.info("------ CLEAR DEAD UTXs: {} s, for deleted: {}", ticker/ 1000, deletions);
+            }
+
+            return deletions;
+
         } finally {
-            databaseSet.clearCache();
             // освободим процесс
             clearProcessed = false;
         }

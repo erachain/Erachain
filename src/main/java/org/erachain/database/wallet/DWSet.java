@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 @Slf4j
 public class DWSet extends DBASet {
@@ -179,6 +180,7 @@ public class DWSet extends DBASet {
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -187,10 +189,11 @@ public class DWSet extends DBASet {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
+            logger.warn("New Version of DB: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
             }

@@ -200,19 +200,19 @@ public class ShibaVerseDApp extends EpochDAppJson {
         String data;
         String status;
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
-            int dataSize = Ints.fromByteArray(dataSizeBytes);
-            pos += 4;
-            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
-            pos += dataSize;
-            data = new String(dataBytes, StandardCharsets.UTF_8);
-
             byte[] statusSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
             pos += 4;
             byte[] statusBytes = Arrays.copyOfRange(bytes, pos, pos + statusLen);
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
+
+            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
+            int dataSize = Ints.fromByteArray(dataSizeBytes);
+            pos += 4;
+            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
+            pos += dataSize;
+            data = new String(dataBytes, StandardCharsets.UTF_8);
 
         } else {
             data = "";
