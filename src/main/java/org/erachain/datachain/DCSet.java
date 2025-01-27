@@ -553,7 +553,7 @@ public class DCSet extends DBASet implements Closeable {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(BlockChain.TEST_DB > 0 ? 3 : 7)// не нагружать процессор для поиска свободного места в базе данных
 
-                //.compressionEnable()
+                //.compressionEnable() // толку мало от сжатия
                 ;
 
         /**
@@ -624,7 +624,25 @@ public class DCSet extends DBASet implements Closeable {
             throw new RuntimeException("File not exists - " + dbFile.getName());
         }
 
-        return DBMaker.newFileDB(dbFile).readOnly().checksumEnable().make();
+        return DBMaker.newFileDB(dbFile).readOnly()
+                .checksumEnable()
+                .make();
+
+    }
+
+    public static DB makeShrinkFileDB(File dbFile) {
+
+        if (dbFile.exists()) {
+            throw new RuntimeException("File already exists - " + dbFile.getName());
+        }
+
+        return DBMaker.newFileDB(dbFile)
+                .checksumEnable() // same as in makeReadOnlyFileDB
+                .cacheDisable()
+                .mmapFileEnableIfSupported()
+                .commitFileSyncDisable()
+                .asyncWriteFlushDelay(2)
+                .make();
 
     }
 

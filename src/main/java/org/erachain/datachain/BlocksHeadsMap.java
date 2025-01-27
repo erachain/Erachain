@@ -52,7 +52,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     @Override
     public int size() {
-        return ((DCSet) databaseSet).getBlockSignsMap().size();
+        return ((DCSet) databaseSet).getBlockMap().size();
     }
 
     public Long getFullWeight() {

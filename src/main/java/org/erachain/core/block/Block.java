@@ -2280,19 +2280,20 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
-        TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
+        TimeTXDoneMap timeDoneMap = dcSet.getTimeTXDoneMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
         Transaction tx;
         Tuple2<Integer, Long> key;
-        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeWaitMap.getTXIterator(false)) {
-            while (iteraator.hasNext()) {
-                key = iteraator.next();
+        // TODO use fork
+        try (IteratorCloseable<Tuple2<Integer, Long>> iterator = timeWaitMap.getTXIterator(false)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
                 // reversed pair - key = <Block, dbRef>
                 if (key.a > heightBlock)
                     break;
 
                 timeWaitMap.remove(key.b);
-                timewDoneMap.put(key.b, key.a);
+                timeDoneMap.put(key.b, key.a);
 
                 tx = txMap.get(key.b);
                 tx.processByTime(this);
@@ -2465,6 +2466,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
         Transaction tx;
         Tuple2<Integer, Long> key;
+        // TODO use fork
         try (IteratorCloseable<Tuple2<Integer, Long>> iterator = timeDoneMap.getTXIterator(true)) {
             while (iterator.hasNext()) {
                 key = iterator.next();

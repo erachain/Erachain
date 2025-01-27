@@ -41,7 +41,7 @@ public class OddEvenDApp extends EpochDAppJson {
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-    static public final int DISABLED_BEFORE = 5910000;
+    static public int DISABLED_BEFORE = 5910000;
 
     // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));

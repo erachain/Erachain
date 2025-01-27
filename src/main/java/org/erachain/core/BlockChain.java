@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import com.google.common.primitives.Longs;
+import lombok.Setter;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -116,6 +117,7 @@ public class BlockChain {
     /**
      * default = 30 sec
      */
+    @Setter
     private static int BLOCKS_PERIOD = 30000; // [milsec]
 
     /**
@@ -518,6 +520,9 @@ public class BlockChain {
 
         if (TEST_MODE) {
 
+            if (!DEMO_MODE)
+                BLOCKS_PERIOD = Controller.blockPeriod * 1000;
+
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
                     new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
@@ -860,7 +865,7 @@ public class BlockChain {
         if (CLONE_MODE)
             return BLOCKS_PERIOD;
         else if (TEST_MODE && !DEMO_MODE)
-            return 7000;
+            return BLOCKS_PERIOD;
         else if (DEMO_MODE)
             return 30000;
 
@@ -1692,6 +1697,9 @@ public class BlockChain {
     }
 
     public String blockFromFuture(int height) {
+        if (TEST_MODE)
+            return null;
+
         long blockTimestamp = getTimestamp(height);
         if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
             return "invalid Timestamp from FUTURE: "
