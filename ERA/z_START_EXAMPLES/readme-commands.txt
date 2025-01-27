@@ -50,6 +50,10 @@ Ignored in SIMPLE_TEST mode.
 Make the shrunk chain database (very compacted) for rebuilding the chain.
 To reassemble the chain from this database, place the files from the folder with the ending "SRK" in the folder with the ending "TMP"
 and run the program with the key "-rechain"
+===
+Вы можете создать сжатый файл БД (в 5 раз меньше, в ZIP - в 10-15 раз меньше) и распространять его для своих пользователей для быстрой синхронизации полной ноды с основной сетью.
+Достаточно программе указать при старте ключ пересборки цепочки - `-rechain`. Тогда будет подхвачена сжатая база данных из папки datachainSRK и из нее будет пересобрана цепочка
+
 
 -nogui
 Start without GUI
