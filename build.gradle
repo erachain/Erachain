@@ -72,7 +72,10 @@ dependencies {
     compile group: 'com.cedarsoftware', name: 'json-io', version: '4.8.0'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.8.2'
-    compile group: 'org.mapdb', name: 'mapdb', version: '1.0.7'
+    /// https://mvnrepository.com/artifact/org.mapdb/mapdb
+    compile group: 'org.mapdb', name: 'mapdb', version: '1.0.9' // last with Tuple
+    //compile group: 'org.mapdb', name: 'mapdb', version: '2.0-beta13' // last with Tuple
+    //compile group: 'org.mapdb', name: 'mapdb', version: '3.1.0'
     compile group: 'com.mitchellbosecke', name: 'pebble', version: '1.6.0'
     compile group: 'es.nitaur.markdown', name: 'txtmark', version: '0.16'
     compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'

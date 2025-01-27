@@ -11,6 +11,10 @@ The network is not in use. Node will generate a blocks even when disconnected fr
 -testnet=0 - set current NTP genesis Timestamp on port 9065
 For start generation of blocks need more than 5 accounts on all nodes or in Your wallet is used '-testnet'.
 
+-block_period=[SEC]
+If set -testnet - set period of Block in seconds. Example:
+-block_period=10
+
 -cli
 start as Command Line Interpretator.
 
@@ -41,6 +45,11 @@ Set this key for quickly process a large number of unconfirmed transactions. But
 -rechain
 Rebuild the chain database (datachain). The rebuild is autorun if a new version of the database structure is used in the node.
 Ignored in SIMPLE_TEST mode.
+
+-shrink
+Make the shrunk chain database (very compacted) for rebuilding the chain.
+To reassemble the chain from this database, place the files from the folder with the ending "SRK" in the folder with the ending "TMP"
+and run the program with the key "-rechain"
 
 -nogui
 Start without GUI

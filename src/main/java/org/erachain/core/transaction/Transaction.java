@@ -360,7 +360,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     // FEE PARAMETERS
     public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
-    public static final long BTC_KEY = AssetCls.ERA_KEY;
+    public static final long BTC_KEY = AssetCls.BTC_KEY;
 
     public static final long FEE_KEY = AssetCls.FEE_KEY;
 

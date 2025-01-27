@@ -46,6 +46,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.dapp.DApp;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.*;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -65,12 +66,10 @@ import org.erachain.webserver.WebService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
-import org.mapdb.HTreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +99,8 @@ import java.util.Timer;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import static org.erachain.datachain.DCSet.DATA_FILE;
 
 /**
  * main class for connection all modules
@@ -131,6 +132,7 @@ public class Controller extends Observable {
     public static String CACHE_DC = "hard";
     public boolean useGui = true;
     public boolean uTxInMemory = false;
+    public static int blockPeriod = 7;
     public boolean useNet = true;
 
 
@@ -193,6 +195,7 @@ public class Controller extends Observable {
     public boolean compactDConStart;
     public boolean inMemoryDC;
     public boolean reBuildChain;
+    public boolean shrinkForReBuildChain;
 
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
@@ -606,6 +609,11 @@ public class Controller extends Observable {
 
     public void start() throws Exception {
 
+        if (shrinkForReBuildChain) {
+            shrinkForReBuildChain();
+            return;
+        }
+
         this.toOfflineTime = NTP.getTime();
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
@@ -760,12 +768,12 @@ public class Controller extends Observable {
             }
 
             if (useGui) {
-                reBuilChainProcess();
+                reBuildChainProcess();
                 stopAndExit(0);
 
             } else {
                 reBuildChainThread = new Thread(() -> {
-                    reBuilChainProcess();
+                    reBuildChainProcess();
                 });
 
                 Runtime.getRuntime()
@@ -1048,67 +1056,128 @@ public class Controller extends Observable {
         return this.dlSet;
     }
 
+    static private String SHRINK_NAME = "SRK";
+    static private String BACKUP_NAME = "TMP";
+
+    /**
+     * Для пересборки цепочки из этой базы данных поместите файлы из папки с окончанием "SRK" в папку с окончанием "TMP"
+     *  и запустите программу с ключом "-rechain"
+     */
+    public void shrinkForReBuildChain() {
+        LOGGER.warn("Start shrinking DB for rebuilding the chain database");
+        File currentDBFile = new File(Settings.getInstance().getDataChainPath(), DATA_FILE);
+
+        if (!currentDBFile.exists()) {
+            LOGGER.warn("Not found current DB file {}", currentDBFile.toString());
+            System.exit(-3);
+            return;
+        }
+
+        File shrinkDBFile = new File(currentDBFile.getParentFile().getPath() + SHRINK_NAME, DATA_FILE);
+        if (shrinkDBFile.getParentFile().exists()) {
+            try {
+                Files.walkFileTree(shrinkDBFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
+            } catch (Throwable e) {
+                LOGGER.error(e.getMessage(), e);
+                System.exit(-4);
+                return;
+            }
+        } else {
+            LOGGER.warn("Make dir {}", shrinkDBFile.toString());
+            shrinkDBFile.getParentFile().mkdirs();
+        }
+
+        LOGGER.warn("Open current DB {}", currentDBFile.getParentFile().getName());
+        DCSetRO dcSetCurrentRO = new DCSetRO(currentDBFile);
+
+        LOGGER.warn("Merge to Shrink DB {}", shrinkDBFile.getParentFile().getName());
+        DCSet dcSetShrunk = new DCSetShrink(shrinkDBFile);
+
+        // BLOCKS
+        LOGGER.warn("Merge Blocks");
+        DBTab mapFrom = dcSetCurrentRO.getBlockMap();
+        DBTab mapTo = dcSetShrunk.getBlockMap();
+        Object nextKey;
+        try (IteratorCloseable iterator = mapFrom.getIterator()) {
+            int count = 0;
+            while (iterator.hasNext()) {
+                nextKey = iterator.next();
+                Block block = (Block) mapFrom.get(nextKey);
+                count += block.getTransactionCount();
+                mapTo.put(nextKey,  mapFrom.get(nextKey));
+                if (++count % 10000 == 0)
+                    LOGGER.warn("merged {} blocks and transactions", count);
+                if (count % 300000 == 0) {
+                    dcSetShrunk.flush(0, true, false);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        LOGGER.warn("Closing current DB...");
+        dcSetCurrentRO.close();
+        LOGGER.warn("Closing shrink DB...");
+        dcSetShrunk.flush(0, true, false);
+        dcSetShrunk.close();
+        LOGGER.warn("Make the shrink DB done!\nFor rebuild chain from it - move files from {} to {} and restart program with '-rebuild' option",
+                shrinkDBFile.getParentFile(), currentDBFile.getParentFile() + BACKUP_NAME);
+        System.exit(0);
+
+    }
+
     public void reBuilChainCopy() {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
-        LOGGER.warn("Start rebuilding the chain database\n");
+        LOGGER.warn("Start rebuilding the chain database");
 
-        File dataDir = new File(Settings.getInstance().getDataChainPath());
-        File dataBackDir = new File(dataDir.getPath() + "TMP");
+        File chainDbFile = new File(Settings.getInstance().getDataChainPath(), DATA_FILE);
+        File readFromFile;
+        {
+            File dataBackUpFile = new File(Settings.getInstance().getDataChainPath() + BACKUP_NAME, DATA_FILE);
+            File dataShrinkFile = new File(Settings.getInstance().getDataChainPath() + SHRINK_NAME, DATA_FILE);
+            readFromFile = dataShrinkFile.exists() ? dataShrinkFile : dataBackUpFile;
+        }
 
-        if (dataDir.exists()) {
-            if (dataBackDir.exists()) {
+        if (chainDbFile.exists()) {
+            if (readFromFile.exists()) {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Continue rebuilding chain from: " + dataBackDir.getName()));
-                LOGGER.info("Continue rebuilding chain from: " + dataBackDir.getName());
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Continue rebuilding chain from: " + readFromFile.getParentFile().getName()));
+                LOGGER.info("Continue rebuilding chain from: " + readFromFile.getParentFile().getName());
             } else {
                 try {
-                    FileUtils.moveDirectory(dataDir, dataBackDir);
-
-                    if (false) {
-                        File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
-                        LOGGER.warn("Open backup {}", dataBackFile.getName());
-                        DCSet dcSetBackUp = new DCSet(dataBackFile, false, false, false, DCSet.DBS_MAP_DB);
-                        dcSetBackUp.getDatabase().getAll().forEach((key, elem) -> {
-                            if (!key.equals("blocks") && !key.equals("height") && !key.equals("blocks_heads")) {
-                                if (elem instanceof HTreeMap) {
-                                    //((HTreeMap)elem).clear(); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
-                                    //dcSetBackUp.getDatabase().delete(key); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
-                                    // не пашет dcSetBackUp.getDatabase().catPut(key, dcSetBackUp.getDatabase().createHashMap(key));
-                                    // не пашет dcSetBackUp.getDatabase().namedPut(key, dcSetBackUp.getDatabase().createTreeMap(key));
-                                } else if (elem instanceof BTreeMap) {
-                                    //((BTreeMap)elem).clear(); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
-                                    //dcSetBackUp.getDatabase().delete(key); - вызывает пересчет ключей а данные по активам уже удалены - что приводит к ошибке Ноль
-                                    // не пашетdcSetBackUp.getDatabase().catPut(key, dcSetBackUp.getDatabase().createHashMap(key));
-                                    // не пашет dcSetBackUp.getDatabase().namedPut(key, dcSetBackUp.getDatabase().createTreeMap(key));
-                                }
-                            }
-                        });
-                        LOGGER.warn("Try commit {}", dataBackFile.getName());
-                        dcSetBackUp.database.commit();
-                        LOGGER.warn("Try compact {}", dataBackFile.getName());
-                        dcSetBackUp.database.compact();
-                        LOGGER.warn("Try close {}", dataBackFile.getName());
-                        dcSetBackUp.close();
-                    }
-
+                    FileUtils.moveDirectory(chainDbFile.getParentFile(), readFromFile);
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     System.exit(-11);
                 }
             }
         } else {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "The chain database not exist: " + dataDir.getName()));
-            LOGGER.info("The chain database not exist: " + dataDir.getName());
-            System.exit(-12);
+            if (readFromFile.exists()) {
+                // Создаем пустую БД
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Rebuilding chain from: " + readFromFile.getParentFile().getName()));
+            } else {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "The Current database not exist and Backup or Shrink DB not exists: "
+                        + chainDbFile.getParentFile().getName()));
+                LOGGER.info("The Current database not exist and Backup or Shrink DB not exists: " + chainDbFile.getParentFile().getName());
+                System.exit(-12);
+            }
         }
 
     }
 
-    public void reBuilChainProcess() {
+    public void reBuildChainProcess() {
 
-        File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
+        File readFromFile;
+        {
+            File dataBackUpFile = new File(Settings.getInstance().getDataChainPath() + BACKUP_NAME, DATA_FILE);
+            File dataShrinkFile = new File(Settings.getInstance().getDataChainPath() + SHRINK_NAME, DATA_FILE);
+            readFromFile = dataShrinkFile.exists() ? dataShrinkFile : dataBackUpFile;
+        }
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database. Please do not turn off the program!!"));
@@ -1116,8 +1185,8 @@ public class Controller extends Observable {
 
         // OPEN BACKUP CHaIN
         // на UNIX тут очень большая задержка и файл начинает расти - транзакционный больше данных в несколько раз!!
-        LOGGER.warn("Open backup {}", dataBackFile.getName());
-        DCSetRO dcSetBackUp = new DCSetRO(dataBackFile, databaseSystem);
+        LOGGER.warn("Open backup {}", readFromFile.getParentFile().getName());
+        DCSetRO dcSetBackUp = new DCSetRO(readFromFile);
 
         LOGGER.warn("Check backup BlockMap");
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
@@ -1162,12 +1231,10 @@ public class Controller extends Observable {
                     try {
                         block.process(dcSet, true);
 
-                        count += 1 + (block.getTransactionCount() >> 3);
-                        if (count > 10000) {
-                            count = 0;
+                        count += 1 + block.getTransactionCount();
+                        if (count % 10000 == 0) {
                             dcSet.flush(0, true, false);
                             LOGGER.info("Rebuilds block " + i);
-                            Thread.sleep(100); // осовободим время процессора
                         }
 
                     } catch (InterruptedException e) {
@@ -1214,7 +1281,7 @@ public class Controller extends Observable {
             if (sizeOld > size) {
                 LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
             } else {
-                LOGGER.info("Rechain is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
+                LOGGER.info("Rechain is DONE. Please restart the node without '-rechain' parameter!");
             }
 
         }
@@ -2447,8 +2514,9 @@ public class Controller extends Observable {
                 }
                 Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
-                    // Этот пир дает цепочку из будущего - не берем его
-                    peer.ban(5, "FROM FUTURE: " + whPeer);
+                    if (!BlockChain.TEST_MODE)
+                        // Этот пир дает цепочку из будущего - не берем его
+                        peer.ban(5, "FROM FUTURE: " + whPeer);
                     continue;
                 }
 
@@ -4322,6 +4390,12 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-shrink")) {
+                shrinkForReBuildChain = true;
+                useGui = false;
+                continue;
+            }
+
             if (arg.toLowerCase().equals("-inmemory")) {
                 inMemoryDC = true;
                 continue;
@@ -4340,6 +4414,18 @@ public class Controller extends Observable {
 
             if (arg.equals("-utx-in-memory")) {
                 uTxInMemory = true;
+                continue;
+            }
+
+            if (arg.startsWith("-block_period=") && arg.length() > 14) {
+                try {
+                    blockPeriod = Integer.parseInt(arg.substring(14));
+
+                    if (blockPeriod < 7) {
+                        blockPeriod = 7;
+                    }
+                } catch (Exception e) {
+                }
                 continue;
             }
 
@@ -4543,7 +4629,7 @@ public class Controller extends Observable {
                 //STARTING NETWORK/BLOCKCHAIN/RPC
 
                 Controller.getInstance().start();
-                if (reBuildChain && !Settings.simpleTestNet) {
+                if (reBuildChain && !Settings.simpleTestNet || shrinkForReBuildChain) {
                     return;
                 }
 

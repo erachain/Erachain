@@ -2,7 +2,6 @@ package org.erachain.datachain;
 // upd 09/03
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.DBTab;
 
 import java.io.File;
 import java.io.IOError;
@@ -11,16 +10,15 @@ import java.io.IOError;
  * набор таблиц для пересборки цепочки
  */
 @Slf4j
-public class DCSetRO extends DCSet {
+public class DCSetShrink extends DCSet {
 
     private BlocksMapImpl blockMap;
 
-    public DCSetRO(File dbFile) {
-        super(dbFile, DCSet.makeReadOnlyFileDB(dbFile), false, false);
+    public DCSetShrink(File dbFile) {
+        super(dbFile, DCSet.makeShrinkFileDB(dbFile), false, false);
 
         try {
             this.blockMap = new BlocksMapImpl(DBS_MAP_DB, this, database);
-
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
             this.close();

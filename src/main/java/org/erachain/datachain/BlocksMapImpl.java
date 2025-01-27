@@ -4,6 +4,7 @@ package org.erachain.datachain;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.controller.errors.RuntimeExceptionNoTrace;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -37,6 +38,8 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap {
 
+    static final boolean SIZE_ENABLE = true;
+
     //@Setter
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
@@ -60,14 +63,17 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
     @Override
     public void openMap() {
+
+        sizeEnable = SIZE_ENABLE;
+
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new BlocksSuitRocksDB(databaseSet, database);
+                    map = new BlocksSuitRocksDB(databaseSet, database, sizeEnable);
                     break;
                 default:
-                    map = new BlocksSuitMapDB(databaseSet, database);
+                    map = new BlocksSuitMapDB(databaseSet, database, sizeEnable);
             }
         } else {
             switch (dbsUsed) {
@@ -83,8 +89,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         }
     }
 
+    /**
+     * Размер теперь тут считаем - так как это проще для действий с rebuild и shrink
+     * @return
+     */
     @Override
     public int size() {
+        if (sizeEnable)
+            return map.size();
+
         return ((DCSet) databaseSet).getBlockSignsMap().size();
     }
 
@@ -96,7 +109,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     @Override
     public byte[] getLastBlockSignature() {
         if (lastBlockSignature == null) {
-            lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
+            lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(size()).signature;
         }
         return lastBlockSignature;
     }
@@ -104,7 +117,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     @Override
     public void resetLastBlockSignature() {
         // TODO: еще вопрос про org.erachain.datachain.BlocksHeadsMap.getFullWeight
-        lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
+        lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(size()).signature;
     }
 
     public void setLastBlockSignature(byte[] signature) {
@@ -154,7 +167,12 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         }
 
         // LOAD HEAD
-        block.loadHeadMind((DCSet) databaseSet);
+        try {
+            block.loadHeadMind((DCSet) databaseSet);
+        } catch (NullPointerException e) {
+            // это может случиться если цепочка откатывается и удаление не синхронное - три таблицы вне коммита
+            return null;
+        }
 
         return block;
 
@@ -176,19 +194,16 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
-        dcSet.getBlockSignsMap().put(signature, height);
-        if (dcSet.getBlockSignsMap().size() != height) {
+        if (size() + 1 != height) {
             // так как это вызывается асинхронно при проверке прилетающих победных блоков
             // то тут иногда вылетает ошибка - но в общем должно быть норм все
-            logger.error("CHECK TABS: \n getBlockSignsMap().size() != height : "
-                    + dcSet.getBlockSignsMap().size() + " != " + height
-                    + " : " + block);
-            if (BlockChain.CHECK_BUGS > 9) {
-                Long error = null;
-                ++error;
-            }
+            String error = "BlocksMap: size() + 1 != height at [putAndProcess]: "
+                    + size() + 1 + " != " + height
+                    + " : " + block;
+            throw new RuntimeExceptionNoTrace(error);
         }
 
+        dcSet.getBlockSignsMap().put(signature, height);
         PublicKeyAccount creator = block.getCreator();
         if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
             // так как у нас новые счета сами стартуют без инициализации - надо тут учесть начало

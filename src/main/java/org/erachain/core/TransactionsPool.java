@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import lombok.NoArgsConstructor;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
@@ -19,6 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+@NoArgsConstructor
 public class TransactionsPool extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
@@ -269,6 +271,7 @@ public class TransactionsPool extends MonitoredThread {
         }
     }
 
+    @Override
     public void run() {
 
         runned = true;

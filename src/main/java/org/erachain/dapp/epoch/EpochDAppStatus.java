@@ -2,6 +2,7 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import lombok.Getter;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class EpochDAppStatus extends EpochDApp {
 
+    @Getter
     protected String status;
 
     public EpochDAppStatus(int id, PublicKeyAccount maker) {

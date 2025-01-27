@@ -18,8 +18,8 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
 
     private final String NAME_TABLE = "BLOCKS_TABLE";
 
-    public BlocksSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, false);
+    public BlocksSuitRocksDB(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, logger, sizeEnable);
     }
 
     @Override

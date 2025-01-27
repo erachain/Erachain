@@ -18,6 +18,7 @@ import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -238,7 +239,7 @@ public class MoneyStakingTest extends TestCase {
 
     }
 
-    //@Test
+    @Test
     public void testProcessDemerrage() throws Exception {
         init();
 
