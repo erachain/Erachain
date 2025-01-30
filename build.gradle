@@ -43,9 +43,13 @@ group 'org.erachain'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url "https://artifacts.alfresco.com/nexus/content/repositories/public/"
+    }
+    maven {
+        url 'file://D:/path/to/local/directory'
     }
     jcenter() // or Maven central, required for Lombok dependency
 }
@@ -55,7 +59,6 @@ compileJava {
 }
 
 dependencies {
-    implementation 'org.jetbrains:annotations:19.0.0'
     implementation 'org.jetbrains:annotations:19.0.0'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 // https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni
@@ -73,7 +76,8 @@ dependencies {
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.8.2'
     /// https://mvnrepository.com/artifact/org.mapdb/mapdb
-    compile group: 'org.mapdb', name: 'mapdb', version: '1.0.9' // last with Tuple
+    //   compile group: 'org.mapdb', name: 'mapdb', version: '1.0.9' // last with Tuple
+    //   compile group: 'org.mapdb', name: 'mapdb', version: '1.0.9-large' // VOLUME_CHUNK_SHIFT = 24
     //compile group: 'org.mapdb', name: 'mapdb', version: '2.0-beta13' // last with Tuple
     //compile group: 'org.mapdb', name: 'mapdb', version: '3.1.0'
     compile group: 'com.mitchellbosecke', name: 'pebble', version: '1.6.0'
