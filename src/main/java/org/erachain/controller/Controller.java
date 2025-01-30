@@ -1148,7 +1148,7 @@ public class Controller extends Observable {
                 LOGGER.info("Continue rebuilding chain from: " + readFromFile.getParentFile().getName());
             } else {
                 try {
-                    FileUtils.moveDirectory(chainDbFile.getParentFile(), readFromFile);
+                    FileUtils.moveDirectory(chainDbFile.getParentFile(), readFromFile.getParentFile());
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     System.exit(-11);
@@ -4456,7 +4456,7 @@ public class Controller extends Observable {
 
                     if (dbsChain.equals("rocksdb")) {
                         databaseSystem = DCSet.DBS_ROCK_DB;
-                    } else if (dbsChain.equals("mapdb")) {
+                    } else if (dbsChain.equals("org/mapdb")) {
                         databaseSystem = DCSet.DBS_MAP_DB;
                     } else if (dbsChain.equals("fast")) {
                         databaseSystem = DCSet.DBS_FAST;
