@@ -1493,7 +1493,7 @@ public class BlockChain {
     }
 
     public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
-        return new Tuple2<Integer, Long>(dcSet.getBlocksHeadsMap().size(),
+        return new Tuple2<Integer, Long>(dcSet.getBlockMap().size(),
                 dcSet.getBlocksHeadsMap().getFullWeight());
     }
 

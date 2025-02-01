@@ -175,6 +175,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.transactionsCount = transactionCount;
             this.transactionsHash = transactionsHash;
             this.reference = reference;
+            if (reference == null)
+                throw new RuntimeException("Block reference id NULL!!");
 
             this.heightBlock = heightBlock;
             this.forgingValue = forgingValue;
@@ -190,6 +192,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                          long totalFee, long emittedFee, long totalWinValue) {
             this.version = block.version;
             this.reference = block.reference;
+            if (reference == null)
+                throw new RuntimeException("Block reference id NULL!!");
             this.creator = block.creator;
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
@@ -208,6 +212,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         public BlockHead(Block block, long totalFee, long emittedFee) {
             this.version = block.version;
             this.reference = block.reference;
+            if (reference == null)
+                throw new RuntimeException("Block reference id NULL!!");
             this.creator = block.creator;
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
@@ -226,6 +232,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         public BlockHead(Block block) {
             this.version = block.version;
             this.reference = block.reference;
+            if (reference == null)
+                throw new RuntimeException("Block reference id NULL!!");
             this.creator = block.creator;
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
@@ -476,6 +484,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                  int forgingValue, long winValue, long target) {
         this.version = version;
         this.reference = reference;
+        if (reference == null)
+            throw new RuntimeException("Block reference id NULL!!");
         this.creator = creator;
         this.heightBlock = heightBlock;
 
@@ -493,6 +503,8 @@ public class Block implements Closeable, ExplorerJsonLine {
     public Block(int version, byte[] reference, PublicKeyAccount creator) {
         this.version = version;
         this.reference = reference;
+        if (reference == null)
+            throw new RuntimeException("Block reference id NULL!!");
         this.creator = creator;
         this.heightBlock = 1;
 
@@ -508,6 +520,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                  byte[] transactionsHash, byte[] atBytes, byte[] signature) {
         this.version = version;
         this.reference = reference;
+        if (reference == null)
+            throw new RuntimeException("Block reference id NULL!!");
         this.creator = creator;
         this.heightBlock = heightBlock;
 
@@ -524,6 +538,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         // TODO Auto-generated constructor stub
         this.version = version;
         this.reference = parentBlock.signature;
+        if (reference == null)
+            throw new RuntimeException("Block reference id NULL!!");
         this.creator = generator;
         this.heightBlock = parentBlock.heightBlock + 1;
 
@@ -2297,6 +2313,9 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 tx = txMap.get(key.b);
                 tx.processByTime(this);
+                // перезапишем так как хвост в транзакции отрос
+                txMap.put(tx);
+
 
             }
         } catch (IOException e) {

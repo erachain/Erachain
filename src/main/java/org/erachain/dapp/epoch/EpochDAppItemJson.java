@@ -17,7 +17,7 @@ import org.json.simple.parser.ParseException;
 
 import java.nio.charset.StandardCharsets;
 
-public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTimed {
+public abstract class EpochDAppItemJson extends EpochDAppJson {
 
     protected int itemType;
     protected long itemKey;

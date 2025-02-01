@@ -13,6 +13,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
 import org.erachain.dapp.DApp;
 import org.erachain.dapp.DAppFactory;
+import org.erachain.dapp.DAppTimed;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.json.simple.JSONArray;
@@ -394,11 +395,11 @@ public class MoneyStakingReferal extends EpochDAppItemJson {
     }
 
     ///////// COMMANDS
-    private boolean job(boolean asOrphan) {
+    private void job(boolean asOrphan) {
 
         RSend rSend = (RSend) commandTx;
         if (rSend.balancePosition() != BALANCE_POS_OWN)
-            return true;
+            return;
 
         PublicKeyAccount sender = commandTx.getCreator();
         String senderAddress = sender.getAddress();
@@ -525,31 +526,20 @@ public class MoneyStakingReferal extends EpochDAppItemJson {
 
         }
 
-        return true;
-
     }
 
     @Override
-    public boolean processByTime() {
-        fail("unknown command");
-        return false;
-    }
-
-    @Override
-    public boolean process() {
+    public void process() {
         if (block == null) {
             // Это еще неподтвержденная - нечего исполнять или не Послать
-            return true;
+            return;
         }
-        return job(false);
-    }
-
-    @Override
-    public void orphanByTime() {
+        job(false);
     }
 
     @Override
     public void orphanBody() {
+        super.orphanBody();
         job(true);
     }
 

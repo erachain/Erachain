@@ -81,7 +81,9 @@ public abstract class EpochDAppStatus extends EpochDApp {
     /**
      * For use FAIL status
      */
-    abstract public void orphanBody();
+    public void orphanBody() {
+        status = null;
+    }
 
     /**
      * Use FAIL status

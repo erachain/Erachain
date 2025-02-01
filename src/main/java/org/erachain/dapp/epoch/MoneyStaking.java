@@ -56,7 +56,7 @@ public class MoneyStaking extends EpochDAppItemJson {
     /**
      * Коэффициент на 1 секунду для 1% в банковский год (360 дней)
      */
-    static final BigDecimal STAKE_PERIOD_MULTI = BigDecimal.ONE.divide(new BigDecimal(360L * 86400L * 100L), 10, RoundingMode.HALF_DOWN);
+    static final BigDecimal STAKE_PERIOD_MULTI = BigDecimal.ONE.divide(new BigDecimal(365L * 86400L * 100L), 14, RoundingMode.HALF_DOWN);
 
     /**
      * Постоянный множитель доходности annualPercentage - Reward multiplier as a Percentage per year. По умолчанию 10% годовых
@@ -147,7 +147,7 @@ public class MoneyStaking extends EpochDAppItemJson {
             return;
         }
 
-        BigDecimal balanceOwnNew = account.getBalanceForPosition(asset.getKey(), BALANCE_POS_OWN).b;
+        BigDecimal balanceOwnNew = account.getBalanceForPosition(dcSet, asset.getKey(), BALANCE_POS_OWN).b;
 
         Object[] point = (Object[]) valueGet(account.getAddress());
         // NULL тоже заносим для стирания при откате. И баланс старый
@@ -231,8 +231,8 @@ public class MoneyStaking extends EpochDAppItemJson {
                         pointNew[0] = BigDecimal.ZERO;
 
                         // Сперва запомним балансы для отката
-                        Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
-                        Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                        Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
+                        Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
                         stateSubPoints.add(new Object[]{assetKey,
                                 assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
                                 account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
@@ -281,8 +281,8 @@ public class MoneyStaking extends EpochDAppItemJson {
             if ((blockTimestamp - lastTimeAction) / 1000 >= SKIP_SECONDS) {
                 // Выплату сделать
                 // Сперва запомним балансы для отката
-                Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
-                Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
+                Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
                 stateSubPoints.add(new Object[]{assetKey,
                         assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
                         account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
@@ -325,7 +325,7 @@ public class MoneyStaking extends EpochDAppItemJson {
      * @param asOrphan
      * @return
      */
-    private boolean job(boolean asOrphan) {
+    private void job(boolean asOrphan) {
 
         if (asOrphan) {
             Object[][][] statePoints = (Object[][][]) removeState(commandTx.getDBRef());
@@ -368,7 +368,7 @@ public class MoneyStaking extends EpochDAppItemJson {
             status = "";
             TransferBalanceDto[] transfers = ((TransferredBalances) commandTx).getTransfers();
             if (transfers == null || transfers.length == 0)
-                return false;
+                return;
 
             Object[][][] statePoints = new Object[transfers.length][][];
             int i = 0;
@@ -400,31 +400,22 @@ public class MoneyStaking extends EpochDAppItemJson {
 
         }
 
-        return true;
-
     }
 
     @Override
-    public boolean processByTime() {
-        fail("unknown command");
-        return false;
-    }
-
-    @Override
-    public boolean process() {
+    public void process() {
         if (block == null) {
             // Это еще неподтвержденная - нечего исполнять или не Послать
-            return true;
+            return;
         }
-        return job(false);
-    }
 
-    @Override
-    public void orphanByTime() {
+        job(false);
     }
 
     @Override
     public void orphanBody() {
+        super.orphanBody();
+
         job(true);
     }
 

@@ -105,8 +105,7 @@ public class ErrorDApp extends DApp {
     }
 
     @Override
-    public boolean process() {
-        return false;
+    public void process() {
     }
 
     @Override

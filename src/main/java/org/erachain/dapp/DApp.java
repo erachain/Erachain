@@ -250,7 +250,7 @@ public abstract class DApp {
             ShibaVerseDApp.blockAction(dcSet, block, asOrphan);
     }
 
-    abstract public boolean process();
+    abstract public void process();
 
     abstract public void orphan();
 

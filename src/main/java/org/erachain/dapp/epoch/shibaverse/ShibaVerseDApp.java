@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransferredBalances;
 import org.erachain.dapp.DApp;
 import org.erachain.dapp.DAppFactory;
+import org.erachain.dapp.DAppTimed;
 import org.erachain.dapp.epoch.EpochDAppJson;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
@@ -34,7 +35,7 @@ import java.util.*;
 
 import static org.erachain.core.item.assets.AssetTypes.AS_INSIDE_ASSETS;
 
-public class ShibaVerseDApp extends EpochDAppJson {
+public class ShibaVerseDApp extends EpochDAppJson implements DAppTimed {
 
     int WAIT_RAND = 3;
 
@@ -271,7 +272,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
     /**
      * @param asOrphan
      */
-    private boolean catchComets(boolean asOrphan) {
+    private void catchComets(boolean asOrphan) {
         // рождение комет
 
         if (gravitaKey == null)
@@ -280,16 +281,16 @@ public class ShibaVerseDApp extends EpochDAppJson {
         RSend rSend = (RSend) commandTx;
         if (commandTx.getAssetKey() != gravitaKey) {
             fail("Wrong asset key. Need " + gravitaKey);
-            return false;
+            return;
         } else if (!rSend.hasAmount() || !rSend.hasPacket() && commandTx.getAmount().signum() <= 0) {
             fail("Wrong amount. Need > 0");
-            return false;
+            return;
         } else if (rSend.isBackward()) {
             fail("Wrong direction - backward");
-            return false;
+            return;
         } else if (rSend.balancePosition() != Account.BALANCE_POS_OWN) {
             fail("Wrong balance position. Need OWN[1]");
-            return false;
+            return;
         }
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
@@ -369,7 +370,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
         else
             status = "done";
 
-        return true;
+        return;
 
     }
 
@@ -410,8 +411,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
         return BigDecimal.ZERO;
     }
 
-    private boolean random(boolean asOrphan) {
-        return true;
+    private void random(boolean asOrphan) {
     }
 
     /**
@@ -419,7 +419,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
      *
      * @param asOrphan
      */
-    private boolean shopBuy(boolean asOrphan) {
+    private void shopBuy(boolean asOrphan) {
         PublicKeyAccount creator = commandTx.getCreator();
 
         if (asOrphan) {
@@ -442,33 +442,33 @@ public class ShibaVerseDApp extends EpochDAppJson {
             RSend rSend = (RSend) commandTx;
             if (!rSend.hasAmount()) {
                 fail("Has not amount");
-                return false;
+                return;
             } else if (commandTx.getAssetKey() != 1 && commandTx.getAssetKey() != 18) {
                 fail("Wrong asset key. Need 1 or 18");
-                return false;
+                return;
             } else if (rSend.balancePosition() != Account.BALANCE_POS_OWN) {
                 fail("Wrong balance position. Need OWN[1]");
-                return false;
+                return;
             } else if (!rSend.hasPacket() && commandTx.getAmount().signum() <= 0) {
                 fail("Wrong amount. Need > 0");
-                return false;
+                return;
             } else if (rSend.isBackward()) {
                 fail("Wrong direction - backward");
-                return false;
+                return;
             } else if (pars == null) {
                 fail("Empty pars");
-                return false;
+                return;
             } else {
                 try {
                     shopAssetKey = Long.parseLong(pars.get(1).toString());
                 } catch (Exception e) {
                     fail("Wrong asset key: " + pars.get(1));
-                    return false;
+                    return;
                 }
 
                 if (false && shopAssetKey != buster01Key) {
                     fail("Wrong asset key");
-                    return false;
+                    return;
                 }
             }
 
@@ -476,13 +476,13 @@ public class ShibaVerseDApp extends EpochDAppJson {
             BigDecimal sellPrice = shopPrice(shopAssetKey, priceAssetKey);
             if (sellPrice == null || sellPrice.signum() < 1) {
                 fail("not priced");
-                return false;
+                return;
             }
 
             shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             if (shopAsset == null) {
                 fail("Shop asset not exist");
-                return false;
+                return;
             }
 
             AssetCls priceAsset = commandTx.getAsset();
@@ -521,28 +521,26 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
         }
 
-        return true;
     }
 
-    private boolean stakeAction(boolean asOrphan) {
+    private void stakeAction(boolean asOrphan) {
 
         RSend rSend = (RSend) commandTx;
         if (commandTx.getAssetKey() != gravitaKey) {
             fail("Wrong asset key. Need " + gravitaKey);
-            return false;
+            return;
         } else if (!rSend.hasAmount() || !rSend.hasPacket() && commandTx.getAmount().signum() <= 0) {
             fail("Wrong amount. Need > 0");
-            return false;
+            return;
         } else if (rSend.isBackward()) {
             fail("Wrong direction - backward");
-            return false;
+            return;
         } else if (rSend.balancePosition() != Account.BALANCE_POS_OWN) {
             fail("Wrong balance position. Need [1]OWN");
-            return false;
+            return;
         }
 
         fail("-");
-        return false;
     }
 
     // CHARGE all from FARM 01
@@ -561,28 +559,28 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
     }
 
-    private boolean farmAction(boolean asOrphan) {
+    private void farmAction(boolean asOrphan) {
 
         fail("-");
 
         RSend rSend = (RSend) commandTx;
         if (asOrphan) {
-            return true;
+            return;
 
         } else {
             AssetCls asset = dcSet.getItemAssetMap().get(commandTx.getAssetKey());
             if (!asset.getMaker().equals(MAKER)) {
                 fail("Wrong asset maker. Need " + MAKER.getAddress());
-                return false;
+                return;
             } else if (!rSend.hasAmount()) {
                 fail("Wrong amount. Need > 0");
-                return false;
+                return;
             } else if (rSend.isBackward()) {
                 fail("Wrong direction - backward");
-                return false;
+                return;
             } else if (rSend.balancePosition() != Account.BALANCE_POS_DEBT) {
                 fail("Wrong balance position. Need [2]DEBT");
-                return false;
+                return;
             }
         }
 
@@ -594,7 +592,6 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
         }
 
-        return false;
     }
 
     private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
@@ -654,7 +651,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
      *
      * @param asOrphan
      */
-    private boolean shopSetPrices(boolean asOrphan) {
+    private void shopSetPrices(boolean asOrphan) {
 
         SmartContractValues map = dcSet.getSmartContractValues();
         if (asOrphan) {
@@ -674,10 +671,10 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
             if (pars == null) {
                 fail("Wrong JSON params");
-                return false;
+                return;
             } else if (pars.size() < 2) {
                 fail("Wrong params size <2");
-                return false;
+                return;
             } else {
                 prices = (JSONObject) pars.get(1);
                 for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
@@ -685,15 +682,15 @@ public class ShibaVerseDApp extends EpochDAppJson {
                         long assetKey = Long.parseLong(item.getKey());
                         if (!dcSet.getItemAssetMap().contains(assetKey)) {
                             fail("Asset not exist for Key: " + item.getKey());
-                            return false;
+                            return;
                         }
                     } catch (Exception e) {
                         fail("Wrong assetKey: " + item.getKey());
-                        return false;
+                        return;
                     }
                     if (!(item.getValue() instanceof JSONObject)) {
                         fail("Not JSON: " + item.getValue().toString());
-                        return false;
+                        return;
                     }
 
                     for (Map.Entry<String, Object> priceItem : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
@@ -701,18 +698,18 @@ public class ShibaVerseDApp extends EpochDAppJson {
                             long assetKey = Long.parseLong(priceItem.getKey());
                             if (!dcSet.getItemAssetMap().contains(assetKey)) {
                                 fail("Asset not exist for Key: " + priceItem.getKey());
-                                return false;
+                                return;
                             }
                         } catch (Exception e) {
                             fail("Wrong assetKey: " + priceItem.getKey());
-                            return false;
+                            return;
                         }
 
                         try {
                             new BigDecimal(priceItem.getValue().toString());
                         } catch (Exception e) {
                             fail("Wrong price value: " + priceItem.getValue());
-                            return false;
+                            return;
                         }
 
                     }
@@ -745,11 +742,9 @@ public class ShibaVerseDApp extends EpochDAppJson {
             status = "done";
         }
 
-        return true;
-
     }
 
-    private boolean adminWithdraw(Account admin, boolean asOrphan) {
+    private void adminWithdraw(Account admin, boolean asOrphan) {
         if (asOrphan) {
             // restore results for orphan
             List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(commandTx.getDBRef())[0];
@@ -763,7 +758,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
             if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
                 fail("not initated yet");
-                return false;
+                return;
             }
 
             ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
@@ -806,11 +801,9 @@ public class ShibaVerseDApp extends EpochDAppJson {
             }
         }
 
-        return true;
-
     }
 
-    private boolean init(Account admin, boolean asOrphan) {
+    private void init(Account admin, boolean asOrphan) {
 
         /**
          * issue main currency
@@ -826,7 +819,7 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
             if (dcSet.getSmartContractValues().contains(INIT_KEY)) {
                 fail("already initated");
-                return false;
+                return;
             }
 
             AssetVenture gravita = new AssetVenture(null, stock, "GR", null, null,
@@ -844,7 +837,6 @@ public class ShibaVerseDApp extends EpochDAppJson {
             status = "done";
         }
 
-        return true;
     }
 
     /**
@@ -853,30 +845,29 @@ public class ShibaVerseDApp extends EpochDAppJson {
      * @param admin
      * @return
      */
-    public boolean processAdminCommands(Account admin) {
+    public void processAdminCommands(Account admin) {
         if ("init".equals(command)) {
-            return init(admin, false);
+            init(admin, false);
         } else if (command.startsWith("emite")) {
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            return adminWithdraw(admin, false);
+            adminWithdraw(admin, false);
         } else if (COMMAND_SET_PRICE.equals(command)) {
-            return shopSetPrices(false);
+            shopSetPrices(false);
+        } else {
+            fail("unknown command");
         }
-
-        fail("unknown command");
-        return false;
     }
 
     @Override
-    public boolean process() {
+    public void process() {
 
         if (!isValid())
-            return true;
+            return;
 
         if (commandTx instanceof RSend) {
             RSend rsend = (RSend) commandTx;
             if (isAdminCommand(commandTx)) {
-                return processAdminCommands(
+                processAdminCommands(
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
@@ -886,34 +877,32 @@ public class ShibaVerseDApp extends EpochDAppJson {
                     // рождение комет
                     dcSet.getTimeTXWaitMap().put(commandTx.getDBRef(), block.heightBlock + WAIT_RAND);
                     status = "wait";
-                    return false;
+                    return;
                 } else if (COMMAND_BUY.equals(command)) {
-                    return shopBuy(false);
+                    shopBuy(false);
                 } else if (COMMAND_STAKE.equals(command)) {
-                    return stakeAction(false);
+                    stakeAction(false);
                 } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
-                    return farmAction(false);
+                    farmAction(false);
                 }
             }
+            return;
         }
 
         fail("unknown command");
-        return false;
 
     }
 
     @Override
-    public boolean processByTime() {
+    public void processByTime() {
 
         if (COMMAND_CATH_COMET.equals(command)) {
-            return catchComets(false);
+            catchComets(false);
         } else if (COMMAND_RANDOM.equals(command)) {
-            return random(false);
+            random(false);
+        } else {
+            fail("unknown command");
         }
-
-        fail("unknown command");
-        return false;
-
     }
 
     public void orphanAdminCommands(Account admin) {
@@ -929,6 +918,8 @@ public class ShibaVerseDApp extends EpochDAppJson {
 
     @Override
     public void orphanBody() {
+
+        super.orphanBody();
 
         if (isAdminCommand(commandTx)) {
             orphanAdminCommands(

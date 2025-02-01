@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransferredBalances;
 import org.erachain.dapp.DApp;
 import org.erachain.dapp.DAppFactory;
+import org.erachain.dapp.DAppTimed;
 import org.erachain.dapp.epoch.EpochDAppJson;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.DCSet;
@@ -35,7 +36,7 @@ import java.util.*;
 
 import static org.erachain.core.item.assets.AssetTypes.AS_INSIDE_ASSETS;
 
-public class MemoCardsDApp extends EpochDAppJson {
+public class MemoCardsDApp extends EpochDAppJson  implements DAppTimed {
 
     int WAIT_RAND = 3;
 
@@ -514,10 +515,9 @@ public class MemoCardsDApp extends EpochDAppJson {
         return BigDecimal.ZERO;
     }
 
-    private boolean random(boolean asOrphan) {
+    private void random(boolean asOrphan) {
         if (commandTx.getAssetKey() == BUSTER_1_KEY)
-            return openBuster_1(asOrphan);
-        return true;
+            openBuster_1(asOrphan);
     }
 
     /**
@@ -525,7 +525,7 @@ public class MemoCardsDApp extends EpochDAppJson {
      *
      * @param asOrphan
      */
-    private boolean shopBuy(boolean asOrphan) {
+    private void shopBuy(boolean asOrphan) {
         PublicKeyAccount creator = commandTx.getCreator();
 
         if (asOrphan) {
@@ -548,33 +548,33 @@ public class MemoCardsDApp extends EpochDAppJson {
             RSend rSend = (RSend) commandTx;
             if (!rSend.hasAmount()) {
                 fail("Has not amount");
-                return false;
+                return;
             } else if (commandTx.getAssetKey() != 1 && commandTx.getAssetKey() != 18) {
                 fail("Wrong asset key. Need 1 or 18");
-                return false;
+                return;
             } else if (rSend.balancePosition() != Account.BALANCE_POS_OWN) {
                 fail("Wrong balance position. Need OWN[1]");
-                return false;
+                return;
             } else if (!rSend.hasPacket() && commandTx.getAmount().signum() <= 0) {
                 fail("Wrong amount. Need > 0");
-                return false;
+                return;
             } else if (rSend.isBackward()) {
                 fail("Wrong direction - backward");
-                return false;
+                return;
             } else if (pars == null) {
                 fail("Empty pars");
-                return false;
+                return;
             } else {
                 try {
                     shopAssetKey = Long.parseLong(pars.get(1).toString());
                 } catch (Exception e) {
                     fail("Wrong asset key: " + pars.get(1));
-                    return false;
+                    return;
                 }
 
                 if (shopAssetKey != BUSTER_1_KEY) {
                     fail("Wrong asset key");
-                    return false;
+                    return;
                 }
             }
 
@@ -582,13 +582,13 @@ public class MemoCardsDApp extends EpochDAppJson {
             BigDecimal sellPrice = shopPrice(shopAssetKey, priceAssetKey);
             if (sellPrice == null || sellPrice.signum() < 1) {
                 fail("not priced");
-                return false;
+                return;
             }
 
             shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             if (shopAsset == null) {
                 fail("Shop asset not exist");
-                return false;
+                return;
             }
 
             AssetCls priceAsset = commandTx.getAsset();
@@ -627,7 +627,6 @@ public class MemoCardsDApp extends EpochDAppJson {
 
         }
 
-        return true;
     }
 
     //////////////////// ADMIN PROCESS
@@ -637,7 +636,7 @@ public class MemoCardsDApp extends EpochDAppJson {
      *
      * @param asOrphan
      */
-    private boolean shopSetPrices(boolean asOrphan) {
+    private void shopSetPrices(boolean asOrphan) {
 
         SmartContractValues map = dcSet.getSmartContractValues();
         if (asOrphan) {
@@ -656,13 +655,13 @@ public class MemoCardsDApp extends EpochDAppJson {
 
             if (!isAdminCommand(commandTx.getCreator())) {
                 fail("not admin");
-                return false;
+                return;
             } else if (pars == null) {
                 fail("Wrong JSON params");
-                return false;
+                return;
             } else if (pars.size() < 2) {
                 fail("Wrong params size <2");
-                return false;
+                return;
             } else {
                 prices = (JSONObject) pars.get(1);
                 for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
@@ -670,15 +669,15 @@ public class MemoCardsDApp extends EpochDAppJson {
                         long assetKey = Long.parseLong(item.getKey());
                         if (!dcSet.getItemAssetMap().contains(assetKey)) {
                             fail("Asset not exist for Key: " + item.getKey());
-                            return false;
+                            return;
                         }
                     } catch (Exception e) {
                         fail("Wrong assetKey: " + item.getKey());
-                        return false;
+                        return;
                     }
                     if (!(item.getValue() instanceof JSONObject)) {
                         fail("Not JSON: " + item.getValue().toString());
-                        return false;
+                        return;
                     }
 
                     for (Map.Entry<String, Object> priceItem : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
@@ -686,18 +685,18 @@ public class MemoCardsDApp extends EpochDAppJson {
                             long assetKey = Long.parseLong(priceItem.getKey());
                             if (!dcSet.getItemAssetMap().contains(assetKey)) {
                                 fail("Asset not exist for Key: " + priceItem.getKey());
-                                return false;
+                                return;
                             }
                         } catch (Exception e) {
                             fail("Wrong assetKey: " + priceItem.getKey());
-                            return false;
+                            return;
                         }
 
                         try {
                             new BigDecimal(priceItem.getValue().toString());
                         } catch (Exception e) {
                             fail("Wrong price value: " + priceItem.getValue());
-                            return false;
+                            return;
                         }
 
                     }
@@ -729,8 +728,6 @@ public class MemoCardsDApp extends EpochDAppJson {
 
             status = "done";
         }
-
-        return true;
 
     }
 
@@ -855,14 +852,16 @@ public class MemoCardsDApp extends EpochDAppJson {
     }
 
     @Override
-    public boolean process() {
+    public void process() {
 
-        if ("init".equals(command)) // INIT HERE - before common isValid
-            return init(false);
-
+        if ("init".equals(command)) {
+            // INIT HERE - before common isValid
+            init(false);
+            return;
+        }
 
         if (!isValid())
-            return true;
+            return;
 
         if (commandTx instanceof RSend) {
             RSend rsend = (RSend) commandTx;
@@ -870,48 +869,49 @@ public class MemoCardsDApp extends EpochDAppJson {
             if (COMMAND_RANDOM.equals(command)) {
                 if (rsend.isBackward() || rsend.balancePosition() != Account.BALANCE_POS_OWN) {
                     fail("wrong action: " + rsend.viewActionType());
-                    return false;
+                    return;
                 } else if (block == null) {
                     fail("wait block");
-                    return false;
+                    return;
                 }
 
                 /// WAIT RANDOM FROM FUTURE
                 dcSet.getTimeTXWaitMap().put(commandTx.getDBRef(), block.heightBlock + WAIT_RAND);
                 status = "wait";
-                return false;
+                return;
 
                 /// COMMANDS
             } else if (COMMAND_BUY.equals(command)) {
-                return shopBuy(false);
+                shopBuy(false);
 
                 /// ADMIN COMMAND
             } else if (COMMAND_WITHDRAW.startsWith(command)) {
-                return adminWithdraw(false);
+                adminWithdraw(false);
             } else if (COMMAND_SET_PRICE.equals(command)) {
-                return shopSetPrices(false);
+                shopSetPrices(false);
             }
-        }
 
-        fail("unknown command");
-        return false;
+        } else {
+            fail("unknown command");
+        }
 
     }
 
     @Override
-    public boolean processByTime() {
+    public void processByTime() {
 
         if (COMMAND_RANDOM.equals(command)) {
-            return random(false);
+            random(false);
+        } else {
+            fail("unknown command");
         }
-
-        fail("unknown command");
-        return false;
 
     }
 
     @Override
     public void orphanBody() {
+
+        super.orphanBody();
 
         /// COMMANDS
         if (COMMAND_BUY.equals(command)) {
