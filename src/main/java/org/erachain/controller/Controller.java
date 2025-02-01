@@ -1122,7 +1122,7 @@ public class Controller extends Observable {
         LOGGER.warn("Closing shrink DB...");
         dcSetShrunk.flush(0, true, false);
         dcSetShrunk.close();
-        LOGGER.warn("Make the shrink DB done!\nFor rebuild chain from it - move files from {} to {} and restart program with '-rebuild' option",
+        LOGGER.warn("Make the shrink DB done!\nFor rebuild chain from it - move files from {} to {} and restart program with '-rechain' option",
                 shrinkDBFile.getParentFile(), currentDBFile.getParentFile() + BACKUP_NAME);
         System.exit(0);
 
