@@ -1106,7 +1106,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                             //PASS BLOCK TO CONTROLLER
                                             LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
                                             if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
-                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                                    null // не надо банить тут - может цепочка ушла уже и это мой блок же
                                             )) {
 
                                                 // need to BROADCAST
@@ -1454,7 +1454,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             return;
         }
 
-        if (forgingStatus != ForgingStatus.FORGING) {
+        if (forgingStatus != ForgingStatus.FORGING && forgingStatus != ForgingStatus.FORGING_WAIT) {
             setForgingStatus(ForgingStatus.FORGING_WAIT);
         }
 

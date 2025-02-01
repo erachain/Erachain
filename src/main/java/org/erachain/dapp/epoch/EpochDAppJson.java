@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Общий класс в котором параметры задаются вОписании к транзакции в виде JSON
  */
-public abstract class EpochDAppJson extends EpochDAppStatus implements DAppTimed {
+public abstract class EpochDAppJson extends EpochDAppStatus {
 
     protected String command;
     // TODO нужно наследный класс делать для Версии - так как там другой парсинг и в байты для ДБ нужно версию тоже катать

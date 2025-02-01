@@ -272,7 +272,7 @@ public class LeafFall extends EpochDApp {
     }
 
     @Override
-    public boolean process() {
+    public void process() {
 
         /**
          * use this state storage if many variables used in smart-contract
@@ -295,7 +295,6 @@ public class LeafFall extends EpochDApp {
 
         valuesMap.put(COUNT_VAR, ++count);
 
-        return false;
     }
 
     @Override

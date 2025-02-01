@@ -1100,7 +1100,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     /**
      * Постраничный поиск по строке поиска
      *
-     * @param offest
      * @param filterStr
      * @param useForge
      * @param pageSize
@@ -2758,6 +2757,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
+
         if (dApp == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут

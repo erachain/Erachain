@@ -527,7 +527,7 @@ public class Synchronizer extends Thread {
             // FIND HEADERS for common CHAIN
             if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
                 LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
-                        + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
+                        + " my HEIGHT: " + dcSet.getBlockMap().size());
             }
 
             byte[] lastCommonBlockSignature;
@@ -939,10 +939,17 @@ public class Synchronizer extends Thread {
          * Чтобы проверить правильность и силу цепочки/
          */
         int commonBockHeight = dcSet.getBlockSignsMap().get(lastCommonBlockSignature);
-        // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
-        int needChainLenght = 3 + myChainHeight - commonBockHeight;
-        if (headers.size() > needChainLenght) {
-            headers = headers.subList(0, needChainLenght);
+        if (false) {
+            // Запретим это так как лучше оставить всю цепочку у себя чем откатить ее и после 3-х блоков, на повтороной синхронизации
+            // понять что там битая цепочка
+            // а скорость ради которой это затевается - не так важна против защиты данных
+            // поэтому отключаем ниже код
+
+            // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
+            int needChainLenght = 3 + myChainHeight - commonBockHeight;
+            if (headers.size() > needChainLenght) {
+                headers = headers.subList(0, needChainLenght);
+            }
         }
 
         LOGGER.info("findHeaders headers CLEAR" + "now headers: " + headers.size());

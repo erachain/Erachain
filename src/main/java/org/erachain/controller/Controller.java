@@ -108,8 +108,8 @@ import static org.erachain.datachain.DCSet.DATA_FILE;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.6.02";
-    public static String buildTime = "2025-01-30 12:00:00 UTC";
+    public static String version = "6.6.03";
+    public static String buildTime = "2025-02-01 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -2514,10 +2514,14 @@ public class Controller extends Observable {
                 }
                 Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
-                    if (!BlockChain.TEST_MODE)
+                    if (!BlockChain.TEST_MODE) {
                         // Этот пир дает цепочку из будущего - не берем его
                         peer.ban(5, "FROM FUTURE: " + whPeer);
-                    continue;
+                        continue;
+                    } else {
+                        // в целях теста позволим из будущего синхриться до текущей
+                        ;;
+                    }
                 }
 
                 if (height < whPeer.a
