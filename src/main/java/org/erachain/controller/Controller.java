@@ -108,8 +108,8 @@ import static org.erachain.datachain.DCSet.DATA_FILE;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.6.03";
-    public static String buildTime = "2025-02-01 12:00:00 UTC";
+    public static String version = "6.6.04";
+    public static String buildTime = "2025-02-02 22:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
