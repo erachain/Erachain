@@ -882,6 +882,8 @@ public final class Fun {
     public static <K2,K1> Iterable<K1> filter(final NavigableSet<Tuple2<K2, K1>> secondaryKeys, final K2 secondaryKey) {
         return filter(secondaryKeys, secondaryKey, true, secondaryKey, true);
     }
+
+    // Не работает с descendingSet !!!
     public static <K2,K1> Iterable<K1> filter(final NavigableSet<Tuple2<K2, K1>> secondaryKeys,
                                               final K2 lo, final boolean loInc, final K2 hi, final boolean hiInc) {
         return new Iterable<K1>(){

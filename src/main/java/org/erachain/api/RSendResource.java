@@ -61,8 +61,10 @@ public class RSendResource {
                 "make and broadcast SEND asset amount and mail");
         help.put("POST r_send/raw {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
-        help.put("GET r_send/test1/{delay}?password={password}",
-                "Start test; delay = 0 - stop");
+        help.put("GET r_send/test1/{probability}/{delay}?password={password}",
+                "Start test send messages; delay = 0 - stop");
+        help.put("GET r_send/test2/{probability}/{delay}?password={password}",
+                "Start test send COMPU; delay = 0 - stop");
         help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
                 "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
                         + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"

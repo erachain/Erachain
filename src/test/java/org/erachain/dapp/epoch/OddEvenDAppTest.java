@@ -1,5 +1,7 @@
 package org.erachain.dapp.epoch;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import junit.framework.TestCase;
 import lombok.SneakyThrows;
 import org.erachain.controller.Controller;
@@ -16,6 +18,8 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.dapp.DApp;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -66,6 +70,7 @@ public class OddEvenDAppTest extends TestCase {
         BlockChain.ALL_VALID_BEFORE = 0;
         gb = bchain.getGenesisBlock();
         cntrl.transactionsPool = new TransactionPoolStub();
+        //cntrl.getBlockGenerator().stop = true;
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
@@ -82,12 +87,15 @@ public class OddEvenDAppTest extends TestCase {
 
     private void testOrphan(DCSet dcSet) throws Exception {
 
+        TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
+
         BigDecimal amountSend = new BigDecimal("10");
         Transaction rSendTxDApp = new RSend(maker, null, null, (byte) 0, dAppAccount, ERA_KEY,
                 amountSend, null, "1".getBytes(StandardCharsets.UTF_8), isText, encryptMessage,
                 // Одинаковое время жестко задаем
                 1735678800005L,
                 0L);
+        int txType = rSendTxDApp.getType();
         rSendTxDApp.sign(maker, Transaction.FOR_NETWORK);
         ArrayList<Transaction> txsDApp = new ArrayList<>();
         txsDApp.add(rSendTxDApp);
@@ -102,6 +110,36 @@ public class OddEvenDAppTest extends TestCase {
         block2DApp.sign(maker);
         // Исполним перевод
         block2DApp.process(dcSet, true);
+
+        System.out.println(rSendTxDApp.viewSignature());
+        assertTrue(finalMap.get(rSendTxDApp.getSignature()) != null);
+
+        /// Проверим как ключи в БД легли
+        IteratorCloseable<Long> iteratorLong;
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), true);
+        assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+
+        iteratorLong = finalMap.getIteratorByAddressAndType(OddEvenDApp.MAKER.getShortAddressBytes(), txType, false, false);
+        assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+        iteratorLong = finalMap.getIteratorByAddressAndType(OddEvenDApp.MAKER.getShortAddressBytes(), txType, false, true);
+        assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), true);
+            assertEquals(rSendTxDApp.viewSignature(), finalMap.get(iteratorLong.next()).viewSignature());
+
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
+
+
         assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
         Transaction txDApp = dcSet.getTransactionFinalMap().get(2, 1);
@@ -122,9 +160,23 @@ public class OddEvenDAppTest extends TestCase {
                 1000, 1000L, 1000L);
         block3.process(dcSet, true);
 
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
+
         Block block4 = blockGenerator.generateNextBlock(maker, block3, uTx,
                 1000, 1000L, 1000L);
         block4.process(dcSet, true);
+
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
 
         assertTrue(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertFalse(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
@@ -133,6 +185,13 @@ public class OddEvenDAppTest extends TestCase {
         Block block5Done = blockGenerator.generateNextBlock(maker, block4, uTx,
                 1000, 1000L, 1000L);
         block5Done.process(dcSet, true);
+
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
 
         assertFalse(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertTrue(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
@@ -156,11 +215,38 @@ public class OddEvenDAppTest extends TestCase {
         assertFalse(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertTrue(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
 
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
+
+        Long fromID = null; int offset = 0; int pageSize = 10; boolean useForge = false;
+        List<Transaction> transactions;
+        if (!dcSet.isFork()) {
+            transactions = finalMap.getTransactionsByAddressFromID(OddEvenDApp.MAKER.getShortAddressBytes(),
+                    fromID, offset, pageSize, !useForge, true);
+            assertEquals(1, transactions.size());
+        }
+
+
         /////////// ORPHAN
         block6After.orphan(dcSet);
         assertEquals(block6After.heightBlock, 6);
         assertEquals(block6After.getHeight(), 6);
         assertEquals(block6After.blockHead.heightBlock, 6);
+
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+
+            transactions = finalMap.getTransactionsByAddressFromID(OddEvenDApp.MAKER.getShortAddressBytes(),
+                    fromID, offset, pageSize, !useForge, true);
+            assertEquals(1, transactions.size());
+        }
 
         assertFalse(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertTrue(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
@@ -180,12 +266,38 @@ public class OddEvenDAppTest extends TestCase {
         block3.orphan(dcSet);
         assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(1, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(1, Iterators.size(iteratorLong));
+        }
+
+        if (!dcSet.isFork()) {
+            transactions = finalMap.getTransactionsByAddressFromID(OddEvenDApp.MAKER.getShortAddressBytes(),
+                    fromID, offset, pageSize, !useForge, true);
+            assertEquals(1, transactions.size());
+        }
+
         assertTrue(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertFalse(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
         block2DApp.orphan(dcSet);
         assertEquals(new BigDecimal("1000.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
         assertFalse(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());
         assertFalse(dcSet.getTimeTXDoneMap().getTXIterator(false).hasNext());
+
+        iteratorLong = finalMap.getIteratorByCreator(maker.getShortAddressBytes(), false);
+        assertEquals(0, Iterators.size(iteratorLong));
+        if (!dcSet.isFork()) {
+            iteratorLong = finalMap.getIteratorByRecipient(OddEvenDApp.MAKER.getShortAddressBytes(), false);
+            assertEquals(0, Iterators.size(iteratorLong));
+        }
+
+        if (!dcSet.isFork()) {
+            transactions = finalMap.getTransactionsByAddressFromID(OddEvenDApp.MAKER.getShortAddressBytes(),
+                    fromID, offset, pageSize, !useForge, true);
+            assertEquals(0, transactions.size());
+        }
 
     }
 
@@ -242,26 +354,29 @@ public class OddEvenDAppTest extends TestCase {
         assertEquals(block2DApp.getHeight(), 2);
         assertEquals(block2DApp.blockHead.heightBlock, 2);
 
-        Fun.Tuple2<List<Transaction>, Integer> uTx = new Fun.Tuple2<>(new ArrayList<>(), 0);
-        Block block3 = blockGenerator.generateNextBlock(maker, block2DApp, uTx,
+        Fun.Tuple2<List<Transaction>, Integer> uTxEmpty = new Fun.Tuple2<>(new ArrayList<>(), 0);
+        Block block3 = blockGenerator.generateNextBlock(maker, block2DApp, uTxEmpty,
                 1000, 1000L, 1000L);
         block3.process(dcSet, true);
+        assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
         {
             // Теперь проверим как исполнится в форке, когда запуск не в нем был
             DCSet dcSetFork = dcSet.fork("test");
 
-            Block block4 = blockGenerator.generateNextBlock(maker, block3, uTx,
+            Block block4 = blockGenerator.generateNextBlock(maker, block3, uTxEmpty,
                     1000, 1000L, 1000L);
             block4.process(dcSetFork, true);
+            assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
             assertTrue(dcSetFork.getTimeTXWaitMap().getTXIterator(false).hasNext());
             assertFalse(dcSetFork.getTimeTXDoneMap().getTXIterator(false).hasNext());
             assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSetFork));
 
-            Block block5Done = blockGenerator.generateNextBlock(maker, block4, uTx,
+            Block block5Done = blockGenerator.generateNextBlock(maker, block4, uTxEmpty,
                     1000, 1000L, 1000L);
             block5Done.process(dcSetFork, true);
+            assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
             assertFalse(dcSetFork.getTimeTXWaitMap().getTXIterator(false).hasNext());
             assertTrue(dcSetFork.getTimeTXDoneMap().getTXIterator(false).hasNext());
@@ -273,9 +388,10 @@ public class OddEvenDAppTest extends TestCase {
             assertEquals("You win! x2 = 20", itDApp.getStatus());
             assertEquals(new BigDecimal("1010.00000000"), maker.getBalanceUSE(ERA_KEY, dcSetFork));
 
-            Block block6After = blockGenerator.generateNextBlock(maker, block5Done, uTx,
+            Block block6After = blockGenerator.generateNextBlock(maker, block5Done, uTxEmpty,
                     1000, 1000L, 1000L);
             block6After.process(dcSetFork, true);
+            assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
 
             assertEquals(block6After.heightBlock, 6);
             assertEquals(block6After.getHeight(), 6);
@@ -319,6 +435,7 @@ public class OddEvenDAppTest extends TestCase {
 
         }
 
+        assertEquals(new BigDecimal("990.00000000"), maker.getBalanceUSE(ERA_KEY, dcSet));
         block3.orphan(dcSet);
 
         assertTrue(dcSet.getTimeTXWaitMap().getTXIterator(false).hasNext());

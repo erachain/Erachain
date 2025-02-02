@@ -3,6 +3,7 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
 import lombok.Setter;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
@@ -421,6 +422,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected int height;
     protected int seqNo;
     protected long dbRef; // height + SeqNo
+    /**
+     * Если проверка идет блока в цепочке или нового блока кандидата - то проверяем на предмет транзакций из будущего.
+     * Иначе игнорируем
+     */
+    @Setter
+    @Getter
+    protected boolean inChain;
 
     /**
      * external flags of transaction. If FLAGS is USED need to set SINB BIT - use
@@ -678,7 +686,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      *
      * @param dcSet
      * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
-     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности
+     *                           для отображения Выпускающих транзакций - после их обработки, например в Блокэксплоере,
+     *                           чтобы посмотреть какой актив был этой транзакцией выпущен.
      */
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         this.dcSet = dcSet;
@@ -2120,41 +2130,26 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return isSignatureValid(dcSet, false);
     }
 
-    /**
-     * flags
-     * = 1 - not check fee
-     * = 2 - not check person
-     * = 4 - not check PublicText
-     */
-    public int isValid(int forDeal, long checkFlags) {
-
-        if (height < BlockChain.ALL_VALID_BEFORE) {
-            return VALIDATE_OK;
-        }
-
-        if (typeBytes[0] == -1 || typeBytes[1] == -1 || typeBytes[2] == -1 || typeBytes[3] == -1) {
-            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
-            errorValue = (typeBytes[0] == -1 ? "[0]" : typeBytes[1] == -1 ? "[1]" : typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
-            return INVALID_FLAGS;
-        }
-
+    protected int checkReference(int forDeal) {
         // CHECK IF REFERENCE TIMESTAMP IS OK
         //Long reference = forDeal == null ? this.creator.getLastTimestamp(dcSet) : forDeal;
-        if (forDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
+        if (forDeal > Transaction.FOR_PACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
-                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                int heightBefore = height - 1;
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(heightBefore)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(heightBefore) - timestamp) / 1000;
                     if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
-                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                int heightBefore = height - BlockChain.CHECK_DOUBLE_SPEND_DEEP;
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(heightBefore)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(heightBefore) - timestamp) / 1000;
                     if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
@@ -2177,6 +2172,40 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 }
             }
         }
+        return VALIDATE_OK;
+    }
+
+    protected int isValidTimestamp() {
+
+        if (inChain && timestamp > Controller.getInstance().getBlockChain().getTimestamp(height + 1)) {
+            errorValue = "A transaction from the future is " + (timestamp - Controller.getInstance().getBlockChain().getTimestamp(height + 1)) / 1000
+                    + " seconds ahead of the block[" + height + "] time.";
+            return INVALID_TIMESTAMP;
+        }
+        return VALIDATE_OK;
+    }
+
+    /**
+     * flags
+     * = 1 - not check fee
+     * = 2 - not check person
+     * = 4 - not check PublicText
+     */
+    public int isValid(int forDeal, long checkFlags) {
+
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
+        if (typeBytes[0] == -1 || typeBytes[1] == -1 || typeBytes[2] == -1 || typeBytes[3] == -1) {
+            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
+            errorValue = (typeBytes[0] == -1 ? "[0]" : typeBytes[1] == -1 ? "[1]" : typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
+            return INVALID_FLAGS;
+        }
+
+        int check = isValidTimestamp();
+        if (check != VALIDATE_OK)
+            return check;
 
         // CHECK CREATOR
         if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
@@ -2184,12 +2213,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_ADDRESS;
         }
 
-        if (false) {
-            // TODO remove see
-            int height = this.getBlockHeightByParentOrLast(dcSet);
-        }
-        //if (height <= 0 || height > 1000)
-        //    return INVALID_TIMESTAMP;
+        check = checkReference(forDeal);
+        if (check != VALIDATE_OK)
+            return check;
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -2742,6 +2768,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
+        dApp = DAppFactory.make(this, block);
+
         if (dApp != null && dApp instanceof DAppTimed) {
             ((DAppTimed) dApp.set(this, block)).processByTime();
         }

@@ -1603,8 +1603,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     if (!isSignatureValid) {
                         // for check SIGN need HEIGHT
                         transaction.setHeightSeq(heightBlock, seqNo);
-                        if (!transaction.isSignatureValid(dcSetPlace)
-                                && BlockChain.ALL_VALID_BEFORE < heightBlock) {
+                        if (BlockChain.ALL_VALID_BEFORE < heightBlock
+                                && !transaction.isSignatureValid(dcSetPlace)) {
                             //
                             LOGGER.warn("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
                                     + ": " + transaction);
@@ -1634,11 +1634,16 @@ public class Block implements Closeable, ExplorerJsonLine {
                     transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
+
+                    // Включим проверки для конкретного блока в цепочке
+                    transaction.setInChain(true);
+
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
                     // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
-                    if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
-                            != Transaction.VALIDATE_OK
-                            && BlockChain.ALL_VALID_BEFORE < heightBlock) {
+                    if (BlockChain.ALL_VALID_BEFORE < heightBlock
+                            && transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
+                                != Transaction.VALIDATE_OK
+                    ) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.warn("*** " + this.heightBlock + "-" + seqNo
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
@@ -2311,7 +2316,15 @@ public class Block implements Closeable, ExplorerJsonLine {
                 timeWaitMap.remove(key.b);
                 timeDoneMap.put(key.b, key.a);
 
-                tx = txMap.get(key.b);
+                // Для перестройки индексов включая и вторичные и не протокольные - надо удалить
+                // а потом ниже добавить по новой
+                // TODO хотя на самом деле нужно только данные хвоста обновить - putRAW нужно сделать
+                tx = txMap.remove(key.b);
+                        // !!! Нельзя мясо сбрасывать так как в БД есть нобер блока и номер в блоке у этой трнзакции
+                        //.copy();
+                // НО базу Блока зададим - так как из кэша у транзакции может быть Основная БД
+                // А нам нужна форкнутая - которая у блока текущего задана
+                tx.setDC(dcSet);
                 tx.processByTime(this);
                 // перезапишем так как хвост в транзакции отрос
                 txMap.put(tx);

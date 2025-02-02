@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Synchronizer extends Thread {
 
     public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> (6 - (Controller.HARD_WORK >> 1)));
-    public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
+    public static final int GET_HEADERS_TIMEOUT = 20000;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
@@ -802,7 +802,7 @@ public class Synchronizer extends Thread {
         int timeSOT;
         if (peer.network.getActivePeers(false).size() < 3) {
             // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
-            timeSOT = 600000;
+            timeSOT = 60000;
         } else {
             timeSOT = GET_HEADERS_TIMEOUT;
         }
