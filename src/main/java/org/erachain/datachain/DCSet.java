@@ -1682,7 +1682,7 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
+     * Нужно не забыть переменные внутри каждой таблицы тоже в Родителя скинуть
      */
     @Override
     public synchronized void writeToParent() {
@@ -1709,6 +1709,10 @@ public class DCSet extends DBASet implements Closeable {
             // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
             // иначе размер больше будет в форке и не то значение
             ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+            if (false) {
+                // это не переменная а данные - он в таблице сами перекинутся
+                ///((AddressForging) addressForging.getParent()).getLast(block.getCreator().getAddress());
+            }
 
             for (DBTab table : tables) {
                 table.writeToParent();
