@@ -362,7 +362,7 @@ public class Network extends Observable {
         for (Peer peer : this.knownPeers) {
             if (peer.isUsed())
                 if (!onlyWhite || peer.isWhite()) {
-                    if (!excludeMute || peer.getMute() > 0)
+                    if (!excludeMute || peer.getMute() <= 0)
                         counter++;
                 }
         }

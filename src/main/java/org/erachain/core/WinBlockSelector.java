@@ -3,14 +3,14 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
+import org.erachain.network.MessagesProcessor;
 import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
-import org.erachain.network.message.Message;
-import org.erachain.network.message.MessageFactory;
+import org.erachain.network.message.*;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -60,7 +60,7 @@ public class WinBlockSelector extends MonitoredThread {
         }
     }
 
-    public void processMessage(Message message) {
+    public void processMessage(Message message) throws Exception {
 
         if (message == null)
             return;
@@ -71,6 +71,39 @@ public class WinBlockSelector extends MonitoredThread {
 
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
+        LOGGER.info("received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                + newBlock);
+
+        if (newBlock.heightBlock == controller.getMyHeight() + 2) {
+            LOGGER.debug("newBlock.height == height + 2");
+            // это может быть новый блок уже после того как мы засинхрились и словили ПогбедныйБлок предпоследний
+            Block previousWaitWinBlock = blockChain.getWaitWinBuffer();
+            if (previousWaitWinBlock == null) {
+                LOGGER.debug("previous WaitWinBlock == null - try get it form peer");
+                previousWaitWinBlock = ((BlockMessage) message.getSender().getResponse(new GetBlockMessage(newBlock.getReference()))).getBlock();
+                if (previousWaitWinBlock == null) {
+                    LOGGER.debug("previous WaitWinBlock from peer = null");
+                    return;
+                }
+
+                if (!blockChain.setWaitWinBuffer(dcSet, previousWaitWinBlock, message.getSender())) {
+                    LOGGER.debug("previous WaitWinBlock from peer is Invalid");
+                    return;
+                }
+            }
+
+            if (Arrays.equals(previousWaitWinBlock.getSignature(), newBlock.getReference())) {
+                // Если действительно жто родитель нового Победного то его нужно залить в нашу цепочку сперва
+                LOGGER.debug("previous WaitWinBlock sign = ref new Block. Try flush previous");
+                if (!controller.flushNewBlockGenerated()) {
+                    return;
+                }
+            }
+        } else if (newBlock.heightBlock != controller.getMyHeight() + 1) {
+            // иначе пропускаем
+            LOGGER.debug("newBlock.height != height + 1 - ignore {}", newBlock);
+            return;
+        }
 
         // если мы синхронизируемся - то берем победный блок а потои
         // его перепроверим при выходе из синхронизации
@@ -84,12 +117,9 @@ public class WinBlockSelector extends MonitoredThread {
 
         int invalid = newBlock.isValidHead(dcSet);
 
-        LOGGER.info("received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                + newBlock);
-
         if (invalid > 0) {
             // то проверим заголовок
-            LOGGER.info("Block HEAD is Invalid[" + invalid + "] - ignore " + newBlock);
+            LOGGER.info("Block[{}] HEAD is Invalid={} - ignore", newBlock.toString(), invalid);
 
             if (invalid <= Block.INVALID_REFERENCE) {
                 // на всякий случай вышлем свой блок - возможно это как раз запрос на посылку нашего победного блока

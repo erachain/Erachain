@@ -83,6 +83,9 @@ public class Block implements Closeable, ExplorerJsonLine {
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
 
+    public static Block DEBUG_LAST_BLOCK;
+    public static byte[] DEBUG_LAST_BLOCK_SIGN;
+    public static int DEBUG_LAST_BLOCK_HEIGHT;
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -188,6 +191,27 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.size = size;
         }
 
+        public BlockHead(Block block, BlockHead head) {
+            this.version = block.version;
+            this.reference = block.reference;
+            if (reference == null)
+                throw new RuntimeException("Block reference id NULL!!");
+            this.creator = block.creator;
+            this.transactionsCount = block.transactionCount;
+            this.transactionsHash = block.transactionsHash;
+            this.signature = block.signature;
+
+            this.size = head.size;
+
+            this.heightBlock = head.heightBlock;
+            this.forgingValue = head.forgingValue;
+            this.winValue = head.winValue;
+            this.target = head.target;
+            this.totalWinValue = head.totalWinValue;
+            this.totalFee = head.totalFee;
+            this.emittedFee = head.emittedFee;
+        }
+
         public BlockHead(Block block, int heightBlock, int forgingValue, long winValue, long target,
                          long totalFee, long emittedFee, long totalWinValue) {
             this.version = block.version;
@@ -233,7 +257,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.version = block.version;
             this.reference = block.reference;
             if (reference == null)
-                throw new RuntimeException("Block reference id NULL!!");
+                throw new RuntimeExceptionNoTrace("BlockHead: Block reference id NULL!!");
             this.creator = block.creator;
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
@@ -269,8 +293,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             pos += VERSION_LENGTH;
 
             //WRITE REFERENCE
-            byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-            System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
+            byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+            System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
             pos += REFERENCE_LENGTH;
 
             //WRITE GENERATOR
@@ -1053,7 +1077,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("generatingBalance", this.forgingValue);
         block.put("winValue", this.getWinValue());
         block.put("target", this.getTarget());
-        block.put("winValueTargeted", blockHead.calcWinValueTargeted());
+        block.put("winValueTargeted", calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
         block.put("fee", BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
         block.put("reward", BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
@@ -1109,7 +1133,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         blockJSON.put("generatingBalance", blockHead.forgingValue);
         blockJSON.put("target", blockHead.target);
         blockJSON.put("winValue", blockHead.winValue);
-        blockJSON.put("winValueTargeted", blockHead.calcWinValueTargeted());
+        blockJSON.put("winValueTargeted", calcWinValueTargeted());
         return blockJSON;
     }
 
@@ -1125,8 +1149,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
-        byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
+        byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
         //WRITE GENERATOR
@@ -1320,6 +1344,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return INVALID_MAX_COUNT;
         }
 
+        // http://84.252.73.209:9047/index/blockexplorer.html?block=5944339&lang=en
         //CHECK IF PARENT EXISTS
         if (this.heightBlock < 2 || this.reference == null) {
             LOGGER.warn("*** Block[" + this.heightBlock + "].reference invalid");
@@ -1329,6 +1354,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
             LOGGER.warn("*** Block[" + this.heightBlock + "].reference from fork");
+            Block lastBlock = dcSet.getBlockMap().get(dcSet.getBlockMap().size());
+            LOGGER.warn("*** LAST Block[{}] sign:{} ref:{}", lastBlock.heightBlock, Base58.encode(lastBlock.signature), Base58.encode(lastBlock.reference));
+            LOGGER.warn("*** THIS Block[{}] sign:{} ref:{}", this.heightBlock, Base58.encode(this.signature), Base58.encode(this.reference));
             return INVALID_BRANCH;
         }
 
@@ -1418,9 +1446,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
         if (this.target == 0) {
-            BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
             LOGGER.warn("*** Block[" + this.heightBlock + "] TARGET = 0");
             LOGGER.warn("*** currentTarget: " + currentTarget);
+            BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
             return INVALID_BLOCK_WIN;
         }
 
@@ -2603,9 +2631,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
-            LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
-                    + "  ERROR ");
-
+            throw new RuntimeExceptionNoTrace("[" + this.heightBlock + "]  ERROR this.reference != map.lastSign");
         }
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
@@ -2695,10 +2721,11 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
+    // 7M7ssru3hWaVQ1vEH141TQSufErSnm6D1R
     @Override
     public String toString() {
         return "[" + this.getHeight() + "]"
-                + (this.winValue != 0 ? " WV: " + this.winValue : "")
+                + " WV: " + this.winValue
                 + " TX: " + this.transactionCount
                 + " CR:" + this.getCreator().getPersonAsString();
     }

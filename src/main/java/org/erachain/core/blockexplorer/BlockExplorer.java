@@ -1651,6 +1651,7 @@ public class BlockExplorer {
 
         output.put("height", lastBlockHead.heightBlock);
         output.put("timestamp", lastBlockHead.getTimestamp());
+        output.put("version", CONTROLLER.getVersion(false));
 
         output.put("Label_hour", Lang.T("hour", langObj));
         output.put("Label_hours", Lang.T("hours", langObj));

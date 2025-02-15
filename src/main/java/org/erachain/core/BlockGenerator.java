@@ -854,9 +854,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     betterPeer = null;
                     needRequestWinBlock = false;
 
-                    Timestamp timestampPoit = new Timestamp(timePoint);
-                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit + " for UTX time: " + new Timestamp(timePointForValidTX));
-                    this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
+                    height = bchain.getHeight(dcSet);
+                    Timestamp timestampPoint = new Timestamp(timePoint);
+                    LOGGER.info("+ + + + + START GENERATE HEIGHT [{}] on {} for UTX time: {}", height + 1, timestampPoint, new Timestamp(timePointForValidTX));
+                    this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoint);
+
+                    // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                    ctrl.network.decrementWeightOfPeerMutes();
 
                     flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT(height);
                     local_status = 0;

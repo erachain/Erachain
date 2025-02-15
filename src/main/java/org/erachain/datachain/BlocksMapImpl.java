@@ -4,7 +4,6 @@ package org.erachain.datachain;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.controller.errors.RuntimeExceptionNoTrace;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -18,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+
+import java.util.Arrays;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -171,6 +172,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             block.loadHeadMind((DCSet) databaseSet);
         } catch (NullPointerException e) {
             // это может случиться если цепочка откатывается и удаление не синхронное - три таблицы вне коммита
+            // Но поидее такого не должно быть - у нас же все синхронно
             return null;
         }
 
@@ -180,27 +182,33 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
     @Override
     public void putAndProcess(Block block) {
+
         DCSet dcSet = (DCSet) databaseSet;
+        if (block.heightBlock > 1) {
+            Integer previousHeight = dcSet.getBlockSignsMap().get(block.getReference());
+            if (previousHeight == null)
+                throw new RuntimeException("putAndProcess: previousHeight not found!");
+            if (previousHeight != block.heightBlock - 1)
+                throw new RuntimeException("putAndProcess: previousHeight[" + previousHeight + "] != block.heightBlock - 1");
+        }
+
         byte[] signature = block.getSignature();
         int height = block.getHeight();
         if (height < 1) {
-            Long error = null;
-            ++error;
+            throw new RuntimeException("putAndProcess: height < 1");
         }
 
         if (dcSet.getBlockSignsMap().contains(signature)) {
-            logger.error("already EXIST : " + height
-                    + " SIGN: " + Base58.encode(signature));
-            return;
+            throw new RuntimeException("putAndProcess: already EXIST : " + height + " SIGN: " + Base58.encode(signature));
         }
 
         if (size() + 1 != height) {
             // так как это вызывается асинхронно при проверке прилетающих победных блоков
             // то тут иногда вылетает ошибка - но в общем должно быть норм все
-            String error = "BlocksMap: size() + 1 != height at [putAndProcess]: "
+            String error = "BlocksMap.putAndProcess: size() + 1 != height at [putAndProcess]: "
                     + size() + 1 + " != " + height
                     + " : " + block;
-            throw new RuntimeExceptionNoTrace(error);
+            throw new RuntimeException(error);
         }
 
         dcSet.getBlockSignsMap().put(signature, height);
@@ -221,18 +229,21 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             creator.setForgingData(dcSet, height, block.getForgingValue());
         }
 
-        dcSet.getBlocksHeadsMap().putAndProcess(height, block.blockHead);
-        this.setLastBlockSignature(signature);
-
-        if (BlockChain.CHECK_BUGS > 5) {
-            Block.BlockHead head = block.blockHead;
-            Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
-            if (lastPoint.a > head.heightBlock) {
-                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
-                Long error = null;
-                error++;
-            }
+        Block.BlockHead head = block.blockHead;
+        Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+        if (lastPoint.a > head.heightBlock) {
+            throw new RuntimeException("putAndProcess: NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
         }
+
+        if (!Arrays.equals(block.getReference(), head.reference))
+            throw new RuntimeException("putAndProcess: block.getReference() != head.reference");
+        if (!Arrays.equals(block.getSignature(), head.signature))
+            throw new RuntimeException("putAndProcess: block.getSignature() != head.signature");
+        if (!Arrays.equals(block.getTransactionsHash(), head.transactionsHash))
+            throw new RuntimeException("putAndProcess: block.getTransactionsHash() != head.transactionsHash");
+
+        dcSet.getBlocksHeadsMap().putAndProcess(height, head);
+        this.setLastBlockSignature(signature);
 
         put(height, block);
 

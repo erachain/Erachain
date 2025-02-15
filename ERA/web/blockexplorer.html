@@ -1644,6 +1644,7 @@ button.white-bgc[disabled]:focus,
             var output = '';
             output += lastBlock.Label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
             output += ' (' + convertTimestamp(lastBlock.timestamp, true) + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.Label_ago + ') ';
+            output += lastBlock.version;
             output += '<br>';
 
             return output;

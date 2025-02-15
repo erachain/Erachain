@@ -108,8 +108,8 @@ import static org.erachain.datachain.DCSet.DATA_FILE;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.6.04";
-    public static String buildTime = "2025-02-02 22:00:00 UTC";
+    public static String version = "6.7.01";
+    public static String buildTime = "2025-02-15 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1192,34 +1192,34 @@ public class Controller extends Observable {
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
         BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
         // Размер определяется по getBlockSignsMap!
-        int startHeight = blocksMap.size() + 1;
+        int startHeight = blocksMap.size();
         LOGGER.warn("new BlockMap size: {}", startHeight);
-        if (startHeight > 2) {
-            LOGGER.info("Restart rebuild chain from block " + startHeight);
+        if (startHeight > 1) {
+            LOGGER.warn("Restart rebuild chain from block " + startHeight);
         }
 
         try {
-            Block block = blocksMapOld.get(startHeight);
+            Block block = blocksMapOld.get(startHeight + 1);
             if (block == null) {
-                LOGGER.info("Rechain alreafy is done on height:" + startHeight + ".");
+                LOGGER.warn("Rechain already is done on height:" + (startHeight) + ".");
             } else {
                 if (block.isValid(this.dcSet, true) > 0) {
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
-                    LOGGER.info("Wrong GENESIS block");
+                    LOGGER.error("Wrong GENESIS block");
                     System.exit(-14);
                 }
 
                 int blockSizeOld = blocksMapOld.size();
                 LOGGER.warn("\nRechain started... backup block height: {}", blockSizeOld);
                 int count = 0;
-                for (int i = ++startHeight; i <= blockSizeOld; ++i) {
+                for (int i = startHeight + 2; i <= blockSizeOld; ++i) {
                     block = blocksMapOld.get(i);
 
                     // need for calculate WIN Value
                     int invalid = block.isValidHead(dcSet);
                     if (invalid > 0) {
-                        LOGGER.info("Block[" + i + "] is invalid: " + invalid);
+                        LOGGER.error("Block[" + i + "] is invalid: " + invalid);
                         break;
                     }
 
@@ -1234,14 +1234,14 @@ public class Controller extends Observable {
                         count += 1 + block.getTransactionCount();
                         if (count % 10000 == 0) {
                             dcSet.flush(0, true, false);
-                            LOGGER.info("Rebuilds block " + i);
+                            LOGGER.warn("Rebuilds block " + i);
                         }
 
                     } catch (InterruptedException e) {
                         break;
                     } catch (Throwable e) {
                         if (isStopping) {
-                            LOGGER.info("User BREAK on block " + i);
+                            LOGGER.warn("User BREAK on block " + i);
                         } else {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1251,7 +1251,7 @@ public class Controller extends Observable {
 
 
                     if (isStopping) {
-                        LOGGER.info("User BREAK on block " + i);
+                        LOGGER.warn("User BREAK on block " + i);
                         break;
                     }
                 }
@@ -1259,12 +1259,12 @@ public class Controller extends Observable {
 
         } finally {
             if (this.webService != null) {
-                LOGGER.info("Stopping WEB server");
+                LOGGER.warn("Stopping WEB server");
                 this.webService.stop();
             }
 
             if (this.rpcService != null) {
-                LOGGER.info("Stopping RPC server");
+                LOGGER.warn("Stopping RPC server");
                 this.rpcService.stop();
             }
 
@@ -1273,19 +1273,18 @@ public class Controller extends Observable {
 
             setChanged();
             notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database at size: " + size)));
-            LOGGER.info("Closing database at size: " + size);
+            LOGGER.warn("Closing database at size: " + size);
             dcSet.close();
             dlSet.close();
 
-            LOGGER.info("Rebuilding is ended on height:" + size);
+            LOGGER.warn("Rebuilding is ended on height:" + size);
             if (sizeOld > size) {
-                LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
+                LOGGER.warn("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
             } else {
-                LOGGER.info("Rechain is DONE. Please restart the node without '-rechain' parameter!");
+                LOGGER.warn("Rechain is DONE. Please restart the node without '-rechain' parameter!");
             }
 
         }
-
 
     }
 
@@ -3060,7 +3059,7 @@ public class Controller extends Observable {
         if (this.isOnStopping())
             return -1;
 
-        return dcSet.getBlocksHeadsMap().size();
+        return dcSet.getBlockMap().size();
     }
 
     public Block getLastBlock() {
