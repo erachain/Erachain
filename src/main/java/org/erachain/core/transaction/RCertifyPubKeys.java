@@ -33,7 +33,7 @@ import java.util.*;
  * =1 - need sign by person
  * typeBytes[2] - size of personalized accounts
  */
-public class RCertifyPubKeys extends Transaction implements Itemable {
+public class RCertifyPubKeys extends Transaction implements Itemable, CertifiedPublicKeys {
 
     public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
     public static final String TYPE_NAME = "Certify Public Key";

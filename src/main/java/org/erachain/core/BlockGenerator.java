@@ -453,7 +453,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         LOGGER.error(e.getMessage(), e);
                         //REMOVE FROM LIST
-                        needRemoveInvalids.add(transaction.getSignature());
+                        if (map.size() > 100) {
+                            // если много неподтвержденных то удалим ее, иначе ждем - может тут есть трнзакции типа создать персону которые ее сделают валидной
+                            needRemoveInvalids.add(transaction.getSignature());
+                        }
 
                     }
 
