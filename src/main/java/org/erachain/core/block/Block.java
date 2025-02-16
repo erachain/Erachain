@@ -2247,7 +2247,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 index = i + indexStart;
                 txCalculated = this.txCalculated.get(i);
                 txCalculated.setHeightSeq(this.heightBlock, index);
-                // if here ERROR in DB SERIALIZER - chek transaction in block before!
+                // if here ERROR in DB SERIALIZER - check transaction in block before!
                 finalMap.put(txCalculated);
 
             }

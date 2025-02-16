@@ -36,7 +36,7 @@ public abstract class EpochDAppStatus extends EpochDApp {
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (status != null)
-                len += status.length();
+                len += status.getBytes(StandardCharsets.UTF_8).length;
         }
         return len;
     }

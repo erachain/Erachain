@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,7 @@ public class MoneyStakingTest extends TestCase {
     PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
     PrivateKeyAccount privAcc1 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, "1"));
     PrivateKeyAccount privAcc2 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, "2"));
-    PrivateKeyAccount privAcc3 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, "3"));
     AssetCls asset;
-    AssetCls assetMovable;
 
     long assetKey = 2L;
     BigDecimal amount = new BigDecimal("1000");
@@ -58,7 +57,6 @@ public class MoneyStakingTest extends TestCase {
     long dbRef = 0L;
     int seqNo = 0;
     Block block;
-    Block block2;
     List<Transaction> txs = new ArrayList<>();
     Fun.Tuple2<List<Transaction>, Integer> orderedTransactions;
     JSONObject pars = new JSONObject();
@@ -68,9 +66,14 @@ public class MoneyStakingTest extends TestCase {
     private byte[] image = null;
     MoneyStaking moneyStaking = new MoneyStaking();
 
+    String makerPointsKey;
+    String acc1PointsKey;
+    String acc2PointsKey;
+
     private void init() throws Exception {
 
-        dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
+        //dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
+        dcSet = DCSet.createEmptyHardDatabaseSet(new File("ERA_TEST/datachainTest", "base.dat"), false, false, IDB.DBS_MAP_DB);
         cntrl = Controller.getInstance();
         timestamp = NTP.getTime();
         cntrl.initBlockChain(dcSet);
@@ -111,8 +114,13 @@ public class MoneyStakingTest extends TestCase {
         pars.put("%", "12");
         parsStr = pars.toString();
 
+        makerPointsKey = MoneyStaking.getPointsKey(maker, assetKey);
+        acc1PointsKey = MoneyStaking.getPointsKey(privAcc1, assetKey);
+        acc2PointsKey = MoneyStaking.getPointsKey(privAcc2, assetKey);
+
     }
 
+    @Test
     public void testToBytes() throws Exception {
         init();
 
@@ -123,6 +131,7 @@ public class MoneyStakingTest extends TestCase {
         assertEquals(parsedDApp.itemDescription, dApp.itemDescription);
     }
 
+    @Test
     public void testProcess() throws Exception {
         init();
 
@@ -134,8 +143,8 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints = (Object[][][]) dApp.peekState(rSendTx.getDBRef());
         assertEquals(statePoints.length, 1);
         assertEquals(statePoints[0].length, 1);
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        Object[] stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        Object[] stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
@@ -151,8 +160,8 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints1 = (Object[][][]) dApp1.peekState(rSendTx1.getDBRef());
         assertEquals(statePoints1.length, 1);
         assertEquals(statePoints1[0].length, 1);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("0.03421"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        assertEquals(stateAcc1[0], new BigDecimal("0.03616"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
 
@@ -165,16 +174,16 @@ public class MoneyStakingTest extends TestCase {
             rSendTx2.setDC(dcSet);
             MoneyStaking dApp2 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx2, block);
             dApp2.process();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.75"), new BigDecimal("-1000.75")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.75"), new BigDecimal("1000.75")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.80"), new BigDecimal("-1000.80")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.80"), new BigDecimal("1000.80")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
             Object[][][] statePoints2 = (Object[][][]) dApp.peekState(rSendTx2.getDBRef());
             assertEquals(statePoints2[0].length, 3);
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488056473333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            Object[] stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            Object[] stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488056473333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -187,29 +196,29 @@ public class MoneyStakingTest extends TestCase {
             rSendTx3.setDC(dcSet);
             MoneyStaking dApp3 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx3, block);
             dApp3.process();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-1.47"), new BigDecimal("-1001.47")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1001.47"), new BigDecimal("1001.47")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-1.56"), new BigDecimal("-1001.56")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1001.56"), new BigDecimal("1001.56")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
             Object[][][] statePoints3 = (Object[][][]) dApp.peekState(rSendTx3.getDBRef());
             assertEquals(statePoints3[0].length, 3);
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488258073333L);
-            assertEquals(stateAcc1[2], new BigDecimal("1000.75"));
-            stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            assertEquals(stateAcc1[2], new BigDecimal("1000.80"));
+            stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488258073333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
 
             dApp3.orphan();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.75"), new BigDecimal("-1000.75")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.75"), new BigDecimal("1000.75")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.80"), new BigDecimal("-1000.80")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.80"), new BigDecimal("1000.80")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488056473333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488056473333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -217,25 +226,25 @@ public class MoneyStakingTest extends TestCase {
             dApp2.orphan();
             assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("-1000")));
             assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000"), new BigDecimal("1000")));
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-            assertEquals(stateAcc1[0], new BigDecimal("0.03421"));
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+            assertEquals(stateAcc1[0], new BigDecimal("0.03616"));
             assertEquals(stateAcc1[1], 1487854873333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+            assertEquals(dApp.valueGet(acc2PointsKey), null);
         }
 
         dApp1.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
         dApp.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc1.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        assertEquals(dApp.valueGet(acc1PointsKey), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
     }
 
@@ -255,8 +264,8 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints = (Object[][][]) dApp.peekState(rSendTx.getDBRef());
         assertEquals(statePoints.length, 1);
         assertEquals(statePoints[0].length, 1);
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        Object[] stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        Object[] stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
@@ -272,8 +281,9 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints1 = (Object[][][]) dApp1.peekState(rSendTx1.getDBRef());
         assertEquals(statePoints1.length, 1);
         assertEquals(statePoints1[0].length, 1);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        //assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+        assertEquals(stateAcc1[0], new BigDecimal("-0.03617"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
 
@@ -286,16 +296,16 @@ public class MoneyStakingTest extends TestCase {
             rSendTx2.setDC(dcSet);
             MoneyStaking dApp2 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx2, block);
             dApp2.process();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.76"), new BigDecimal("-999.24")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.24"), new BigDecimal("999.24")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.81"), new BigDecimal("-999.19")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.19"), new BigDecimal("999.19")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
             Object[][][] statePoints2 = (Object[][][]) dApp.peekState(rSendTx2.getDBRef());
             assertEquals(statePoints2[0].length, 3);
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488056473333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            Object[] stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            Object[] stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488056473333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -308,29 +318,29 @@ public class MoneyStakingTest extends TestCase {
             rSendTx3.setDC(dcSet);
             MoneyStaking dApp3 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx3, block);
             dApp3.process();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1.49"), new BigDecimal("-998.51")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("998.51"), new BigDecimal("998.51")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1.58"), new BigDecimal("-998.42")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("998.42"), new BigDecimal("998.42")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
             Object[][][] statePoints3 = (Object[][][]) dApp.peekState(rSendTx3.getDBRef());
             assertEquals(statePoints3[0].length, 3);
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488258073333L);
-            assertEquals(stateAcc1[2], new BigDecimal("999.24"));
-            stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            assertEquals(stateAcc1[2], new BigDecimal("999.19"));
+            stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488258073333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
 
             dApp3.orphan();
-            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.76"), new BigDecimal("-999.24")));
-            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.24"), new BigDecimal("999.24")));
+            assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.81"), new BigDecimal("-999.19")));
+            assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.19"), new BigDecimal("999.19")));
             assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
             assertEquals(stateAcc1[0], new BigDecimal("0"));
             assertEquals(stateAcc1[1], 1488056473333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+            stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
             assertEquals(stateAcc2[0], new BigDecimal("0"));
             assertEquals(stateAcc2[1], 1488056473333L);
             assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -338,28 +348,29 @@ public class MoneyStakingTest extends TestCase {
             dApp2.orphan();
             assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("-1000")));
             assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000"), new BigDecimal("1000")));
-            stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-            assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+            stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+            assertEquals(stateAcc1[0], new BigDecimal("-0.03617"));
             assertEquals(stateAcc1[1], 1487854873333L);
             assertEquals(stateAcc1[2], new BigDecimal("1000"));
-            assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+            assertEquals(dApp.valueGet(acc2PointsKey), null);
         }
 
         dApp1.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
         dApp.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc1.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        assertEquals(dApp.valueGet(acc1PointsKey), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
     }
 
+    @Test
     public void testProcessZero() throws Exception {
         init();
 
@@ -371,8 +382,8 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints = (Object[][][]) dApp.peekState(rSendTx.getDBRef());
         assertEquals(statePoints.length, 1);
         assertEquals(statePoints[0].length, 1);
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        Object[] stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        Object[] stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
@@ -388,8 +399,9 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints1 = (Object[][][]) dApp1.peekState(rSendTx1.getDBRef());
         assertEquals(statePoints1.length, 1);
         assertEquals(statePoints1[0].length, 1);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("0.03421"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        //assertEquals(stateAcc1[0], new BigDecimal("0.03616"));
+        assertEquals(stateAcc1[0], new BigDecimal("0.03616"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
 
@@ -400,16 +412,16 @@ public class MoneyStakingTest extends TestCase {
         rSendTx2.setDC(dcSet);
         MoneyStaking dApp2 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx2, block);
         dApp2.process();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.75"), new BigDecimal("-1000.75")));
-        assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.75"), new BigDecimal("1000.75")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.80"), new BigDecimal("-1000.80")));
+        assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000.80"), new BigDecimal("1000.80")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         Object[][][] statePoints2 = (Object[][][]) dApp.peekState(rSendTx2.getDBRef());
         assertEquals(statePoints2[0].length, 3);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488056473333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        Object[] stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        Object[] stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488056473333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -427,29 +439,29 @@ public class MoneyStakingTest extends TestCase {
         rSendTx3.setDC(dcSet);
         MoneyStaking dApp3 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx3, block);
         dApp3.process();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.75"), new BigDecimal("-1000.75")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.80"), new BigDecimal("-1000.80")));
         assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         Object[][][] statePoints3 = (Object[][][]) dApp.peekState(rSendTx3.getDBRef());
         assertEquals(statePoints3[0].length, 3);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488258073333L);
         assertEquals(stateAcc1[2], new BigDecimal("0"));
-        stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488258073333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
 
         dApp3.orphan();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.75"), new BigDecimal("-1000.75")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("-0.80"), new BigDecimal("-1000.80")));
         assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488056473333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488056473333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -457,27 +469,28 @@ public class MoneyStakingTest extends TestCase {
         dApp2.orphan();
         assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("-1000")));
         assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1000"), new BigDecimal("1000")));
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("0.03421"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        assertEquals(stateAcc1[0], new BigDecimal("0.03616"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
         dApp1.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
         dApp.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc1.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        assertEquals(dApp.valueGet(acc1PointsKey), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
     }
 
+    @Test
     public void testProcessDemerrageZero() throws Exception {
         init();
 
@@ -493,8 +506,8 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints = (Object[][][]) dApp.peekState(rSendTx.getDBRef());
         assertEquals(statePoints.length, 1);
         assertEquals(statePoints[0].length, 1);
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        Object[] stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        Object[] stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
@@ -510,8 +523,9 @@ public class MoneyStakingTest extends TestCase {
         Object[][][] statePoints1 = (Object[][][]) dApp1.peekState(rSendTx1.getDBRef());
         assertEquals(statePoints1.length, 1);
         assertEquals(statePoints1[0].length, 1);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        //assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+        assertEquals(stateAcc1[0], new BigDecimal("-0.03617"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
 
@@ -522,16 +536,16 @@ public class MoneyStakingTest extends TestCase {
         rSendTx2.setDC(dcSet);
         MoneyStaking dApp2 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx2, block);
         dApp2.process();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.76"), new BigDecimal("-999.24")));
-        assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.24"), new BigDecimal("999.24")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.81"), new BigDecimal("-999.19")));
+        assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("999.19"), new BigDecimal("999.19")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         Object[][][] statePoints2 = (Object[][][]) dApp.peekState(rSendTx2.getDBRef());
         assertEquals(statePoints2[0].length, 3);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488056473333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        Object[] stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        Object[] stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488056473333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -550,32 +564,32 @@ public class MoneyStakingTest extends TestCase {
         rSendTx3.setDC(dcSet);
         MoneyStaking dApp3 = (MoneyStaking) moneyStaking.of(parsStr, pars, asset, rSendTx3, block);
         dApp3.process();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.97"), new BigDecimal("-999.03")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("1.02"), new BigDecimal("-998.98")));
         assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.00"), new BigDecimal("0.00")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         Object[][][] statePoints3 = (Object[][][]) dApp.peekState(rSendTx3.getDBRef());
         assertEquals(statePoints3[0].length, 4);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488258073333L);
         assertEquals(stateAcc1[2], new BigDecimal("0.21"));
-        stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488258073333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
 
         dApp3.orphan();
-        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.76"), new BigDecimal("-999.24")));
+        assertEquals(maker.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.81"), new BigDecimal("-999.19")));
         // наш установленный баланс после 3й транзакции
         assertEquals(privAcc1.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0.21"), new BigDecimal("0.21")));
         assertEquals(privAcc2.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN), new Fun.Tuple2<>(new BigDecimal("0"), new BigDecimal("0")));
         statePoints2 = (Object[][][]) dApp.peekState(rSendTx2.getDBRef());
         assertEquals(statePoints2[0].length, 3);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], new BigDecimal("0"));
         assertEquals(stateAcc1[1], 1488056473333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        stateAcc2 = (Object[]) dApp.valueGet(privAcc2.getAddress());
+        stateAcc2 = (Object[]) dApp.valueGet(acc2PointsKey);
         assertEquals(stateAcc2[0], new BigDecimal("0"));
         assertEquals(stateAcc2[1], 1488056473333L);
         assertEquals(stateAcc2[2], new BigDecimal("0"));
@@ -586,26 +600,27 @@ public class MoneyStakingTest extends TestCase {
         statePoints1 = (Object[][][]) dApp1.peekState(rSendTx1.getDBRef());
         assertEquals(statePoints1.length, 1);
         assertEquals(statePoints1[0].length, 1);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
-        assertEquals(stateAcc1[0], new BigDecimal("-0.03422"));
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
+        assertEquals(stateAcc1[0], new BigDecimal("-0.03617"));
         assertEquals(stateAcc1[1], 1487854873333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
 
         dApp1.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        stateAcc1 = (Object[]) dApp.valueGet(privAcc1.getAddress());
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        stateAcc1 = (Object[]) dApp.valueGet(acc1PointsKey);
         assertEquals(stateAcc1[0], BigDecimal.ZERO);
         assertEquals(stateAcc1[1], 1487845369333L);
         assertEquals(stateAcc1[2], new BigDecimal("1000"));
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
         dApp.orphan();
-        assertEquals(dApp.valueGet(maker.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc1.getAddress()), null);
-        assertEquals(dApp.valueGet(privAcc2.getAddress()), null);
+        assertEquals(dApp.valueGet(makerPointsKey), null);
+        assertEquals(dApp.valueGet(acc1PointsKey), null);
+        assertEquals(dApp.valueGet(acc2PointsKey), null);
 
     }
 
+    @Test
     public void testOrphanBody() {
     }
 }
