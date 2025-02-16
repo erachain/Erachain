@@ -115,7 +115,7 @@ public abstract class EpochDAppJson extends EpochDAppStatus {
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (dataStr != null)
-                len += dataStr.length();
+                len += dataStr.getBytes(StandardCharsets.UTF_8).length;
         }
 
         return len;

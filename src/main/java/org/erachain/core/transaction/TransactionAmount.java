@@ -280,6 +280,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable,
 
             // запомним что тут две сущности
             if (key != 0) {
+                if (asset == null) {
+                    // У RCalculated такое может быть в process_after
+                    asset = dcSet.getItemAssetMap().get(key);
+                }
+
                 if (creatorPersonDuration != null) {
                     if (recipientPersonDuration != null) {
                         itemsKeys = new Object[][]{
