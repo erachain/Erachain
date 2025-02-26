@@ -10,6 +10,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dapp.DApp;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
 import org.erachain.webserver.WebResource;
@@ -19,7 +21,9 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-public class DogePlanet extends EpochDAPP {
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
+
+public class DogePlanet extends EpochDApp {
 
     static public final int ID = 1000;
     static public final String NAME = "Doge Planets";
@@ -31,8 +35,12 @@ public class DogePlanet extends EpochDAPP {
 
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
-    public DogePlanet(int count) {
+    private DogePlanet() {
         super(ID, MAKER);
+    }
+
+    public DogePlanet(int count, Transaction commandTx, Block block) {
+        super(ID, MAKER, commandTx, block);
         this.count = count;
     }
 
@@ -40,6 +48,17 @@ public class DogePlanet extends EpochDAPP {
         super(ID, MAKER);
         this.count = count;
         this.keyEnd = keyEnd;
+    }
+
+    @Override
+    public DApp of(Transaction commandTx, Block block) {
+        throw new RuntimeException("Wrong OF(...)");
+    }
+
+    public static void setDAppFactory() {
+        DogePlanet instance = new DogePlanet();
+        DAppFactory.STOCKS.put(MAKER, instance);
+        DAppFactory.DAPP_BY_ID.put(ID, instance);
     }
 
     public String getName() {
@@ -110,11 +129,11 @@ public class DogePlanet extends EpochDAPP {
             return new DogePlanet(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer));
         }
 
-        return new DogePlanet(Ints.fromByteArray(countBuffer));
+        return new DogePlanet(Ints.fromByteArray(countBuffer), 0);
     }
 
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction transaction) {
+    public void process() {
 
         AssetUnique planet;
         int i = count;
@@ -129,14 +148,14 @@ public class DogePlanet extends EpochDAPP {
         else
             totalIssued = totalIssuedObj;
 
-        PublicKeyAccount creator = transaction.getCreator();
+        PublicKeyAccount creator = commandTx.getCreator();
         do {
 
             totalIssued++;
 
             planet = new AssetUnique(null, stock, "Shiba Planet #" + totalIssued, null, null,
-                    null, AssetCls.AS_NON_FUNGIBLE);
-            planet.setReference(transaction.getSignature(), transaction.getDBRef());
+                    null, AS_NON_FUNGIBLE);
+            planet.setReference(commandTx.getSignature(), commandTx.getDBRef());
 
             //INSERT INTO DATABASE
             keyEnd = dcSet.getItemAssetMap().incrementPut(planet);
@@ -146,7 +165,7 @@ public class DogePlanet extends EpochDAPP {
             if (block != null) {
                 // add remark for action
                 block.addCalculated(creator, keyEnd, BigDecimal.ONE,
-                        "Produce: " + planet.getName(), transaction.getDBRef());
+                        "Produce: " + planet.getName(), commandTx.getDBRef());
             }
 
 
@@ -154,12 +173,10 @@ public class DogePlanet extends EpochDAPP {
 
         valuesMap.put(COUNT_KEY, totalIssued);
 
-
-        return false;
     }
 
     @Override
-    public void orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan() {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Integer totalIssued = (Integer) valuesMap.get(COUNT_KEY);
@@ -167,7 +184,7 @@ public class DogePlanet extends EpochDAPP {
         int i = 0;
         do {
 
-            transaction.getCreator().changeBalance(dcSet, true, false, keyEnd,
+            commandTx.getCreator().changeBalance(dcSet, true, false, keyEnd,
                     BigDecimal.ONE, false, false, false);
 
             //DELETE FROM DATABASE

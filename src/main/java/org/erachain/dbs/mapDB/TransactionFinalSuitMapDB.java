@@ -28,10 +28,7 @@ import org.mapdb.Fun.Tuple3;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NavigableSet;
+import java.util.*;
 
 //import java.math.BigDecimal;
 
@@ -60,11 +57,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     private NavigableSet typeKey;
 
     @SuppressWarnings("rawtypes")
-    private NavigableSet creatorKey;
+    private NavigableSet<Fun.Tuple2<byte[], Long>> creatorKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet addressTypeKey;
     @SuppressWarnings("rawtypes")
-    private NavigableSet recipientKey;
+    private NavigableSet<Fun.Tuple2<byte[], Long>> recipientKey;
 
     private NavigableSet dialogKey;
 
@@ -299,84 +296,58 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending) {
+    private IteratorCloseable<Long> getIteratorByAddress(NavigableSet<Fun.Tuple2<byte[], Long>> secondaryKeySet,
+                                         byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        Iterable keys = Fun.filter(descending ? this.creatorKey.descendingSet() : this.creatorKey, addressKey);
-        return IteratorCloseableImpl.make(keys.iterator());
+        if (fromSeqNo == null) {
+            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
+
+        if (toSeqNo == null) {
+            toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
+        }
+
+        return IteratorCloseableImpl.make(new IndexIterator<Long>((descending ? secondaryKeySet.descendingSet() : secondaryKeySet)
+                .subSet(Fun.t2(addressKey, fromSeqNo), false,
+                        Fun.t2(addressKey, toSeqNo), false).iterator()));
+    }
+
+        @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending) {
+        return getIteratorByAddress(creatorKey, addressShort, null, null, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        if (fromSeqNo == null) {
-            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
-        }
-
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo),
-                        Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+        return getIteratorByAddress(creatorKey, addressShort, fromSeqNo, null, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        if (fromSeqNo == null) {
-            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
-        }
-
-        if (toSeqNo == null) {
-            toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
-        }
-
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo),
-                        Fun.t2(addressKey, toSeqNo)).iterator()));
+        return getIteratorByAddress(creatorKey, addressShort, fromSeqNo, toSeqNo, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        Iterable keys = Fun.filter(descending ? this.recipientKey.descendingSet() : this.recipientKey, addressKey);
-        return IteratorCloseableImpl.make(keys.iterator());
+        return getIteratorByAddress(recipientKey, addressShort, null, null, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
-                        Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+        return getIteratorByAddress(recipientKey, addressShort, fromSeqNo, null, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        if (toSeqNo == null) {
-            toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
-        }
-
-        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
-                        Fun.t2(addressKey, toSeqNo)).iterator()));
+        return getIteratorByAddress(recipientKey, addressShort, fromSeqNo, toSeqNo, descending);
     }
 
     @Override
@@ -516,6 +487,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             return getIterator(fromSeqNo, descending);
 
         IteratorCloseable<Long> creatorsIterator = getIteratorByCreator(addressShort, fromSeqNo, descending);
+        // Не протокольный индекс!!
         IteratorCloseable<Long> recipientsIterator = getIteratorByRecipient(addressShort, fromSeqNo, descending);
 
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(creatorsIterator, recipientsIterator),

@@ -5,7 +5,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.BlockChain;
+import org.erachain.controller.Controller;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -14,7 +14,9 @@ import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
@@ -30,16 +32,16 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * <hr>
  * Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
  * см. typeKey и recipientKey. Они используются для API RPC block explorer.
- * Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
+ * Нужно ограничивать размер выдаваемого списка чтобы не перегружать ноду.
  * <br>
  * Так же вторичный индекс по времени, который используется в ГУИ TIMESTAMP_INDEX = 0 (default)
- * - он оргнизыется внутри DCMap в списке индексов для сортировок в ГУИ
- *
+ * - он организуется внутри DCMap в списке индексов для сортировок в ГУИ
+ * <p>
  * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
  *
- *  <hr>
- *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
- *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
+ * <hr>
+ * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работает, а почему в Ордерах не работало?
+ * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 @Slf4j
 public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
@@ -69,15 +71,19 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public void openMap()
     {
         if (parent == null) {
-            switch (dbsUsed) {
-                case DBS_ROCK_DB:
-                    map = new TransactionSuitRocksDB(databaseSet, database);
-                    break;
-                case DBS_MAP_DB_IN_MEM:
-                    map = new TransactionSuitMapDBinMem(databaseSet, database);
-                    break;
-                default:
-                    map = new TransactionSuitMapDB(databaseSet, database);
+            if (Controller.getInstance().uTxInMemory) {
+                map = new TransactionSuitMapDBinMem(databaseSet, database);
+            } else {
+                switch (dbsUsed) {
+                    case DBS_ROCK_DB:
+                        map = new TransactionSuitRocksDB(databaseSet, database);
+                        break;
+                    case DBS_MAP_DB_IN_MEM:
+                        map = new TransactionSuitMapDBinMem(databaseSet, database);
+                        break;
+                    default:
+                        map = new TransactionSuitMapDB(databaseSet, database);
+                }
             }
         } else {
             switch (dbsUsed) {
@@ -124,84 +130,64 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
-     * @param timestamp
-     * @param cutMaximum - образать список только по максимальному размеру, инаяе образать список и по времени протухания
+     *
+     * @param heightTimestamp
      */
-    protected long pointClear;
-    public int clearByDeadTimeAndLimit(long keepTime, boolean cutMaximum) {
+    @Override
+    public int clearByDeadTime(long heightTimestamp) {
 
-        // займем просецц или установим флаг
         if (isClearProcessedAndSet())
             return 0;
 
         try { // для освобождения ресурса
 
-            long realTime = System.currentTimeMillis();
+            long startTime = NTP.getTime();
 
-            if (realTime - pointClear < 10000) {
-                return 0;
-            }
+            long tickerIter = startTime;
+            int deletions = 0;
 
-            try { // для запоминания времени точки
-
-                long tickerIter = realTime;
-                int deletions = 0;
-
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
-                    tickerIter = System.currentTimeMillis() - tickerIter;
-                    if (tickerIter > 10) {
-                        LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                    }
-
-                    Transaction transaction;
-
-                    tickerIter = System.currentTimeMillis();
-                    long size = this.map.size();
-                    tickerIter = System.currentTimeMillis() - tickerIter;
-                    if (tickerIter > 10) {
-                        LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                    }
-                    while (iterator.hasNext()) {
-                        Long key = iterator.next();
-                        transaction = this.map.get(key);
-                        if (transaction == null) {
-                            // такая ошибка уже было
-                            continue;
-                        }
-
-                        long deadline = transaction.getDeadline();
-                        if (deadline < keepTime
-                                || size - deletions >
-                                (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
-                                        : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                            // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
-                            this.deleteDirect(key);
-                            deletions++;
-                        } else {
-                            break;
-                        }
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
+            /*
+             * по несколько секунд итератор берется - при том что таблица пустая -
+             * - дале COMPACT не помогает
+             */
+            try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
+                tickerIter = NTP.getTime() - tickerIter;
+                if (tickerIter > 100) {
+                    LOGGER.debug("TAKE ITERATOR: {} ms", tickerIter);
                 }
 
-                long ticker = System.currentTimeMillis() - realTime;
-                if (ticker > 100 || deletions > 0) {
-                    LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
+                Transaction transaction;
+
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
+                    transaction = this.map.get(key);
+                    if (transaction == null) {
+                        // такая ошибка уже была
+                        continue;
+                    }
+
+                    long deadline = transaction.getDeadline();
+                    if (deadline < heightTimestamp) {
+                        // обязательно прямая чиста из таблицы иначе опять сюда в очередь прилетит и не сработает
+                        this.deleteDirect(key);
+                        ////LOGGER.debug("deleteDirect: {}", Transaction.viewDBRef(key));
+                        deletions++;
+                    } else {
+                        break;
+                    }
                 }
-
-                return deletions;
-
-            } finally {
-                // учтем новое время в точке
-                pointClear = System.currentTimeMillis();
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
+
+            long ticker = NTP.getTime() - startTime;
+            if (ticker > 1000 || deletions > 0) {
+                LOGGER.info("------ CLEAR DEAD UTXs: {} s, for deleted: {}", ticker/ 1000, deletions);
+            }
+
+            return deletions;
+
         } finally {
-            databaseSet.clearCache();
             // освободим процесс
             clearProcessed = false;
         }

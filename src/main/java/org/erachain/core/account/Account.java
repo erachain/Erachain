@@ -15,7 +15,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.dapp.DAPPFactory;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
@@ -310,7 +310,7 @@ public class Account implements Comparable {
         if (Crypto.getInstance().isValidAddress(address)) {
             Account account = new Account(address);
             if (account.isDAppOwned()) {
-                return DAPPFactory.getName(account);
+                return DAppFactory.getName(account);
             }
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - can't encrypt for it, please use public key instead";
@@ -482,10 +482,17 @@ public class Account implements Comparable {
         return this.getBalanceUSE(key, DCSet.getInstance());
     }
 
+    public static Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+    makeBalanceOWN(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                   Object[] newValue) {
+        return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                new Tuple2<BigDecimal, BigDecimal>((BigDecimal) newValue[0], (BigDecimal) newValue[1]), balance.b, balance.c, balance.d, balance.e
+        );
+    }
+
     /**
-     *
      * @param key asset key (long)
-     * @param db database Set
+     * @param db  database Set
      * @return (BigDecimal) balance.a + balance.b
      */
     public BigDecimal getBalanceUSE(long key, DCSet db) {

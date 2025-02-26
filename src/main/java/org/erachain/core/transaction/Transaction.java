@@ -3,6 +3,8 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
+import lombok.Setter;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -23,9 +25,9 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.dapp.DAPP;
-import org.erachain.dapp.DAPPFactory;
-import org.erachain.dapp.DAPPTimed;
+import org.erachain.dapp.DApp;
+import org.erachain.dapp.DAppFactory;
+import org.erachain.dapp.DAppTimed;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -34,6 +36,7 @@ import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -358,7 +361,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     // FEE PARAMETERS
     public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
-    public static final long BTC_KEY = AssetCls.ERA_KEY;
+    public static final long BTC_KEY = AssetCls.BTC_KEY;
 
     public static final long FEE_KEY = AssetCls.FEE_KEY;
 
@@ -412,13 +415,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final byte HAS_EXLINK_MASK = 32;
     public static final byte HAS_SMART_CONTRACT_MASK = 16;
     /**
-     * typeBytes[2] | HAS_EXLINK_MASK | HAS_SMART_CONTRACT_MASK
+     * typeBytes[2] | HAS_EXLINK_MASK | (HAS_SMART_CONTRACT_MASK or HAS_SMART_CONTRACT_MASK_ORDER)
      */
     protected byte[] typeBytes;
 
     protected int height;
     protected int seqNo;
     protected long dbRef; // height + SeqNo
+    /**
+     * Если проверка идет блока в цепочке или нового блока кандидата - то проверяем на предмет транзакций из будущего.
+     * Иначе игнорируем
+     */
+    @Setter
+    @Getter
+    protected boolean inChain;
 
     /**
      * external flags of transaction. If FLAGS is USED need to set SINB BIT - use
@@ -452,7 +462,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected Object[][] itemsKeys;
 
     protected ExLink exLink;
-    protected DAPP dApp;
+    @Setter
+    protected DApp dApp;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -467,7 +478,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.TYPE_NAME = type_name;
     }
 
-    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, DAPP dApp, byte feePow, long timestamp,
+    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, DApp dApp, byte feePow, long timestamp,
                           long extFlags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
@@ -675,7 +686,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      *
      * @param dcSet
      * @param andUpdateFromState если нужно нарастить мясо на скелет из базв Финал. Не нужно для неподтвержденных
-     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности для отображения Выпускающих трнзакций - после их обработки, например в Блокэксплоере чтобы посмотреть какой актив был этой трнзакцией выпущен.
+     *                           и если ее нет в базе еще. Используется только для вычисления номера Сущности
+     *                           для отображения Выпускающих транзакций - после их обработки, например в Блокэксплоере,
+     *                           чтобы посмотреть какой актив был этой транзакцией выпущен.
      */
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         this.dcSet = dcSet;
@@ -892,7 +905,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public long getDeadline() {
-        return this.timestamp + 5 * BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
+        return timestamp + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 2);
     }
 
     public long getKey() {
@@ -952,13 +965,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return exLink;
     }
 
-    public DAPP getSmartContract() {
+    public DApp getDApp() {
         return dApp;
     }
 
-    public void resetEpochDAPP() {
-        if (dApp != null && dApp.isEpoch()) {
-            typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
+    public static int getBaseLength() {
+        return BASE_LENGTH;
+    }
+
+    /**
+     * Сбросим если он не Эпохальный и не Ошибка - то есть не принадлежит этой конкретной транззакции
+     */
+    public void resetNotOwnedDApp() {
+        if (dApp != null && !dApp.isTxOwned()) {
+            typeBytes[2] &= ~get_HAS_SMART_CONTRACT_MASK();
             dApp = null;
         }
     }
@@ -1012,7 +1032,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
+                LOGGER.error("itemsKeys[" + i + "] = " + JSONArray.toJSONString(Arrays.asList(itemsKeys[i - tagsWords.length])));
                 throw (e);
             }
         }
@@ -1090,7 +1110,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     /**
      * Постраничный поиск по строке поиска
      *
-     * @param offest
      * @param filterStr
      * @param useForge
      * @param pageSize
@@ -1894,10 +1913,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void sign(PrivateKeyAccount creator, int forDeal) {
 
+        if (forDeal > FOR_NETWORK) {
+            throw new RuntimeException("Wrong forDeal in SIGN - > FOR_NETWORK: " + forDeal);
+        }
+
         // use this.reference in any case and for Pack too
         // but not with SIGN
         boolean withSign = false;
-        byte[] data = this.toBytes(forDeal, false);
+        byte[] data = toBytes(forDeal, false);
         if (data == null)
             return;
 
@@ -1914,11 +1937,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * У неоторых трнзакций этот флаг занят и он другой - для toByte()
+     * У неоторых трнзакций этот флаг занят и он другой - для toByte() - у CreateOrderTransaction
      *
      * @return
      */
-    protected byte HAS_SMART_CONTRACT_MASK() {
+    protected byte get_HAS_SMART_CONTRACT_MASK() {
         return HAS_SMART_CONTRACT_MASK;
     }
 
@@ -1953,11 +1976,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, exLink.toBytes());
         }
 
-        if (dApp != null && (forDeal == FOR_DB_RECORD || !dApp.isEpoch())) {
-            typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
+        if (dApp != null && (forDeal == FOR_DB_RECORD || dApp.isTxOwned())) {
+            data[2] |= get_HAS_SMART_CONTRACT_MASK();
             data = Bytes.concat(data, dApp.toBytes(forDeal));
         } else {
-            typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
+            data[2] &= ~get_HAS_SMART_CONTRACT_MASK();
         }
 
         if (forDeal > FOR_PACK) {
@@ -2020,7 +2043,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }
@@ -2107,41 +2130,26 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return isSignatureValid(dcSet, false);
     }
 
-    /**
-     * flags
-     * = 1 - not check fee
-     * = 2 - not check person
-     * = 4 - not check PublicText
-     */
-    public int isValid(int forDeal, long checkFlags) {
-
-        if (height < BlockChain.ALL_VALID_BEFORE) {
-            return VALIDATE_OK;
-        }
-
-        if (typeBytes[0] == -1 || typeBytes[1] == -1 || typeBytes[2] == -1 || typeBytes[3] == -1) {
-            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
-            errorValue = (typeBytes[0] == -1 ? "[0]" : typeBytes[1] == -1 ? "[1]" : typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
-            return INVALID_FLAGS;
-        }
-
+    protected int checkReference(int forDeal) {
         // CHECK IF REFERENCE TIMESTAMP IS OK
         //Long reference = forDeal == null ? this.creator.getLastTimestamp(dcSet) : forDeal;
-        if (forDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
+        if (forDeal > Transaction.FOR_PACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
-                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                int heightBefore = height - 1;
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(heightBefore)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(heightBefore) - timestamp) / 1000;
                     if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
-                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                int heightBefore = height - BlockChain.CHECK_DOUBLE_SPEND_DEEP;
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(heightBefore)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
+                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(heightBefore) - timestamp) / 1000;
                     if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
@@ -2164,6 +2172,40 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 }
             }
         }
+        return VALIDATE_OK;
+    }
+
+    protected int isValidTimestamp() {
+
+        if (inChain && timestamp > Controller.getInstance().getBlockChain().getTimestamp(height + 1)) {
+            errorValue = "A transaction from the future is " + (timestamp - Controller.getInstance().getBlockChain().getTimestamp(height + 1)) / 1000
+                    + " seconds ahead of the block[" + height + "] time.";
+            return INVALID_TIMESTAMP;
+        }
+        return VALIDATE_OK;
+    }
+
+    /**
+     * flags
+     * = 1 - not check fee
+     * = 2 - not check person
+     * = 4 - not check PublicText
+     */
+    public int isValid(int forDeal, long checkFlags) {
+
+        if (height < BlockChain.ALL_VALID_BEFORE) {
+            return VALIDATE_OK;
+        }
+
+        if (typeBytes[0] == -1 || typeBytes[1] == -1 || typeBytes[2] == -1 || typeBytes[3] == -1) {
+            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
+            errorValue = (typeBytes[0] == -1 ? "[0]" : typeBytes[1] == -1 ? "[1]" : typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
+            return INVALID_FLAGS;
+        }
+
+        int check = isValidTimestamp();
+        if (check != VALIDATE_OK)
+            return check;
 
         // CHECK CREATOR
         if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
@@ -2171,12 +2213,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_ADDRESS;
         }
 
-        if (false) {
-            // TODO remove see
-            int height = this.getBlockHeightByParentOrLast(dcSet);
-        }
-        //if (height <= 0 || height > 1000)
-        //    return INVALID_TIMESTAMP;
+        check = checkReference(forDeal);
+        if (check != VALIDATE_OK)
+            return check;
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
@@ -2464,6 +2503,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
         if (personDuration == null
+                || personDuration.a == null
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
@@ -2702,11 +2742,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             // потом он будет записан в базу данных и его можно найти загрузив эту транзакцию
             // !!! ВНИМАНИЕ - делать эпохальный можно только тут - а не перед isValid или в setDCSet
             // так как иначе он будет при парсе транзакции учтен и байты съедут
-            dApp = DAPPFactory.make(this);
-        }
+            dApp = DAppFactory.make(this, block);
+        } else if (dApp != null// Нужно обновить иначе может уже обнуленная форкнутая DCSet залететь-  && dApp.getCommandTx() == null
+        )
+            dApp.set(this, block);
 
         if (dApp != null)
-            dApp.process(dcSet, block, this);
+            dApp.process();
 
         // UPDATE REFERENCE OF SENDER
         if (this.creator != null)
@@ -2726,8 +2768,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
-        if (dApp != null && dApp instanceof DAPPTimed) {
-            ((DAPPTimed) dApp).processByTime(dcSet, block, this);
+        dApp = DAppFactory.make(this, block);
+
+        if (dApp != null && dApp instanceof DAppTimed) {
+            ((DAppTimed) dApp.set(this, block)).processByTime();
         }
     }
 
@@ -2741,19 +2785,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
+
         if (dApp == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут
-            dApp = DAPPFactory.make(this);
-        }
+            dApp = DAppFactory.make(this, block);
+        } else if (dApp != null// Нужно обновить иначе может уже обнуленная форкнутая DCSet залететь-  && dApp.getCommandTx() == null
+        )
+            dApp.set(this, block);
 
         if (dApp != null) {
             // если смарт-контракт найден, то тут он Голый и
             // его надо загружать из баазы данных чтобы восстановить все значения связанные с этой транзакцией
             Transaction txInDB = dcSet.getTransactionFinalMap().get(dbRef);
-            dApp = txInDB.getSmartContract();
-
-            dApp.orphan(dcSet, this);
+            dApp = txInDB.getDApp();
+            dApp.orphan();
         }
 
     }
@@ -2801,8 +2847,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphanByTime(Block block) {
-        if (dApp != null && dApp instanceof DAPPTimed)
-            ((DAPPTimed) dApp).orphanByTime(dcSet, block, this);
+        if (dApp != null && dApp instanceof DAppTimed)
+            ((DAppTimed) dApp.set(this, block)).orphanByTime();
     }
 
     public Transaction copy() {

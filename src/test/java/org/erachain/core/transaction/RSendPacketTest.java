@@ -11,7 +11,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class RSendPacketTest {
     private BlockChain bchain;
 
     ExLink exLink = new ExLinkAppendix(123123L);
-    DAPP DAPP = null;
+    DApp DAPP = null;
     Object[][] packet = null;
     byte feePow = 0;
     String title = "test";

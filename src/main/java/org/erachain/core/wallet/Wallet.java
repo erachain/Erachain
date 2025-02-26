@@ -16,7 +16,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.DBASet;
 import org.erachain.database.wallet.*;
 import org.erachain.datachain.BlockMap;
@@ -1283,7 +1283,7 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		DAPP dapp = transaction.getSmartContract();
+		DApp dapp = transaction.getDApp();
 		if (dapp != null) {
 			for (Object[] itemKey : dapp.getItemsKeys()) {
 				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
@@ -1352,7 +1352,13 @@ public class Wallet extends Observable implements Observer {
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS
-				this.dwSet.getTransactionMap().set(account, transaction);
+				try {
+					this.dwSet.getTransactionMap().set(account, transaction);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+					Controller.getInstance().stopAndExit(1355);
+
+				}
 				// UPDATE BALANCE
 				deal_transaction(account, transaction, false);
 			}

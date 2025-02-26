@@ -292,8 +292,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
     getOwnersPage(Long assetKey, BigDecimal fromOwnAmount, byte[] fromAddres, int offset, int limit, boolean fillFullPage) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         PagedOwners pager = new PagedOwners(this);

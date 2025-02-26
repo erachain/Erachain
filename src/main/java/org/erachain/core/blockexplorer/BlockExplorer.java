@@ -23,7 +23,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
-import org.erachain.dapp.DAPPFactory;
+import org.erachain.dapp.DAppFactory;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.Pageable;
 import org.erachain.database.PairMapImpl;
@@ -68,6 +68,7 @@ public class BlockExplorer {
     public static final int pageSize = 25;
     private static final String LANG_DEFAULT = "en";
     private static final Logger logger = LoggerFactory.getLogger(BlockExplorer.class);
+    public static final Controller CONTROLLER = Controller.getInstance();
     private volatile static BlockExplorer blockExplorer;
     JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
@@ -340,8 +341,8 @@ public class BlockExplorer {
                         //search assets
                         // use ERA for PRICES
                         Object[] expArgs = new Object[2];
-                        expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
-                        expArgs[1] = Controller.getInstance().dlSet.getPairMap();
+                        expArgs[0] = CONTROLLER.getAsset(ASSET_QUOTE_KEY);
+                        expArgs[1] = CONTROLLER.dlSet.getPairMap();
                         jsonQuerySearchPages(info, AssetCls.class, search, offset, expArgs);
 
                         break;
@@ -455,8 +456,8 @@ public class BlockExplorer {
             output.put("type", "assets");
 
             Object[] expArgs = new Object[2];
-            expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
-            expArgs[1] = Controller.getInstance().dlSet.getPairMap();
+            expArgs[0] = CONTROLLER.getAsset(ASSET_QUOTE_KEY);
+            expArgs[1] = CONTROLLER.dlSet.getPairMap();
             jsonQueryIteratorPages(AssetCls.class, start, offset, expArgs);
 
         } else if (info.getQueryParameters().containsKey("asset")) {
@@ -619,7 +620,7 @@ public class BlockExplorer {
                 long[] timestampRef = account.getLastTimestamp();
                 // get signature for account + time
 
-                Controller cntr = Controller.getInstance();
+                Controller cntr = CONTROLLER;
 
                 int count = transactions.size();
 
@@ -643,7 +644,7 @@ public class BlockExplorer {
     public Map jsonQueryItemsLite(int itemType, Long fromKey) {
 
         Map output = new LinkedHashMap();
-        ItemMap itemsMap = Controller.getInstance().getItemMap(itemType);
+        ItemMap itemsMap = CONTROLLER.getItemMap(itemType);
         try (IteratorCloseable<Long> iterator = itemsMap.getIterator(fromKey, true)) {
             Long key;
             ItemCls item;
@@ -740,7 +741,7 @@ public class BlockExplorer {
 
         output.put("assets_list_tip", Lang.T("assets_list_tip", langObj));
 
-        AssetCls asset = Controller.getInstance().getAsset(key);
+        AssetCls asset = CONTROLLER.getAsset(key);
         if (asset == null) {
             return;
         }
@@ -761,7 +762,7 @@ public class BlockExplorer {
         output.put("Label_Volume24", Lang.T("Volume 24h", langObj));
         output.put("Label_Price_Low_High", Lang.T("Price Low / High", langObj));
 
-        PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
+        PairMapImpl pairMap = CONTROLLER.dlSet.getPairMap();
         JSONArray pairsJSON = new JSONArray();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
             while (iterator.hasNext()) {
@@ -812,8 +813,8 @@ public class BlockExplorer {
 
         List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true, true);
 
-        AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
-        AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
+        AssetCls assetHave = CONTROLLER.getAsset(order.getHaveAssetKey());
+        AssetCls assetWant = CONTROLLER.getAsset(order.getWantAssetKey());
 
         output.put("completed", order.isCompleted());
         output.put("canceled", order.isCanceled());
@@ -909,7 +910,7 @@ public class BlockExplorer {
 
         boolean unchecked = false;
 
-        Controller cnt = Controller.getInstance();
+        Controller cnt = CONTROLLER;
         if (assetHaveIn == null) {
 
             pairHaveKey = trade.getHaveKey();
@@ -1032,8 +1033,8 @@ public class BlockExplorer {
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTrade(want, have, true);
 
-        AssetCls assetHave = Controller.getInstance().getAsset(have);
-        AssetCls assetWant = Controller.getInstance().getAsset(want);
+        AssetCls assetHave = CONTROLLER.getAsset(have);
+        AssetCls assetWant = CONTROLLER.getAsset(want);
 
         output.put("assetHaveMaker", assetHave.getMaker().getAddress());
         output.put("assetWantMaker", assetWant.getMaker().getAddress());
@@ -1650,6 +1651,7 @@ public class BlockExplorer {
 
         output.put("height", lastBlockHead.heightBlock);
         output.put("timestamp", lastBlockHead.getTimestamp());
+        output.put("version", CONTROLLER.getVersion(false));
 
         output.put("Label_hour", Lang.T("hour", langObj));
         output.put("Label_hours", Lang.T("hours", langObj));
@@ -1674,7 +1676,7 @@ public class BlockExplorer {
         if (assetKeyStr != null)
             assetKey = Long.valueOf(assetKeyStr);
 
-        AssetCls asset = Controller.getInstance().getAsset(assetKey);
+        AssetCls asset = CONTROLLER.getAsset(assetKey);
         output.put("search_message", assetKey);
 
         // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
@@ -1835,8 +1837,8 @@ public class BlockExplorer {
                 transactionDataJSON = trade.toJson(0, false);
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);
                 Order orderTarget = trade.getTargetOrder(dcSet);
-                AssetCls haveAsset = Controller.getInstance().getAsset(orderInitiator.getHaveAssetKey());
-                AssetCls wantAsset = Controller.getInstance().getAsset(orderInitiator.getWantAssetKey());
+                AssetCls haveAsset = CONTROLLER.getAsset(orderInitiator.getHaveAssetKey());
+                AssetCls wantAsset = CONTROLLER.getAsset(orderInitiator.getWantAssetKey());
                 transactionDataJSON.put("haveKey", haveAsset.getKey());
                 transactionDataJSON.put("wantKey", wantAsset.getKey());
 
@@ -1848,9 +1850,9 @@ public class BlockExplorer {
 
                 int height = (int) (trade.getInitiator() >> 32);
                 transactionDataJSON.put("height", trade.getInitiator() >> 32);
-                transactionDataJSON.put("confirmations", Controller.getInstance().getMyHeight() - height);
+                transactionDataJSON.put("confirmations", CONTROLLER.getMyHeight() - height);
 
-                transactionDataJSON.put("timestamp", Controller.getInstance().blockChain.getTimestampByDBRef(trade.getInitiator()));
+                transactionDataJSON.put("timestamp", CONTROLLER.blockChain.getTimestampByDBRef(trade.getInitiator()));
 
                 transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
                 transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());
@@ -2038,7 +2040,7 @@ public class BlockExplorer {
             ATTransaction aTtransaction = (ATTransaction) unit;
             transactionDataJSON = aTtransaction.toJSON();
 
-            Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
+            Block block = CONTROLLER.getBlockByHeight(aTtransaction.getBlockHeight());
             long timestamp = block.getTimestamp();
             transactionDataJSON.put("timestamp", timestamp);
 
@@ -2080,17 +2082,17 @@ public class BlockExplorer {
 
         JSONArray pairsArray = new JSONArray();
 
-        PairsController pairsCnt = Controller.getInstance().pairsController;
-        PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
+        PairsController pairsCnt = CONTROLLER.pairsController;
+        PairMapImpl pairsMap = CONTROLLER.dlSet.getPairMap();
         // CACHE or UPDATE
         pairsCnt.updateList();
 
-        for (Tuple2<Long, Long> pairKey : Controller.getInstance().pairsController.commonPairsList) {
+        for (Tuple2<Long, Long> pairKey : CONTROLLER.pairsController.commonPairsList) {
 
-            AssetCls assetHave = Controller.getInstance().getAsset(pairKey.a);
+            AssetCls assetHave = CONTROLLER.getAsset(pairKey.a);
             if (assetHave == null)
                 continue;
-            AssetCls assetWant = Controller.getInstance().getAsset(pairKey.b);
+            AssetCls assetWant = CONTROLLER.getAsset(pairKey.b);
             if (assetWant == null)
                 continue;
 
@@ -2386,8 +2388,8 @@ public class BlockExplorer {
 
                     output.put("Label_Desc", Lang.T("Description", langObj));
 
-                } else if (playId.startsWith("DAPP.")) {
-                    output.put("play", DAPPFactory.dAppsById.get(Integer.parseInt(playId.substring(5))).getInfo(langObj));
+                } else if (playId.startsWith("DApp.")) {
+                    output.put("play", DAppFactory.DAPP_BY_ID.get(Integer.parseInt(playId.substring(5))).getInfo(langObj));
 
                     output.put("Label_Accounts", Lang.T("Accounts", langObj));
                     output.put("Label_Commands", Lang.T("Commands", langObj));
@@ -2402,12 +2404,13 @@ public class BlockExplorer {
             }
 
         } else {
-            JSONObject listBuId = new JSONObject();
+            TreeMap<String, JSONObject> listBuId = new TreeMap<>();
             // bots list
             listBuId.put("BOT.5", ErachainStorageBot.getInfoShort(langObj));
 
             // dApps list
-            DAPPFactory.dAppsById.values().forEach(dapp -> listBuId.put("DAPP." + dapp.getID(), dapp.getInfoShort(langObj)));
+            int myHeight = CONTROLLER.getMyHeight();
+            DAppFactory.DAPP_BY_ID.values().forEach(dapp -> listBuId.put("DApp." + dapp.getID(), dapp.getInfo(langObj, myHeight)));
             output.put("pageItemsByID", listBuId);
 
             output.put("Label_Head", Lang.T("Play_Scanner_Head", langObj));
@@ -2603,7 +2606,7 @@ public class BlockExplorer {
             if (Base58.isExtraSymbols(signature)) {
                 transaction = dcSet.getTransactionFinalMap().getRecord(signature);
             } else {
-                transaction = Controller.getInstance().getTransaction(Base58.decode(signature));
+                transaction = CONTROLLER.getTransaction(Base58.decode(signature));
             }
 
             if (transaction == null)
@@ -2639,15 +2642,15 @@ public class BlockExplorer {
                 logger.info("Wrong search while process blocks... ");
                 throw new WrongSearchException();
             }
-            block = Controller.getInstance().getBlockByHeight(dcSet, parseInt);
+            block = CONTROLLER.getBlockByHeight(dcSet, parseInt);
             if (block == null) {
-                block = Controller.getInstance().getBlockByHeight(dcSet, 1);
+                block = CONTROLLER.getBlockByHeight(dcSet, 1);
             }
         } else if (query.equals("last")) {
-            block = Controller.getInstance().getLastBlock();
+            block = CONTROLLER.getLastBlock();
         } else {
             try {
-                block = Controller.getInstance().getBlock(Base58.decode(query));
+                block = CONTROLLER.getBlock(Base58.decode(query));
             } catch (Exception e) {
                 logger.info("Wrong search while process blocks... ");
                 throw new WrongSearchException();
@@ -2776,7 +2779,7 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
 
         List<Transaction> all = new ArrayList<>(
-                Controller.getInstance().getUnconfirmedTransactions(100, true));
+                CONTROLLER.getUnconfirmedTransactions(100, true));
 
         int size = all.size();
 
@@ -2803,7 +2806,7 @@ public class BlockExplorer {
     }
 
     public Tuple2<Integer, Long> getHWeightFull() {
-        return Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
+        return CONTROLLER.getBlockChain().getHWeightFull(dcSet);
     }
 
     public Block.BlockHead getLastBlockHead() {

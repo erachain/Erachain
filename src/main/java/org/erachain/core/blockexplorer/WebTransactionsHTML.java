@@ -18,7 +18,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -180,7 +180,7 @@ public class WebTransactionsHTML {
     }
 
     public void get_HTML(BlockExplorer explorer, Transaction transaction) {
-        // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
+        // TODO: надо переделать тут так чтобы на стороне клиента HTML собиралось с его локальным временм из timestamp
 
         if (explorer != null) {
             this.dcSet = explorer.dcSet;
@@ -958,7 +958,7 @@ public class WebTransactionsHTML {
 
     public static void getContract(HashMap output, Transaction transaction, JSONObject langObj) {
 
-        DAPP contract = transaction.getSmartContract();
+        DApp contract = transaction.getDApp();
         if (contract == null) {
             return;
         }

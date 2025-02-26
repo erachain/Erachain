@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Paths;
 import java.util.List;
 
 //import org.erachain.utils.Logging;
@@ -36,6 +37,10 @@ public class Start {
 
 
     public static void main(String args[]) throws Exception {
+
+        if (java.nio.file.Files.exists(Paths.get(System.getProperty("user.dir"),"src", "main"))) {
+            throw new RuntimeException("Wrong directory - set to /ERA");
+        }
 
         System.out.println("Erachain " + Controller.getBuildDateTimeString());
         System.out.println("use option -?, -h, -help    - for see help");

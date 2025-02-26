@@ -23,6 +23,7 @@ import org.rocksdb.ReadOptions;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -435,6 +436,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         dbSource.close();
         try {
             Files.walkFileTree(dbSource.getDbPathAndFile(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (IOException e) {
         }
         dbSource = new RocksDbTransactSourceImpl2(root, NAME_TABLE, indexes, settings);

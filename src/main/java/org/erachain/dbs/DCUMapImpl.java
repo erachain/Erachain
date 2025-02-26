@@ -624,7 +624,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         this.addUses();
         try {
-
             if (this.map.containsKey(key)) {
                 return true;
             } else {

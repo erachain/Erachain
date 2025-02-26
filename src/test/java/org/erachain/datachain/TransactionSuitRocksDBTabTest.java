@@ -70,9 +70,8 @@ public class TransactionSuitRocksDBTabTest {
 
         db.getTransactionTab().put(transaction);
 
-        long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
-        keepTime = timestamp - (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
-        db.getTransactionTab().clearByDeadTimeAndLimit(keepTime, false);
+        int bloclPeriod = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
+        db.getTransactionTab().clearByDeadTime(timestamp);
 
         List<Transaction> txs1 = db.getTransactionTab().getTransactions(1000, false);
         List<Transaction> txs2 = db.getTransactionTab().getTransactions(1000, false);

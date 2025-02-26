@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import com.google.common.primitives.Longs;
+import lombok.Setter;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -116,6 +118,7 @@ public class BlockChain {
     /**
      * default = 30 sec
      */
+    @Setter
     private static int BLOCKS_PERIOD = 30000; // [milsec]
 
     /**
@@ -204,8 +207,7 @@ public class BlockChain {
             : MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES ? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
     public static final int MAX_BLOCK_SIZE_GEN = TEST_DB > 0 ? TEST_DB << 1 : MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 2;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_BLOCK_SIZE_GEN << 2;
 
     public static final int GENESIS_WIN_VALUE = TEST_MODE ? 3000 : ERA_COMPU_ALL_UP ? 10000 : 22000;
 
@@ -223,7 +225,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 5396170; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 5840000; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2152137;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000;
@@ -234,9 +236,6 @@ public class BlockChain {
      * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
     public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 0;
-    /**
-     * {@link LEFT_PRICE_HEIGHT} as SeqNo
-     */
 
     //public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
@@ -460,10 +459,10 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            !MAIN_MODE ? 0 : 2199400,
+            !MAIN_MODE ? 0 : 5840000,
             Base58.decode(
                     !MAIN_MODE ? ""
-                            : "oC44uRVVb79Qw6K9dftvihVZQomzkFTjBh11AUDuC3opw3ZW1AMj1zvGDRsrprfBV2uBqnN5uCX9Unm5jtop7Rf"));
+                            : "2HvuPvAPnZaMRhw2Q8JSfy7QqxampfgPQHZ7WsdkMHB5sNmL8NoHTRr4HBKDEwBbAjMfM4bxrmYAK5cZp3Y2E2VK"));
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
@@ -521,6 +520,9 @@ public class BlockChain {
         }
 
         if (TEST_MODE) {
+
+            if (!DEMO_MODE)
+                BLOCKS_PERIOD = Controller.blockPeriod * 1000;
 
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
@@ -691,6 +693,14 @@ public class BlockChain {
             // TODO добавить потом
             WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("Xq48dimwhwkXRkFun6pSQFHDSmrDnNqpUbFMkvQHC26nAyoQ3Srip3gE42axNWi5cXSPfTX5yrFkK6R4Hinuq6V")));
 
+            // Изьять Долг по Фильтру - проверки еще не было - удалим их
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("2Gpa5maHjKFZqaFFSBEF7FpvdHZ7PCHr6hwm47cyxBdHJ86LwWCfqisCahaDdg9bMWYgJmn6ygrRKn69p5pAxp73")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("5YFgE7zQGr4gCRnmSvpmxfeP2Zr59ERNrYwHFRxcKo8Y11vwvmovcgitXurHTUihjUX58Nom2HTvWg4TbbiDRCDX")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("3QE5th5dRuTLMQcBXK8Q5QDR5ggb6p9VtRC3P9iLLDQDPRuvXWY1UQ3qqnYWqntbjZuAHxf4C3iLyqwpHN2sAypK")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("ENAeCkxTpmPxuxyN12Ty6gv9aFc8hUHAuh4f2HnY54314sN4FYf3QcUrkk5imDgoqwmnhduWoKT3kgH6Zh3SzGN")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("4ukyxvv4eMHrBrRSsQuMR2EpVMnU6BLRSnQByUCM9jUZjh7DmBTSiRJHmbT7PV898aNgpm6Sr3tJiP4maSw37nzs")));
+            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("5q3VvxbebJC8WDYN7DdaWcYe9kVuNpkvXknegy7Lt3TmxLoEhXrn7BvF67nhAag3TgxrPiFDoEdNKxSrNk42CRWt")));
+
 
             // GENERAL TRUST
             TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -856,7 +866,9 @@ public class BlockChain {
         if (CLONE_MODE)
             return BLOCKS_PERIOD;
         else if (TEST_MODE && !DEMO_MODE)
-            return 7000;
+            return BLOCKS_PERIOD;
+        else if (DEMO_MODE)
+            return 30000;
 
         if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288000; // old MainNet
@@ -868,17 +880,6 @@ public class BlockChain {
     public static int GENERATING_MIN_BLOCK_TIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
         return GENERATING_MIN_BLOCK_TIME_MS(height);
-    }
-
-    public static int FLUSH_TIMEPOINT(int height) {
-        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
-    }
-
-    public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
-        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
-            return -GENERATING_MIN_BLOCK_TIME_MS(height);
-        }
-        return 0;
     }
 
     public static AssetCls ERA_ASSET;
@@ -907,17 +908,13 @@ public class BlockChain {
         return 24 * 60 * 60000 / GENERATING_MIN_BLOCK_TIME_MS(height); // 300 PER DAY
     }
 
-    public static int WIN_TIMEPOINT(int height) {
-        return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+    public static int WIN_TIME_POINT(int height) {
+        int time = GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+        return time > 60000 ? 60000 : time;
     }
 
-    public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
-        int height = timestamp < VERS_30SEC_TIME ? 1 : VERS_30SEC + 1;
-        if (TEST_DB > 0) {
-            return GENERATING_MIN_BLOCK_TIME_MS(height);
-        } else {
-            return TEST_MODE ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
-        }
+    public static int FLUSH_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
     }
 
     public static int VALID_PERSON_REG_ERA(Transaction transaction, int height, BigDecimal totalERA, BigDecimal totalLIA) {
@@ -1395,7 +1392,7 @@ public class BlockChain {
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, block.getReference())) {
             block.close();
-            LOGGER.info("new winBlock from FORK!");
+            LOGGER.info("new winBlock from FORK! {}", peer);
             return false;
         }
 
@@ -1442,12 +1439,19 @@ public class BlockChain {
 
             if (peer != null) {
                 if (noValid > Block.INVALID_REFERENCE) {
+                    LOGGER.info("new winBlock {} invalid: {} - from peer {}", block, noValid, peer);
                     peer.ban(10, "invalid block");
-                } else if (noValid > Block.INVALID_BRANCH) {
-                    peer.ban(0, "invalid block reference");
+                } else if (noValid == Block.INVALID_BLOCK_TIME) {
+                    LOGGER.info("new winBlock {} TIME wrong {} - from peer {}", block, new Timestamp(block.getTimestamp()), peer);
+                    if (Controller.getInstance().getActivePeersCounter() >= Settings.getInstance().getMaxConnections() - 1)
+                        peer.ban(0, "invalid block time " + new Timestamp(block.getTimestamp()));
+                } else if (noValid == Block.INVALID_REFERENCE) {
+                    LOGGER.info("new winBlock {} is FORK from peer {}", block, peer);
+                    if (Controller.getInstance().getActivePeersCounter() >= Settings.getInstance().getMaxConnections() - 1)
+                        peer.ban(0, "invalid block reference");
                 } else {
-                    // вообще не баним - это просто не успел блок встать в цепочку а мы ее уже обновили
-                    LOGGER.info("new winBlock is LATE");
+                    // вообще не баним - это просто не успел блок встать в цепочку, а мы ее уже обновили
+                    LOGGER.info("new winBlock {} is LATE", block);
                 }
             } else {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
@@ -1487,6 +1491,10 @@ public class BlockChain {
         // иначе просто прилетевший блок в момент синхронизации не будет принят
         if (this.waitWinBuffer != null) {
             synchronized (waitWinBuffer) {
+                if (Arrays.equals(waitWinBuffer.getSignature(), block.getReference()))
+                    // Тут еще сидит предыдущий блок, который надо внести в цепочку
+                    return;
+
                 waitWinBuffer.close();
                 waitWinBuffer = null; // поможем сборщику мусора явно
                 this.waitWinBuffer = block;
@@ -1497,7 +1505,7 @@ public class BlockChain {
     }
 
     public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
-        return new Tuple2<Integer, Long>(dcSet.getBlocksHeadsMap().size(),
+        return new Tuple2<Integer, Long>(dcSet.getBlockMap().size(),
                 dcSet.getBlocksHeadsMap().getFullWeight());
     }
 
@@ -1701,6 +1709,9 @@ public class BlockChain {
     }
 
     public String blockFromFuture(int height) {
+        if (TEST_MODE)
+            return null;
+
         long blockTimestamp = getTimestamp(height);
         if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
             return "invalid Timestamp from FUTURE: "

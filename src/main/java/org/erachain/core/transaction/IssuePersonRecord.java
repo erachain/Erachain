@@ -10,21 +10,18 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * typeBytes[3] = 1 - certyfy public of person key too
  */
-public class IssuePersonRecord extends IssueItemRecord {
+public class IssuePersonRecord extends IssueItemRecord implements CertifiedPublicKeys {
     public static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     public static final String TYPE_NAME = "Issue Person";
 
@@ -124,9 +121,9 @@ public class IssuePersonRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        DAPP dapp;
+        DApp dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;
@@ -449,5 +446,16 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         // is DEAD
         return super.calcBaseFee(withFreeProtocol);
+    }
+
+    @Override
+    public List<PublicKeyAccount> getCertifiedPublicKeys() {
+        if (isAndCertifyPubKey()) {
+            PersonHuman person = (PersonHuman) this.item;
+            PublicKeyAccount maker = person.getMaker();
+            return Collections.singletonList(maker);
+        }
+
+        return Collections.emptyList();
     }
 }

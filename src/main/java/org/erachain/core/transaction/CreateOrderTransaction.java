@@ -9,11 +9,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.OrderProcess;
-import org.erachain.core.item.assets.TradePair;
-import org.erachain.dapp.DAPP;
+import org.erachain.core.item.assets.*;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
+import org.erachain.dapp.DApp;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -22,21 +21,16 @@ import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
-
-#### PROPERTY 1
-typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
-
-#### PROPERTY 2
-typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
-
+ * #### PROPERTY 1
+ * typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
+ * <p>
+ * #### PROPERTY 2
+ * typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
  */
-public class CreateOrderTransaction extends Transaction implements Itemable {
+public class CreateOrderTransaction extends Transaction implements Itemable, Orderable, TransferredBalances {
     public static final byte[][] VALID_REC = new byte[][]{
             //Base58.decode("4...")
     };
@@ -44,7 +38,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final String TYPE_NAME = "Create Order";
 
     // < 32 used for acuracy
-    public static final byte HAS_SMART_CONTRACT_MASK = 64;
+    public static final byte HAS_SMART_CONTRACT_MASK_ORDER = 64;
 
     public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
@@ -65,7 +59,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountHave;
     private BigDecimal amountWant;
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DAPP dapp, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DApp dapp, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags) {
         super(typeBytes, TYPE_NAME, creator, exLink, dapp, feePow, timestamp, flags);
         this.haveKey = haveKey;
@@ -84,7 +78,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DAPP dapp, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DApp dapp, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags,
                                   byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, exLink, dapp, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags);
@@ -158,6 +152,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     @Override
+    public Order getOrderFromDb() {
+        //return this.signature;
+        Long orderId = getOrderId();
+        Order order = dcSet.getOrderMap().get(orderId);
+        return order == null? dcSet.getCompletedOrderMap().get(orderId) : order;
+    }
+
+    @Override
     public BigDecimal getAmount() {
         return this.amountHave;
     }
@@ -173,6 +175,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     @Override
+    public AssetCls getAsset() {
+        return this.haveAsset;
+    }
+
+    @Override
     public ItemCls getItem() {
         return this.haveAsset;
     }
@@ -181,6 +188,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return this.haveKey;
     }
 
+    @Override
     public AssetCls getHaveAsset() {
         return this.haveAsset;
     }
@@ -193,6 +201,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return this.wantKey;
     }
 
+    @Override
     public AssetCls getWantAsset() {
         return this.wantAsset;
     }
@@ -235,6 +244,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         transaction.put("amountWant", this.amountWant.toPlainString());
 
         return transaction;
+    }
+
+    @Override
+    protected byte get_HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK_ORDER;
     }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
@@ -286,9 +300,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             exLink = null;
         }
 
-        DAPP dapp;
-        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+        DApp dapp;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK_ORDER) > 0) {
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;
@@ -436,7 +450,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }
@@ -674,6 +688,37 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                     new Object[]{ItemCls.ASSET_TYPE, wantKey, wantAsset == null ? null : wantAsset.getTags()},
             };
         }
+    }
+
+    /**
+     * по инициализации сделки - если пусто, то выход, иначе все покусанные ордера
+     *
+     * @return
+     */
+    @Override
+    public TransferBalanceDto[] getTransfers() {
+        List<Trade> initiated = dcSet.getTradeMap().getInitiatedTrades(getOrderId(), false);
+        if ((initiated == null || initiated.isEmpty()))
+            return null;
+
+        TransferRecipientDto[] recipients = new TransferRecipientDto[initiated.size()];
+        TransferBalanceDto[] transferred = new TransferBalanceDto[recipients.length + 1];
+        Trade item;
+        Transaction targetTx;
+        for (int i = 0; i < recipients.length; i++) {
+            item = initiated.get(i);
+            // Сбор получателей по данной заявке
+            targetTx = item.getTargetTX(dcSet);
+            recipients[i] = new TransferRecipientDto(targetTx.getCreator(), item.getAmountWant(), Account.BALANCE_POS_OWN);
+            // получатели по покусанным заявкам
+            transferred[i] = new TransferBalanceDto(targetTx.getCreator(), wantAsset, Account.BALANCE_POS_OWN, false,
+                    new TransferRecipientDto[]{new TransferRecipientDto(creator, item.getAmountHave(), Account.BALANCE_POS_OWN)});
+        }
+
+        // Актив по данной заявке и его объем
+        transferred[recipients.length] = new TransferBalanceDto(creator, haveAsset, Account.BALANCE_POS_OWN, false, recipients);
+
+        return transferred;
     }
 
     // PROCESS/ORPHAN

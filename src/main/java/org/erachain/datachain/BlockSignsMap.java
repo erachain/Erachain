@@ -16,7 +16,7 @@ import java.util.TreeMap;
  */
 public class BlockSignsMap extends DCUMap<Long, Integer> {
 
-    static final boolean SIZE_ENABLE = true;
+    static final boolean SIZE_ENABLE = false;
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database, SIZE_ENABLE);
@@ -29,23 +29,33 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     @Override
     public void openMap() {
 
-        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+        sizeEnable = SIZE_ENABLE; // разрешаем счет размера - это будет немного тормозить работу
 
         //OPEN HASH MAP
         //
-        map = database.createHashMap("height")
+        DB.HTreeMapMaker mapConstruct = database.createHashMap("height")
                 .keySerializer(SerializerBase.LONG)
-                .valueSerializer(SerializerBase.INTEGER)
-
                 // .comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
                 // or from MapDB .comparator(Fun.BYTE_ARRAY_COMPARATOR)
+                .valueSerializer(SerializerBase.INTEGER);
 
-                .counterEnable() // used for count blocks in Chain
-                .makeOrGet();
+        if (sizeEnable)
+            mapConstruct = mapConstruct.counterEnable();
+
+        map = mapConstruct.makeOrGet();
+
     }
 
     protected void getMemoryMap() {
         map = new TreeMap<Long, Integer>();
+    }
+
+    @Override
+    public int size() {
+        if (sizeEnable)
+            return map.size();
+
+        return ((DCSet) databaseSet).getBlockMap().size();
     }
 
     public Block getBlock(byte[] signature) {

@@ -1,5 +1,7 @@
 package org.erachain.dbs.mapDB;
 
+import com.google.common.primitives.Longs;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -11,12 +13,10 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.mapdb.Bind;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.erachain.ntp.NTP;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
-import org.mapdb.SerializerBase;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Array;
@@ -26,6 +26,14 @@ import java.util.NavigableSet;
 
 @Slf4j
 public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit {
+
+    /**
+     * Сколько трнзакций можно положить в таблицу до ее обновления (очистки). Иначе начинает тормозить,
+     * надо удалитьтаблицу и переложить в нее оставшиеся неподтвержденные
+     */
+    int MAX_PUT_COUNT = 1000000;
+    @Getter
+    protected Atomic.Long totalAdded;
 
     @SuppressWarnings("rawtypes")
     public NavigableSet timestampIndex;
@@ -62,6 +70,8 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
+
+        totalAdded = database.getAtomicLong("utx_total_added");
 
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
@@ -171,4 +181,44 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         return IteratorCloseableImpl.make(new IndexIterator(timestampIndex));
     }
 
+    @Override
+    public void put(Long key, Transaction value) {
+        super.put(key, value);
+
+        // Так как у MapDB замечены тормоза поле создания большого числа записей, даже если они удалялись
+        // проведем чистку полную таблицы
+        if (totalAdded.incrementAndGet() > DCSet.DELETIONS_BEFORE_COMPACT) {
+
+            long ntpTimestamp = NTP.getTime();
+            /////// CLEAR table and refresh uTx
+            try {
+                // уже пора чистить таблицу - удалим ее перенеся оставшиеся в новую чистую
+                int size = size();
+                int i = size;
+                Transaction[] uTxs = values().toArray(new Transaction[i]);
+
+                // ПОЛНОЕ УДАЛЕНИЕ
+                clear();
+
+                // Заносим обратно
+                Transaction item;
+                do {
+                    item = uTxs[--i];
+                    put(Longs.fromByteArray(item.getSignature()), item);
+                } while (i > 0);
+                logger.debug("ADDED UTXs: " + size + ", delay[s]: " + (NTP.getTime() - ntpTimestamp) / 1000);
+            } catch (OutOfMemoryError e) {
+                logger.error(e.getMessage(), e);
+                Controller.getInstance().stopAndExit(456);
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public void clear() {
+        totalAdded.set(0);
+        super.clear();
+    }
 }

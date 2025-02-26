@@ -14,19 +14,12 @@ import java.io.IOError;
 public class DCSetRO extends DCSet {
 
     private BlocksMapImpl blockMap;
-    private BlockSignsMap blockSignsMap;
-    private BlocksHeadsMap blocksHeadsMap;
 
-    public DCSetRO(File dbFile, int defaultDBS) {
+    public DCSetRO(File dbFile) {
         super(dbFile, DCSet.makeReadOnlyFileDB(dbFile), false, false);
 
         try {
-            this.blockMap = new BlocksMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    BLOCKS_MAP
-                    , this, database);
-
-            this.blockSignsMap = new BlockSignsMap(this, database);
-            this.blocksHeadsMap = new BlocksHeadsMap(this, database);
+            this.blockMap = new BlocksMapImpl(DBS_MAP_DB, this, database);
 
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
@@ -41,58 +34,33 @@ public class DCSetRO extends DCSet {
         return this.blockMap;
     }
 
-    /**
-     * ключ: подпись блока
-     * занчение: номер блока (высота, height)<br>
-     * <p>
-     * TODO - убрать длинный индекс
-     *
-     * @return
-     */
-    @Override
-    public BlockSignsMap getBlockSignsMap() {
-        return this.blockSignsMap;
-    }
-
-    /**
-     * Block Height -> Block.BlockHead - заголовок блока влючая все что вычислено <br>
-     * <p>
-     * + FACE - version, creator, signature, transactionsCount, transactionsHash<br>
-     * + parentSignature<br>
-     * + Forging Data - Forging Value, Win Value, Target Value<br>
-     */
-    @Override
-    public BlocksHeadsMap getBlocksHeadsMap() {
-        return this.blocksHeadsMap;
-    }
-
     @Override
     public synchronized void close() {
 
-        if (this.database != null) {
-            // THIS IS not FORK
-            if (!this.database.isClosed()) {
-                this.addUses();
+        if (this.database == null)
+            return;
 
-                for (DBTab tab : tables) {
-                    try {
-                        tab.close();
-                    } catch (IOError e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-                // улучшает работу финализера
-                tables = null;
-                try {
-                    this.database.close();
-                } catch (IOError e) {
-                    logger.error(e.getMessage(), e);
-                }
-                // улучшает работу финализера
-                this.database = null;
+        // THIS IS not FORK
+        if (!this.database.isClosed()) {
+            this.addUses();
 
-                this.uses = 0;
+            try {
+                blockMap.close();
+            } catch (IOError e) {
+                logger.error(e.getMessage(), e);
             }
+
+            // улучшает работу финализера
+            tables = null;
+            try {
+                this.database.close();
+            } catch (IOError e) {
+                logger.error(e.getMessage(), e);
+            }
+            // улучшает работу финализера
+            this.database = null;
+
+            this.uses = 0;
 
             logger.info("closed " + toString());
         }

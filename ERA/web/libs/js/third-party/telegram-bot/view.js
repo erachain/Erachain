@@ -1,21 +1,5 @@
 // Функция для экранирования специальных символов
 
-const map = {
-    '\n': '<br>',
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-    '/': '&#x2F;',
-    '`': '&#x60;',
-    '=': '&#x3D;'
-};
-
-function escapeHtml(text) {
-    return text.replace(/[&<>"'`\n=/]/g, function(m) { return map[m]; });
-}
-
 const priority = {
     'blockquote': 0,
     'pre': 11,

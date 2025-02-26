@@ -18,6 +18,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
+import org.mapdb.Atomic;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 @Slf4j
 public class DWSet extends DBASet {
@@ -34,7 +36,7 @@ public class DWSet extends DBASet {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 534; // vers 5.6.1 orderID
+    final static int CURRENT_VERSION = 536;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DWSet.class);
 
@@ -42,7 +44,7 @@ public class DWSet extends DBASet {
 
     public final DCSet dcSet;
 
-    private Var<Long> licenseKeyVar;
+    private Atomic.Long licenseKeyVar;
     private Long licenseKey;
 
     private AccountMap accountMap;
@@ -78,7 +80,7 @@ public class DWSet extends DBASet {
         this.dcSet = dcSet;
 
         // LICENCE SIGNED
-        licenseKeyVar = database.getAtomicVar("licenseKey");
+        licenseKeyVar = database.getAtomicLong("licenseKey");
         licenseKey = licenseKeyVar.get();
 
         this.accountMap = new AccountMap(this, this.database);
@@ -179,6 +181,7 @@ public class DWSet extends DBASet {
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -187,10 +190,11 @@ public class DWSet extends DBASet {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
+            logger.warn("New Version of DB: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
             }
@@ -215,10 +219,14 @@ public class DWSet extends DBASet {
 
     public byte[] getLastBlockSignature() {
         this.uses++;
-        Var<byte[]> atomic = this.database.getAtomicVar(LAST_BLOCK);
-        byte[] u = atomic.get();
-        this.uses--;
-        return u;
+        try {
+            Var<byte[]> atomic = this.database.getAtomicVar(LAST_BLOCK);
+            return atomic.get();
+        } catch (Exception e) {
+            return null;
+        } finally {
+            this.uses--;
+        }
     }
 
     public void setLastBlockSignature(byte[] signature) {
