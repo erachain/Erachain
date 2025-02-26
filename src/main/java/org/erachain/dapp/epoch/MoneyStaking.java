@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.HasDataString;
+import org.erachain.core.transaction.Orderable;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransferredBalances;
 import org.erachain.core.transaction.dto.TransferBalanceDto;
@@ -142,7 +143,11 @@ public class MoneyStaking extends EpochDAppItemJson {
     void makePointTransfer(List<Object[]> stateSubPoints, Account account, Long assetKey, AssetCls asset,
                            boolean asSender, Account sideAccount) {
 
-        if (asset.getItemType() != itemType || asset.getKey() != itemKey)
+        if (asset.getItemType() != itemType ||
+                // TODO тут можно и второй актив обработать - но нужна проверка что он к этому же ДАПП
+                // но лучше все же списки ДАПП делать - Пока обработка только стороны одной - сразу два актива с ДАПП не обработаются
+                // (!(commandTx instanceof Orderable) && asset.getKey() != itemKey))
+                asset.getKey() != itemKey)
             return;
 
         PublicKeyAccount assetMaker = asset.getMaker();
@@ -337,13 +342,15 @@ public class MoneyStaking extends EpochDAppItemJson {
     private void job(boolean asOrphan) {
 
         if (asOrphan) {
+            // 4280 - 9586 - 79-2
             Object[][][] statePoints = (Object[][][]) removeState(commandTx.getDBRef());
             Object[][] stateSubPoints;
             Object[] stateSubPoint;
             ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
             Long assetKey;
             byte[] shortAddress;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance;
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance;
             // Разворачиваем в обратном порядке
             for (int ii = statePoints.length - 1; ii >= 0; ii--) {
                 stateSubPoints = statePoints[ii];
@@ -398,7 +405,8 @@ public class MoneyStaking extends EpochDAppItemJson {
                     if (transferRecipient.getBalancePos() != BALANCE_POS_OWN)
                         continue;
 
-                    makePointTransfer(stateSubPoints, transferRecipient.getAccount(), assetKey, asset, false, sender);
+                    makePointTransfer(stateSubPoints, transferRecipient.getAccount(),
+                            assetKey, asset, false, sender);
                 }
 
                 statePoints[i++] = (Object[][]) stateSubPoints.toArray(new Object[stateSubPoints.size()][]);

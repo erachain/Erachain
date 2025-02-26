@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -9,10 +10,12 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
 import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -20,10 +23,7 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.erachain.core.transaction.CreateOrderTransaction.HAS_SMART_CONTRACT_MASK_ORDER;
 
@@ -31,7 +31,7 @@ import static org.erachain.core.transaction.CreateOrderTransaction.HAS_SMART_CON
  * Закрывает родительский Заказ и создает новый.
  * При этом создает Сделку  с типом Измена Заказа, в которую вставляет новое Хочу
  */
-public class ChangeOrderTransaction extends Transaction implements TransferredBalances {
+public class ChangeOrderTransaction extends Transaction implements Itemable, Orderable, TransferredBalances {
     public static final byte TYPE_ID = (byte) Transaction.CHANGE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Change Order";
 
@@ -55,6 +55,11 @@ public class ChangeOrderTransaction extends Transaction implements TransferredBa
     long orderID;
     //private CreateOrderTransaction createOrderTx;
     private Order order;
+
+    @Getter
+    private AssetCls haveAsset;
+    @Getter
+    private AssetCls wantAsset;
 
     /**
      * @param typeBytes
@@ -142,6 +147,9 @@ public class ChangeOrderTransaction extends Transaction implements TransferredBa
             order = dcSet.getCompletedOrderMap().get(orderID);
         }
 
+        haveAsset = dcSet.getItemAssetMap().get(order.getHaveAssetKey());
+        wantAsset = dcSet.getItemAssetMap().get(order.getWantAssetKey());
+
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
 
@@ -175,6 +183,14 @@ public class ChangeOrderTransaction extends Transaction implements TransferredBa
 
     public Long getOrderId() {
         return orderID;
+    }
+
+    @Override
+    public Order getOrderFromDb() {
+        //return this.signature;
+        Long orderId = getOrderId();
+        Order order = dcSet.getOrderMap().get(orderId);
+        return order == null? dcSet.getCompletedOrderMap().get(orderId) : order;
     }
 
     @Override
@@ -657,6 +673,32 @@ public class ChangeOrderTransaction extends Transaction implements TransferredBa
 
     @Override
     public TransferBalanceDto[] getTransfers() {
-        return new TransferBalanceDto[0];
+        List<Trade> initiated = dcSet.getTradeMap().getInitiatedTrades(getOrderId(), false);
+        if ((initiated == null || initiated.isEmpty()))
+            return null;
+
+        TransferRecipientDto[] recipients = new TransferRecipientDto[initiated.size()];
+        TransferBalanceDto[] transferred = new TransferBalanceDto[recipients.length + 1];
+        Trade item;
+        Transaction targetTx;
+        for (int i = 0; i < recipients.length; i++) {
+            item = initiated.get(i);
+            // Сбор получателей по данной заявке
+            targetTx = item.getTargetTX(dcSet);
+            recipients[i] = new TransferRecipientDto(targetTx.getCreator(), item.getAmountWant(), Account.BALANCE_POS_OWN);
+            // получатели по покусанным заявкам
+            transferred[i] = new TransferBalanceDto(targetTx.getCreator(), wantAsset, Account.BALANCE_POS_OWN, false,
+                    new TransferRecipientDto[]{new TransferRecipientDto(creator, item.getAmountHave(), Account.BALANCE_POS_OWN)});
+        }
+
+        // Актив по данной заявке и его объем
+        transferred[recipients.length] = new TransferBalanceDto(creator, haveAsset, Account.BALANCE_POS_OWN, false, recipients);
+
+        return transferred;
+    }
+
+    @Override
+    public ItemCls getItem() {
+        return haveAsset;
     }
 }
