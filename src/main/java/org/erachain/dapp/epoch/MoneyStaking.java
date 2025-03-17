@@ -316,11 +316,12 @@ public class MoneyStaking extends EpochDAppItemJson {
                 // reset pending reward
                 pointNew[0] = BigDecimal.ZERO;
                 status += " Withdraw.";
+
             } else {
+                // запишем в сообщение
+                status += (asSender ? " Sender " : " Recipient ") + (multiSignum > 0? "reward " : "demurrage ") + rewardAbs.toPlainString() + ".";
                 status += " Pending.";
             }
-
-            return;
 
         } finally {
             // STORE NEW POINT
