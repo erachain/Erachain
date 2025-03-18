@@ -108,7 +108,7 @@ import static org.erachain.datachain.DCSet.DATA_FILE;
  */
 public class Controller extends Observable {
 
-    public static String version = "6.7.03b";
+    public static String version = "6.7.04";
     public static String buildTime = "2025-02-26 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
