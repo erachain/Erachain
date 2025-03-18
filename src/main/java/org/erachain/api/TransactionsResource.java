@@ -49,7 +49,7 @@ public class TransactionsResource {
 
     @GET
     @Path("signature/{signature}")
-    public static String getTransactionsBySignature(@PathParam("signature") String signature) throws Exception {
+    public String getTransactionsBySignature(@PathParam("signature") String signature) throws Exception {
         // DECODE SIGNATURE
         byte[] signatureBytes;
         try {
@@ -71,7 +71,7 @@ public class TransactionsResource {
 
     @GET
     @Path("seqno/{signature}")
-    public static String getSeqNoBySignature(@PathParam("signature") String signature) {
+    public String getSeqNoBySignature(@PathParam("signature") String signature) {
         // DECODE SIGNATURE
         byte[] signatureBytes;
         try {
@@ -89,6 +89,40 @@ public class TransactionsResource {
         }
 
         return Transaction.viewDBRef(seqNo);
+    }
+
+    @GET
+    @Path("check/{signature}")
+    public String checkBySignature(@PathParam("signature") String signature) {
+        // DECODE SIGNATURE
+        byte[] signatureBytes;
+        try {
+            signatureBytes = Base58.decode(signature);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+        }
+
+        // GET TRANSACTION
+        Transaction txUnconfirmed = Controller.getInstance().getDCSet().getTransactionTab().get(signatureBytes);
+        if (txUnconfirmed != null) {
+            JSONObject txJson = new JSONObject();
+            txJson.put("unconfirmed", "true");
+            return txJson.toString();
+        }
+
+        Long seqNo = Controller.getInstance().getDCSet().getTransactionFinalMapSigns().get(signatureBytes);
+
+        // CHECK IF TRANSACTION EXISTS
+        if (seqNo != null) {
+            JSONObject txJson = new JSONObject();
+            Fun.Tuple2<Integer, Integer> ref = Transaction.parseDBRef(seqNo);
+            txJson.put("height", ref.a);
+            txJson.put("sequence", ref.b);
+            return txJson.toString();
+        }
+
+        throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
+
     }
 
 	/*
