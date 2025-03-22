@@ -119,7 +119,7 @@ public class OrderUnresolveTest {
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-        keyA = issueAssetTransaction.getAssetKey(dcSet);
+        keyA = issueAssetTransaction.getAssetKey();
         balanceA = accountA.getBalance(dcSet, keyA);
 
         assetB = new AssetVenture(itemAppData, gb.getCreator(), "COMPU", icon, image, ".", 0, 8, 0L);
@@ -127,7 +127,7 @@ public class OrderUnresolveTest {
         issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
-        keyB = issueAssetTransaction.getAssetKey(dcSet);
+        keyB = issueAssetTransaction.getAssetKey();
 
     }
 

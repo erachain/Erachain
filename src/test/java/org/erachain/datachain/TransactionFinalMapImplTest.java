@@ -12,7 +12,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.IDB;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
@@ -40,7 +40,7 @@ public class TransactionFinalMapImplTest {
     };
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     byte[] isText = new byte[]{1};
     byte[] enCrypted = new byte[]{0};

@@ -126,6 +126,10 @@ public class Trade {
         return dcSet.getTransactionFinalMap().get(this.initiator);
     }
 
+    public Transaction getTargetTX(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.target);
+    }
+
     public long getTarget() {
         return this.target;
     }
@@ -156,10 +160,10 @@ public class Trade {
     }
 
     public BigDecimal calcPrice() {
-        return Order.calcPrice(this.amountHave, this.amountWant, wantAssetScale);
+        return Order.calcPrice(this.amountHave, this.amountWant);
     }
     public BigDecimal calcPriceRevers() {
-        return Order.calcPrice(this.amountWant, this.amountHave, haveAssetScale);
+        return Order.calcPrice(this.amountWant, this.amountHave);
     }
 
     public int getSequence() {

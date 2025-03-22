@@ -15,6 +15,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.gui.library.ASMutableTreeNode;
@@ -39,7 +40,7 @@ import java.util.List;
  * [2] bits[0] - =1 - has Template (OLD)
  * [3] - < 0 - has DATA
  */
-public class RSignNote extends Transaction implements Itemable {
+public class RSignNote extends Transaction implements Itemable, TransferredBalances {
 
     public static final byte CURRENT_VERS = 3;
 
@@ -358,18 +359,14 @@ public class RSignNote extends Transaction implements Itemable {
         return BigDecimal.ZERO;
     }
 
+
     @Override
-    public String viewSubTypeName() {
-        if (extendedData == null) {
-            parseDataV2WithoutFiles();
-        }
-
-        if (extendedData.hasExAction()) {
-            return Lang.T(getExAction().viewActionType()) + ":" + Lang.T(getExAction().viewType());
-        }
-
-        return "";
+    public TransferBalanceDto[] getTransfers() {
+        if (hasExAction())
+            return getExAction().getTransfers(creator);
+        return null;
     }
+
 
     @Override
     public String viewSubTypeName(JSONObject langObj) {
@@ -669,7 +666,7 @@ public class RSignNote extends Transaction implements Itemable {
             base_len -= SIGNATURE_LENGTH;
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

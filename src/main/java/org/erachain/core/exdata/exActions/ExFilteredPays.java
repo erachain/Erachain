@@ -14,6 +14,8 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
+import org.erachain.core.transaction.dto.TransferRecipientDto;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
@@ -854,6 +856,48 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
     }
 
     @Override
+    public TransferBalanceDto[] getTransfers(Account creator) {
+
+        if (hasAmount()) {
+
+            // возьмем знаки (минус) для создания позиции баланса такой
+            Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+            boolean isAmountNegate;
+            BigDecimal actionPayAmount;
+            boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+            boolean backwardAction;
+
+            Account recipient;
+            TransferBalanceDto[] transfers = new TransferBalanceDto[results.size()];
+            for (int i = 0; i < results.size(); i++) {
+                Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item = results.get(i);
+                recipient = (Account) item.a;
+                if (recipient == null)
+                    break; // ??
+
+                actionPayAmount = (BigDecimal) item.c;
+
+                //if (creator.equals(recipient))
+                //    // пропустим себя в любом случае
+                //    continue;
+
+                isAmountNegate = actionPayAmount.signum() < 0;
+                backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+                // сбросим направлени от фильтра
+                actionPayAmount = actionPayAmount.abs();
+                // зазадим направление от Действия нашего
+                actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+                transfers[i] = new TransferBalanceDto(creator, asset, balancePos, backwardAction,
+                        new TransferRecipientDto[]{new TransferRecipientDto(recipient, actionPayAmount, balancePos)});
+            }
+            return transfers;
+
+        }
+        return null;
+    }
+
+    @Override
     public int preProcess(int height, Account creator, boolean andPreValid) {
         makeFilterPayList(dcSet, height, asset, creator, andPreValid);
         if (resultCode != Transaction.VALIDATE_OK) {
@@ -1235,7 +1279,8 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
             }
 
             ////////// TODO NEED CHECK ALL
-            boolean needCheckAllList = false;
+            /// так как проверка для ИЗЬЯТЬ не проводилась сверху - то делаем тут полную проверку по каждому
+            boolean needCheckAllList = backward && (!BlockChain.MAIN_MODE || height > 5396170);
             if (needCheckAllList) {
 
                 for (Fun.Tuple4 item : results) {
@@ -1376,5 +1421,4 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
         }
         return false;
     }
-
 }

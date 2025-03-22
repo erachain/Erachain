@@ -28,3 +28,4 @@ gui_settings.json
 
 # mac
 *.DS_Store
+/ERA_SIDE/

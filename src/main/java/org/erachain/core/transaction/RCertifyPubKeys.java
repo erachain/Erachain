@@ -16,7 +16,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -33,7 +33,7 @@ import java.util.*;
  * =1 - need sign by person
  * typeBytes[2] - size of personalized accounts
  */
-public class RCertifyPubKeys extends Transaction implements Itemable {
+public class RCertifyPubKeys extends Transaction implements Itemable, CertifiedPublicKeys {
 
     public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
     public static final String TYPE_NAME = "Certify Public Key";
@@ -220,9 +220,9 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             exLink = null;
         }
 
-        DAPP dapp;
+        DApp dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;
@@ -449,7 +449,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

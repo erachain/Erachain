@@ -9,6 +9,7 @@ import org.mapdb.DBMaker;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 @Slf4j
 public class DPSet extends DBASet {
@@ -86,6 +87,7 @@ public class DPSet extends DBASet {
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -94,10 +96,11 @@ public class DPSet extends DBASet {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DLSet.");
+            logger.warn("New Version of DB: " + CURRENT_VERSION + ". Try remake DLSet.");
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
             }

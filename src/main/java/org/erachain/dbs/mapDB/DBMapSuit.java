@@ -397,13 +397,13 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         this.addUses();
         try {
 
-            //RESET MAP
-            this.map.clear();
-
             //RESET INDEXES
             for (Set<Tuple2<?, T>> set : this.indexes.values()) {
                 set.clear();
             }
+
+            //RESET MAP
+            this.map.clear();
 
         } finally {
             this.outUses();
@@ -413,7 +413,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     @Override
     public void clearCache() {
-        // систится у всей базы
+        // чистится у всей базы
     }
 
     @Override

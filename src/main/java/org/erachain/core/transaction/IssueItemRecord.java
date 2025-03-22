@@ -250,6 +250,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         if (creatorPerson != null) {
             dcSet.getItemsValuesMap().putIssuedItem(creatorPerson, item, dbRef);
         }
+
     }
 
     @Override

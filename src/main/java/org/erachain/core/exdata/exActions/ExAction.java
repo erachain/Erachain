@@ -7,6 +7,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.dto.TransferBalanceDto;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -71,6 +72,9 @@ public abstract class ExAction<R> {
     public R getResults() {
         return results;
     }
+
+    public abstract TransferBalanceDto[] getTransfers(Account creator);
+
 
     public BigDecimal getTotalPay() {
         return totalPay;

@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
@@ -28,6 +29,9 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static org.erachain.core.item.assets.AssetTypes.AS_BANK_GUARANTEE;
+import static org.erachain.core.item.assets.AssetTypes.AS_BANK_GUARANTEE_TOTAL;
 
 public class DealsPopupMenu extends JPopupMenu {
 
@@ -208,6 +212,18 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(copyAddress);
+
+        JMenuItem depositPolzaSbp = new JMenuItem(Lang.T("Deposit by SBP"));
+        depositPolzaSbp.getAccessibleContext().setAccessibleDescription(Lang.T("Deposit accounts by SBP"));
+        depositPolzaSbp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    URLViewer.openWebpage(new URL("http://bitloom.ru/polza/sbp/compu?amount=500&receiver=" + creator.getAddress()));
+                } catch (MalformedURLException ex1) {
+                }
+            }
+        });
+        add(depositPolzaSbp);
 
         JMenuItem copyBalance = new JMenuItem(Lang.T("Copy Balance"));
         copyBalance.addActionListener(new ActionListener() {
@@ -508,7 +524,7 @@ public class DealsPopupMenu extends JPopupMenu {
         // SET by this ASSET TYPE etc
         switch (this.asset.getAssetType()) {
 
-            case AssetCls.AS_BANK_GUARANTEE:
+            case AS_BANK_GUARANTEE:
 
                 balance = creator.getBalance(asset.getKey());
                 if (balance.a.b.signum() > 0) {
@@ -535,7 +551,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
-            case AssetCls.AS_BANK_GUARANTEE_TOTAL:
+            case AS_BANK_GUARANTEE_TOTAL:
 
                 balance = creator.getBalance(asset.getKey());
                 if (creator.equals(asset.getMaker()) || balance.a.b.signum() > 0) {

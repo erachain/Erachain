@@ -1182,7 +1182,7 @@ public class ExData {
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
-                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
+                              Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles, boolean onErrorThrown)
             throws Exception {
 
         JSONObject out_Map = new JSONObject();
@@ -1249,6 +1249,7 @@ public class ExData {
                     fileBytesOrig = ZipBytes.decompress(fileBytes);
                 } catch (DataFormatException e1) {
                     LOGGER.error(e1.getMessage(), e1);
+                    fileBytesOrig = fileBytes;
                 }
             } else {
                 fileBytesOrig = fileBytes;
@@ -1325,9 +1326,13 @@ public class ExData {
                     }
 
                     if (publicKey == null) {
-                        JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
-                                        ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        if (onErrorThrown) {
+                            throw new RuntimeException(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY) + " - " + recipient);
+                        } else {
+                            JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient + " : " +
+                                            ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        }
 
                         return null;
                     }
@@ -1706,7 +1711,8 @@ public class ExData {
             }
         }
 
-        if (tags != null && tags.length > 255) {
+        // TODO - преобразовывать без знака при парсигне и тагд тут можно до 255 поднять
+        if (tags != null && tags.length > 127) {
             return Transaction.INVALID_TAGS_LENGTH;
         }
 

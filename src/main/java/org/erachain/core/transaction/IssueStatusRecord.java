@@ -6,7 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.statuses.StatusFactory;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -93,9 +93,9 @@ public class IssueStatusRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        DAPP dapp;
+        DApp dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;

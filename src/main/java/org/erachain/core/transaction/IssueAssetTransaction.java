@@ -8,8 +8,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUnique;
-import org.erachain.dapp.DAPP;
-import org.erachain.datachain.DCSet;
+import org.erachain.dapp.DApp;
 import org.erachain.settings.Settings;
 import org.mapdb.Fun;
 
@@ -80,8 +79,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
         return len * BlockChain.FEE_PER_BYTE;
     }
 
-    public long getAssetKey(DCSet db) {
-        return getItem().getKey();
+    @Override
+    public long getAssetKey() {
+        return getKey();
     }
 
     @Override
@@ -224,9 +224,9 @@ public class IssueAssetTransaction extends IssueItemRecord {
             linkTo = null;
         }
 
-        DAPP dapp;
+        DApp dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            dapp = DAPP.Parses(data, position, forDeal);
+            dapp = DApp.Parses(data, position, forDeal);
             position += dapp.length(forDeal);
         } else {
             dapp = null;

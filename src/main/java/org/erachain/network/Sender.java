@@ -77,13 +77,15 @@ public class Sender extends MonitoredThread {
     public synchronized void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
         if (this.blockingQueue.isEmpty() || this.getHWeightMessage != null) {
             if (logPings)
-                LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             if (USE_MONITOR)
                 this.setMonitorStatus("to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(getHWeightMessage);
         } else {
             if (logPings)
-                LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             if (USE_MONITOR)
                 this.setMonitorStatus("to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
             this.getHWeightMessage = getHWeightMessage;
@@ -93,13 +95,15 @@ public class Sender extends MonitoredThread {
     public synchronized void sendHWeight(HWeightMessage hWeightMessage) {
         if (this.blockingQueue.isEmpty() || this.hWeightMessage != null) {
             if (logPings)
-                LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
             if (USE_MONITOR)
                 this.setMonitorStatus("to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
             blockingQueue.offer(hWeightMessage);
         } else {
             if (logPings)
-                LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
             if (USE_MONITOR)
                 this.setMonitorStatus("to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
             this.hWeightMessage = hWeightMessage;
@@ -155,7 +159,8 @@ public class Sender extends MonitoredThread {
                 ) {
                     this.out.flush();
                     if (logPings)
-                        LOGGER.debug(peer + " FLUSHED OUT sizs:" + out_flush_length + " time: " + (currentTime - out_flush_time));
+                        if (LOGGER.isDebugEnabled())
+                            LOGGER.debug(peer + " FLUSHED OUT sizs:" + out_flush_length + " time: " + (currentTime - out_flush_time));
                     if (USE_MONITOR)
                         this.setMonitorStatus("FLUSHED OUT size: " + out_flush_length + " time: " + (currentTime - out_flush_time));
                     out_flush_time = System.currentTimeMillis();
@@ -230,28 +235,31 @@ public class Sender extends MonitoredThread {
 
             // проверим - может уже такое сообщение было нами принято, или
             // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
-            // и не будет повторно обрабатываться при прилете к нас опять
+            // и не будет повторно обрабатываться при прилете к нам опять
             if (message.isHandled()) {
-                switch (message.getId()) {
+                switch (message.getType()) {
                     case Message.TELEGRAM_TYPE:
                         // может быть это повтор?
 
                         if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
-                            LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
+                            if (LOGGER.isDebugEnabled())
+                                LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
                             return true;
                         }
                         break;
                     case Message.TRANSACTION_TYPE:
                         // может быть это повтор?
                         if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
-                            LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
+                            if (LOGGER.isDebugEnabled())
+                                LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
                             return true;
                         }
                         break;
                     case Message.WIN_BLOCK_TYPE:
                         // может быть это повтор?
                         if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
-                            LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
+                            if (LOGGER.isDebugEnabled())
+                                LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
                             return true;
                         }
                         break;
@@ -263,7 +271,8 @@ public class Sender extends MonitoredThread {
             if (!writeAndFlush(bytes,
                     message.quickSend() // все что нужно быстро отправлять
             )) {
-                LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
                 return false;
             }
 
@@ -272,7 +281,8 @@ public class Sender extends MonitoredThread {
                     || checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
             ) {
                 loggedPoint = System.currentTimeMillis();
-                LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by ms: " + checkTime);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by ms: " + checkTime);
             }
 
             return true;

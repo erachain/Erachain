@@ -2,6 +2,7 @@ package org.erachain.core.wallet;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -15,7 +16,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.DBASet;
 import org.erachain.database.wallet.*;
 import org.erachain.datachain.BlockMap;
@@ -101,6 +102,12 @@ public class Wallet extends Observable implements Observer {
 	public static byte[] generateAccountSeed(byte[] seed, int nonce) {
 		byte[] nonceBytes = Ints.toByteArray(nonce);
 		byte[] accountSeed = Bytes.concat(nonceBytes, seed, nonceBytes);
+		return Crypto.getInstance().doubleDigest(accountSeed);
+	}
+
+	public static byte[] generateAccountSeed(byte[] seed, long nonce) {
+		byte[] nonceBytes = Longs.toByteArray(nonce);
+		byte[] accountSeed = Bytes.concat(seed, nonceBytes);
 		return Crypto.getInstance().doubleDigest(accountSeed);
 	}
 
@@ -989,9 +996,10 @@ public class Wallet extends Observable implements Observer {
 	 *
 	 * @param accountSeed
 	 * @param baseLen
+	 * @param notSynchronize
 	 * @return
 	 */
-	public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
+	public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen, boolean notSynchronize) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
 			return new Tuple3<>(null, -1, "Wallet is locked");
@@ -1016,7 +1024,8 @@ public class Wallet extends Observable implements Observer {
 		this.dwSet.hardFlush();
 
 		// SYNCHRONIZE
-		this.synchronizeFull();
+		if (!notSynchronize)
+			this.synchronizeFull();
 
 		// NOTIFY
 		this.setChanged();
@@ -1274,7 +1283,7 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		DAPP dapp = transaction.getSmartContract();
+		DApp dapp = transaction.getDApp();
 		if (dapp != null) {
 			for (Object[] itemKey : dapp.getItemsKeys()) {
 				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
@@ -1343,7 +1352,13 @@ public class Wallet extends Observable implements Observer {
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS
-				this.dwSet.getTransactionMap().set(account, transaction);
+				try {
+					this.dwSet.getTransactionMap().set(account, transaction);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+					Controller.getInstance().stopAndExit(1355);
+
+				}
 				// UPDATE BALANCE
 				deal_transaction(account, transaction, false);
 			}

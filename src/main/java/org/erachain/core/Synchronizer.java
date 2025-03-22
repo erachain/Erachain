@@ -2,6 +2,7 @@ package org.erachain.core;
 
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
+import org.erachain.controller.errors.RuntimeExceptionNoTrace;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Synchronizer extends Thread {
 
     public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> (6 - (Controller.HARD_WORK >> 1)));
-    public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
+    public static final int GET_HEADERS_TIMEOUT = 20000;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
@@ -115,6 +116,7 @@ public class Synchronizer extends Thread {
 
         //Controller cnt = Controller.getInstance();
         BlockMap blockMap = fork.getBlockMap();
+        Block.DEBUG_LAST_BLOCK_SIGN = blockMap.getLastBlockSignature();
 
         // ORPHAN MY BLOCKS IN FORK TO VALIDATE THE NEW BLOCKS
 
@@ -122,7 +124,7 @@ public class Synchronizer extends Thread {
         Block lastBlock = blockMap.last();
 
         int lastHeight = lastBlock.getHeight();
-        LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]\n" + " newBlocks.size = "
+        LOGGER.info("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]\n" + " newBlocks.size = "
                 + newBlocks.size() + "\n search common block in FORK" + " in mainDB: "
                 + lastBlock.getHeight() + " in ForkDB: " + lastBlock.getHeight()
                 + "\n for last CommonBlock = " + lastCommonBlock.getHeight());
@@ -135,7 +137,7 @@ public class Synchronizer extends Thread {
 
         // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in FORK DB
         // ============ by EQUAL SIGNATURE !!!!!
-        byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+        byte[] lastCommonBlockSignature = lastCommonBlock.getSignature(); // TODO по высоте проверку делать а не по подписям
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
 
             LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
@@ -158,8 +160,6 @@ public class Synchronizer extends Thread {
             if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
-            int height = lastBlock.getHeight();
-
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
                 for (Transaction transaction : lastBlock.getTransactions()) {
@@ -178,11 +178,14 @@ public class Synchronizer extends Thread {
                 ctrl.stopAndExit(311);
             }
 
-            LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + blockMap.size());
             lastBlock.close();
             ctrl.getDCSet().clearCache();
 
             lastBlock = blockMap.last();
+            Block.DEBUG_LAST_BLOCK = lastBlock;
+            Block.DEBUG_LAST_BLOCK_SIGN = lastBlock.getSignature();
+            Block.DEBUG_LAST_BLOCK_HEIGHT = lastBlock.getHeight();
 
         }
 
@@ -216,35 +219,34 @@ public class Synchronizer extends Thread {
         for (Block block : newBlocks) {
 
             int height = block.getHeight();
-            int bbb = fork.getBlockMap().size() + 1;
+            int bbb = blockMap.size() + 1;
             int hhh = fork.getBlocksHeadsMap().size() + 1;
             int sss = fork.getBlockSignsMap().size() + 1;
-            assert (height == hhh);
-            assert (bbb == hhh);
-            assert (sss == hhh);
 
-            if (height == fork.getBlockMap().size()) {
-                if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
-                    LOGGER.error("*** checkNewBlocks - already LAST! [" + height + "] "
-                            + Base58.encode(block.getSignature())
-                            + " from peer: " + peer);
-                    continue;
-                } else {
-                    String mess = "*** checkNewBlocks - already LAST and not equal SIGN! [" + height + "] "
-                            + Base58.encode(block.getSignature())
-                            + " from peer: " + peer;
-                    peer.ban(mess);
-                    throw new Exception(mess);
-                }
-            } else {
-                //Tuple2<Integer, Long> item = fork.getBlockSignsMap().get(block);
-                if (fork.getBlockSignsMap().contains(block.getSignature())) {
-                    LOGGER.error("*** checkNewBlocks - DUPLICATE SIGN! [" + height + "] "
-                            + Base58.encode(block.getSignature())
-                            + " from peer: " + peer);
-                    continue;
+            if (height != bbb
+                    || hhh != bbb
+                    || bbb != sss) {
+                String mess = "*** checkNewBlocks - height != lastBlock.size() + 1 "
+                        + " height: " + height + " from peer: " + peer;
+                throw new RuntimeException(mess);
+            }
 
-                }
+            byte[] lastSign = blockMap.getLastBlockSignature();
+            //Block.DEBUG_LAST_BLOCK_SIGN;
+            String mess;
+            if (Arrays.equals(block.getSignature(), blockMap.getLastBlockSignature())) {
+                mess = "*** checkNewBlocks - already LAST! [" + height + "] "
+                        + Base58.encode(block.getSignature())
+                        + " from peer: " + peer;
+                LOGGER.error(mess);
+                throw new RuntimeException(mess);
+
+            } else if (false) {
+                mess = "*** checkNewBlocks - already LAST and not equal SIGN! [" + height + "] "
+                        + Base58.encode(block.getSignature())
+                        + " from peer: " + peer;
+                peer.ban(mess);
+                throw new RuntimeException(mess);
             }
 
             if (isFromTrustedPeer) {
@@ -258,13 +260,13 @@ public class Synchronizer extends Thread {
                     // все же может не просчитаться высота блока м цель его из-за ошибки валидации
                     // поэтому делаем проверку все равно
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, height: " + height;
+                    mess = "Dishonest peer by not is Valid block, height: " + height;
                     if (invalid > Block.INVALID_BRANCH) {
                         peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     } else {
                         peer.setMute(1);
                     }
-                    throw new Exception(mess);
+                    throw new RuntimeException(mess);
                 }
                 LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
 
@@ -275,18 +277,18 @@ public class Synchronizer extends Thread {
                 // CHECK IF VALID
                 if (block.heightBlock > BlockChain.ALL_VALID_BEFORE && !block.isSignatureValid()) {
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, height: " + height;
+                    mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                    throw new Exception(mess);
+                    throw new RuntimeException(mess);
                 }
 
                 try {
                     block.getTransactions();
                 } catch (Exception e) {
                     LOGGER.debug(e.getMessage(), e);
-                    String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
+                    mess = "Dishonest peer error block.getTransactions PARSE: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                    throw new Exception(mess);
+                    throw new RuntimeException(mess);
                 }
 
                 if (block.heightBlock > BlockChain.ALL_VALID_BEFORE) {
@@ -294,9 +296,9 @@ public class Synchronizer extends Thread {
                             true /// это же проверка в ФОРКЕ - тут нужно! Тем более что там внутри процессинг уже идет
                     ) > 0) {
                         // INVALID BLOCK THROW EXCEPTION
-                        String mess = "Dishonest peer by not is Valid block, height: " + height;
+                        mess = "Dishonest peer by not is Valid block, height: " + height;
                         peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                        throw new Exception(mess);
+                        throw new RuntimeException(mess);
                     }
                 } else {
                     // тут не было проверки заголовка а надо бы - чтобы его создать
@@ -315,7 +317,7 @@ public class Synchronizer extends Thread {
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
             ) {
-                String mess = "Weak FullWeight, height: " + height
+                mess = "Weak FullWeight, height: " + height
                         + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                 LOGGER.debug(peer + " " + mess);
                 // суть в том что тут цепочка на этой высоте слабже моей,
@@ -331,7 +333,7 @@ public class Synchronizer extends Thread {
                     // и так дофига пиров - можно и забанить
                     mess = "Dishonest peer by " + mess;
                     peer.ban(mess);
-                    throw new Exception(mess);
+                    throw new RuntimeException(mess);
                 } else {
                     // пиров еще достаточно но заткнем ему рот - не будем по нему ориентироваться
                     peer.setMute(Controller.MUTE_PEER_COUNT);
@@ -527,7 +529,7 @@ public class Synchronizer extends Thread {
             // FIND HEADERS for common CHAIN
             if (true || Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
                 LOGGER.info("Synchronizing from peer: " + peer.toString() + ":" + peer
-                        + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
+                        + " my HEIGHT: " + dcSet.getBlockMap().size());
             }
 
             byte[] lastCommonBlockSignature;
@@ -802,7 +804,7 @@ public class Synchronizer extends Thread {
         int timeSOT;
         if (peer.network.getActivePeers(false).size() < 3) {
             // тут может очень большой файл в блоке - и будет разрывать связь со всеми - дадим ему пройти
-            timeSOT = 600000;
+            timeSOT = 60000;
         } else {
             timeSOT = GET_HEADERS_TIMEOUT;
         }
@@ -939,10 +941,17 @@ public class Synchronizer extends Thread {
          * Чтобы проверить правильность и силу цепочки/
          */
         int commonBockHeight = dcSet.getBlockSignsMap().get(lastCommonBlockSignature);
-        // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
-        int needChainLenght = 3 + myChainHeight - commonBockHeight;
-        if (headers.size() > needChainLenght) {
-            headers = headers.subList(0, needChainLenght);
+        if (false) {
+            // Запретим это так как лучше оставить всю цепочку у себя чем откатить ее и после 3-х блоков, на повтороной синхронизации
+            // понять что там битая цепочка
+            // а скорость ради которой это затевается - не так важна против защиты данных
+            // поэтому отключаем ниже код
+
+            // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
+            int needChainLenght = 3 + myChainHeight - commonBockHeight;
+            if (headers.size() > needChainLenght) {
+                headers = headers.subList(0, needChainLenght);
+            }
         }
 
         LOGGER.info("findHeaders headers CLEAR" + "now headers: " + headers.size());
@@ -1125,8 +1134,14 @@ public class Synchronizer extends Thread {
                     if (ctrl.isOnStopping())
                         return;
 
-                    if (!ctrl.isStatusSynchronizing() && Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
-                        ctrl.NotifyWalletIncoming(block.getTransactions());
+                    List<Transaction> txs = block.getTransactions();
+                    if (!ctrl.isStatusSynchronizing() && !txs.isEmpty()) {
+                        if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
+                            // уведомление для внешних сервисов что пришли транзакции
+                            ctrl.NotifyWalletIncoming(txs);
+                        }
+                        ctrl.botsErachain.forEach(bot -> bot.processBlock(txs));
+
                     }
 
                     if (ctrl.isOnStopping())

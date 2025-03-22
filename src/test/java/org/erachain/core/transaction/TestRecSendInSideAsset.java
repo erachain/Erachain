@@ -8,7 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Test;
@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_INSIDE_ASSETS;
 import static org.junit.Assert.assertEquals;
 
 public class TestRecSendInSideAsset {
@@ -38,7 +39,7 @@ public class TestRecSendInSideAsset {
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
@@ -93,12 +94,12 @@ public class TestRecSendInSideAsset {
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        asset = new AssetVenture(itemAppData, creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
+        asset = new AssetVenture(itemAppData, creditor, "aasdasd", icon, image, "asdasda", AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
 
-        assetInSide = new AssetVenture(itemAppData, emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
+        assetInSide = new AssetVenture(itemAppData, emitter, "inSide Asset", icon, image, "...", AS_INSIDE_ASSETS, scale, 500l);
 
         if (withIssue) {
     

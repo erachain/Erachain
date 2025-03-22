@@ -30,8 +30,8 @@ import org.mapdb.DB;
 public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements BlocksSuit {
 
 
-    public BlocksSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, false);
+    public BlocksSuitMapDB(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, logger, sizeEnable);
     }
 
     @Override
@@ -40,11 +40,15 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
         LO = 0;
 
         // OPEN MAP
-        map = database.createTreeMap("blocks")
+        DB.BTreeMapMaker mapConstruct = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockSerializer())
-                .valuesOutsideNodesEnable()
-                .makeOrGet();
+                .valuesOutsideNodesEnable();
+
+        if (sizeEnable)
+            mapConstruct = mapConstruct.counterEnable();  // ускоряет подсчет SIZE резко
+
+        map = mapConstruct.makeOrGet();
 
     }
 

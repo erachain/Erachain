@@ -1239,6 +1239,66 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/telegram.js")
+    @GET
+    public Response telegram() {
+        File file = new File("web/libs/js/telegram.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/telegram").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/third-party/telegraf-entity/escapers.js")
+    @GET
+    public Response telegrafEscapers() {
+        File file = new File("web/libs/js/third-party/telegraf-entity/escapers.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/escapers").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/third-party/telegram-bot/view.js")
+    @GET
+    public Response telegrafMod() {
+        File file = new File("web/libs/js/third-party/telegram-bot/view.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/view").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/third-party/telegraf-entity/serialisers.js")
+    @GET
+    public Response telegrafSerialisers() {
+        File file = new File("web/libs/js/third-party/telegraf-entity/serialisers.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/serialisers").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/third-party/telegraf-entity/types.js")
+    @GET
+    public Response telegrafTypes() {
+        File file = new File("web/libs/js/third-party/telegraf-entity/types.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/types").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/utils.js")
     @GET
     public Response utilsjs() {

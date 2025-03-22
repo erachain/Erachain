@@ -9,6 +9,10 @@ import org.erachain.api.ApiClient;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ApiService;
 import org.erachain.at.AT;
+import org.erachain.bot.BotManager;
+import org.erachain.bot.telegram.ErachainBotCls;
+import org.erachain.bot.telegram.ErachainIcBot;
+import org.erachain.bot.telegram.ErachainStorageBot;
 import org.erachain.core.*;
 import org.erachain.core.BlockGenerator.ForgingStatus;
 import org.erachain.core.account.Account;
@@ -39,12 +43,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.DLSet;
-import org.erachain.datachain.BlocksMapImpl;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemMap;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -84,7 +86,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -96,13 +100,16 @@ import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static org.erachain.datachain.DCSet.DATA_FILE;
+
 /**
  * main class for connection all modules
+ * set Enviropment Variable: bot_tgm_token=...
  */
 public class Controller extends Observable {
 
-    public static String version = "6.3.02";
-    public static String buildTime = "2023-03-25 12:00:00 UTC";
+    public static String version = "6.7.05";
+    public static String buildTime = "2025-03-22 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -124,6 +131,8 @@ public class Controller extends Observable {
     public static int HARD_WORK = 0;
     public static String CACHE_DC = "hard";
     public boolean useGui = true;
+    public boolean uTxInMemory = false;
+    public static int blockPeriod = 7;
     public boolean useNet = true;
 
 
@@ -131,6 +140,7 @@ public class Controller extends Observable {
     public static long buildTimestamp;
     private static Controller instance;
     public PairsController pairsController;
+    public TradeHistoryController tradeHistoryController;
     private Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
@@ -164,6 +174,10 @@ public class Controller extends Observable {
     // private JSONObject Setting_Json;
 
     public AboutFrame about_frame = null;
+
+    public String bot_tgm_token;
+    public List<ErachainBotCls> botsErachain = new ArrayList<>();
+    public BotManager botsManager;
     private boolean isStopping = false;
     private String info;
 
@@ -181,6 +195,7 @@ public class Controller extends Observable {
     public boolean compactDConStart;
     public boolean inMemoryDC;
     public boolean reBuildChain;
+    public boolean shrinkForReBuildChain;
 
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
@@ -594,6 +609,11 @@ public class Controller extends Observable {
 
     public void start() throws Exception {
 
+        if (shrinkForReBuildChain) {
+            shrinkForReBuildChain();
+            return;
+        }
+
         this.toOfflineTime = NTP.getTime();
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
@@ -649,12 +669,13 @@ public class Controller extends Observable {
             // удалим все в папке Temp
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (Throwable e) {
-            ////LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         if (reBuildChain && !Settings.simpleTestNet) {
-            reBuilChain();
+            reBuilChainCopy();
         }
 
         if (dcSet == null) {
@@ -746,17 +767,25 @@ public class Controller extends Observable {
                 this.webService.start();
             }
 
-            reBuildChainThread = new Thread(() -> {
-                reBuilChainProcess();
-            });
-            reBuildChainThread.start();
+            if (useGui) {
+                reBuildChainProcess();
+                stopAndExit(0);
 
-            Runtime.getRuntime()
-                    .addShutdownHook(
-                            new Thread(
-                                    () -> {
-                                        reBuilChainHalt();
-                                    }));
+            } else {
+                reBuildChainThread = new Thread(() -> {
+                    reBuildChainProcess();
+                });
+
+                Runtime.getRuntime()
+                        .addShutdownHook(
+                                new Thread(
+                                        () -> {
+                                            reBuilChainHalt();
+                                        }));
+
+                reBuildChainThread.start();
+
+            }
 
             return;
 
@@ -791,8 +820,6 @@ public class Controller extends Observable {
             this.webService = WebService.getInstance();
             this.webService.start();
         }
-
-        pairsController = new PairsController();
 
         // CREATE WALLET
         this.setChanged();
@@ -887,6 +914,16 @@ public class Controller extends Observable {
             }
         });
 
+        botsErachain.add(new ErachainIcBot(this));
+        botsErachain.add(new ErachainStorageBot(this));
+        botsManager = new BotManager(this);
+
+
+        if (!onlyProtocolIndexing) {
+            pairsController = new PairsController();
+            tradeHistoryController = new TradeHistoryController(this);
+        }
+
         if (!useNet)
             this.status = STATUS_OK;
 
@@ -975,8 +1012,9 @@ public class Controller extends Observable {
             if (dataChain.exists()) {
                 try {
                     Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (NoSuchFileException e) {
                 } catch (IOException e) {
-                    //LOGGER.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
             // copy Back dir to DataChain
@@ -1008,8 +1046,9 @@ public class Controller extends Observable {
         if (dataLocal.exists()) {
             try {
                 Files.walkFileTree(dataLocal.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
             } catch (IOException e) {
-                //LOGGER.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
 
@@ -1017,85 +1056,192 @@ public class Controller extends Observable {
         return this.dlSet;
     }
 
-    public void reBuilChain() {
+    static private String SHRINK_NAME = "SRK";
+    static private String BACKUP_NAME = "TMP";
+
+    /**
+     * Для пересборки цепочки из этой базы данных поместите файлы из папки с окончанием "SRK" в папку с окончанием "TMP"
+     *  и запустите программу с ключом "-rechain"
+     */
+    public void shrinkForReBuildChain() {
+        LOGGER.warn("Start shrinking DB for rebuilding the chain database");
+        File currentDBFile = new File(Settings.getInstance().getDataChainPath(), DATA_FILE);
+
+        if (!currentDBFile.exists()) {
+            LOGGER.warn("Not found current DB file {}", currentDBFile.toString());
+            System.exit(-3);
+            return;
+        }
+
+        File shrinkDBFile = new File(currentDBFile.getParentFile().getPath() + SHRINK_NAME, DATA_FILE);
+        if (shrinkDBFile.getParentFile().exists()) {
+            try {
+                Files.walkFileTree(shrinkDBFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e) {
+            } catch (Throwable e) {
+                LOGGER.error(e.getMessage(), e);
+                System.exit(-4);
+                return;
+            }
+        } else {
+            LOGGER.warn("Make dir {}", shrinkDBFile.toString());
+            shrinkDBFile.getParentFile().mkdirs();
+        }
+
+        LOGGER.warn("Open current DB {}", currentDBFile.getParentFile().getName());
+        DCSetRO dcSetCurrentRO = new DCSetRO(currentDBFile);
+
+        LOGGER.warn("Merge to Shrink DB {}", shrinkDBFile.getParentFile().getName());
+        DCSet dcSetShrunk = new DCSetShrink(shrinkDBFile);
+
+        // BLOCKS
+        LOGGER.warn("Merge Blocks");
+        DBTab mapFrom = dcSetCurrentRO.getBlockMap();
+        DBTab mapTo = dcSetShrunk.getBlockMap();
+        Object nextKey;
+        try (IteratorCloseable iterator = mapFrom.getIterator()) {
+            int count = 0;
+            while (iterator.hasNext()) {
+                nextKey = iterator.next();
+                Block block = (Block) mapFrom.get(nextKey);
+                count += block.getTransactionCount();
+                mapTo.put(nextKey,  mapFrom.get(nextKey));
+                if (++count % 10000 == 0)
+                    LOGGER.warn("merged {} blocks and transactions", count);
+                if (count % 300000 == 0) {
+                    dcSetShrunk.flush(0, true, false);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        LOGGER.warn("Closing current DB...");
+        dcSetCurrentRO.close();
+        LOGGER.warn("Closing shrink DB...");
+        dcSetShrunk.flush(0, true, false);
+        dcSetShrunk.close();
+        LOGGER.warn("Make the shrink DB done!\nFor rebuild chain from it - move files from {} to {} and restart program with '-rechain' option",
+                shrinkDBFile.getParentFile(), currentDBFile.getParentFile() + BACKUP_NAME);
+        System.exit(0);
+
+    }
+
+    public void reBuilChainCopy() {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database"));
-        LOGGER.info("Start rebuilding the chain database");
+        LOGGER.warn("Start rebuilding the chain database");
 
-        File dataDir = new File(Settings.getInstance().getDataChainPath());
-        File dataBackDir = new File(dataDir.getPath() + "TMP");
+        File chainDbFile = new File(Settings.getInstance().getDataChainPath(), DATA_FILE);
+        File readFromFile;
+        {
+            File dataBackUpFile = new File(Settings.getInstance().getDataChainPath() + BACKUP_NAME, DATA_FILE);
+            File dataShrinkFile = new File(Settings.getInstance().getDataChainPath() + SHRINK_NAME, DATA_FILE);
+            readFromFile = dataShrinkFile.exists() ? dataShrinkFile : dataBackUpFile;
+        }
 
-        if (dataDir.exists()) {
-            if (dataBackDir.exists()) {
+        if (chainDbFile.exists()) {
+            if (readFromFile.exists()) {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Continue rebuilding chain from: " + dataBackDir.getName()));
-                LOGGER.info("Continue rebuilding chain from: " + dataBackDir.getName());
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Continue rebuilding chain from: " + readFromFile.getParentFile().getName()));
+                LOGGER.info("Continue rebuilding chain from: " + readFromFile.getParentFile().getName());
             } else {
                 try {
-                    FileUtils.moveDirectory(dataDir, dataBackDir);
+                    FileUtils.moveDirectory(chainDbFile.getParentFile(), readFromFile.getParentFile());
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     System.exit(-11);
                 }
             }
         } else {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "The chain database not exist: " + dataDir.getName()));
-            LOGGER.info("The chain database not exist: " + dataDir.getName());
-            System.exit(-12);
+            if (readFromFile.exists()) {
+                // Создаем пустую БД
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Rebuilding chain from: " + readFromFile.getParentFile().getName()));
+            } else {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "The Current database not exist and Backup or Shrink DB not exists: "
+                        + chainDbFile.getParentFile().getName()));
+                LOGGER.info("The Current database not exist and Backup or Shrink DB not exists: " + chainDbFile.getParentFile().getName());
+                System.exit(-12);
+            }
         }
 
     }
 
-    public void reBuilChainProcess() {
+    public void reBuildChainProcess() {
 
-        File dataBackFile = new File(Settings.getInstance().getDataChainPath() + "TMP", DCSet.DATA_FILE);
+        File readFromFile;
+        {
+            File dataBackUpFile = new File(Settings.getInstance().getDataChainPath() + BACKUP_NAME, DATA_FILE);
+            File dataShrinkFile = new File(Settings.getInstance().getDataChainPath() + SHRINK_NAME, DATA_FILE);
+            readFromFile = dataShrinkFile.exists() ? dataShrinkFile : dataBackUpFile;
+        }
 
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start rebuilding the chain database. Please do not turn off the program!!"));
-        LOGGER.info("Start rebuilding the chain database. Please do not turn off the program!!");
+        LOGGER.warn("Start rebuilding the chain database. Please do not turn off the program!!\n");
 
         // OPEN BACKUP CHaIN
-        DCSet dcSetBackUp = new DCSet(dataBackFile, false, false, false, databaseSystem);
+        // на UNIX тут очень большая задержка и файл начинает расти - транзакционный больше данных в несколько раз!!
+        LOGGER.warn("Open backup {}", readFromFile.getParentFile().getName());
+        DCSetRO dcSetBackUp = new DCSetRO(readFromFile);
 
+        LOGGER.warn("Check backup BlockMap");
         BlocksMapImpl blocksMapOld = dcSetBackUp.getBlockMap();
         BlocksMapImpl blocksMap = this.dcSet.getBlockMap();
-        int startHeight = blocksMap.size() + 1;
-        if (startHeight > 2) {
-            LOGGER.info("Restart rebuild chain from block " + startHeight);
+        // Размер определяется по getBlockSignsMap!
+        int startHeight = blocksMap.size();
+        LOGGER.warn("new BlockMap size: {}", startHeight);
+        if (startHeight > 1) {
+            LOGGER.warn("Restart rebuild chain from block " + startHeight);
         }
 
         try {
-            Block block = blocksMapOld.get(startHeight);
+            Block block = blocksMapOld.get(startHeight + 1);
             if (block == null) {
-                LOGGER.info("Rechain alreafy is done on height:" + startHeight + ".");
+                LOGGER.warn("Rechain already is done on height:" + (startHeight) + ".");
             } else {
                 if (block.isValid(this.dcSet, true) > 0) {
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wrong GENESIS block"));
-                    LOGGER.info("Wrong GENESIS block");
+                    LOGGER.error("Wrong GENESIS block");
                     System.exit(-14);
                 }
 
+                int blockSizeOld = blocksMapOld.size();
+                LOGGER.warn("\nRechain started... backup block height: {}", blockSizeOld);
                 int count = 0;
-                for (int i = ++startHeight; i < blocksMapOld.size(); ++i) {
+                for (int i = startHeight + 2; i <= blockSizeOld; ++i) {
                     block = blocksMapOld.get(i);
 
                     // need for calculate WIN Value
                     int invalid = block.isValidHead(dcSet);
                     if (invalid > 0) {
-                        LOGGER.info("Block[" + i + "] is invalid: " + invalid);
+                        LOGGER.error("Block[" + i + "] is invalid: " + invalid);
                         break;
                     }
 
-                    if (false && block.isValid(this.dcSet, true) > 0) {
+                    if (false && // полную валидацию не делаем так как это же наши данные - мы им верим
+                            block.isValid(this.dcSet, true) > 0) {
                         break;
                     }
+
                     try {
                         block.process(dcSet, true);
+
+                        count += 1 + block.getTransactionCount();
+                        if (count % 10000 == 0) {
+                            dcSet.flush(0, true, false);
+                            LOGGER.warn("Rebuilds block " + i);
+                        }
+
+                    } catch (InterruptedException e) {
+                        break;
                     } catch (Throwable e) {
                         if (isStopping) {
-                            LOGGER.info("User BREAK on block " + i);
+                            LOGGER.warn("User BREAK on block " + i);
                         } else {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1103,15 +1249,9 @@ public class Controller extends Observable {
                         break;
                     }
 
-                    count += 1 + (block.getTransactionCount() >> 3);
-                    if (count > 10000) {
-                        count = 0;
-                        dcSet.flush(0, true, false);
-                        LOGGER.info("Rebuilds block " + i);
-                    }
 
                     if (isStopping) {
-                        LOGGER.info("User BREAK on block " + i);
+                        LOGGER.warn("User BREAK on block " + i);
                         break;
                     }
                 }
@@ -1119,12 +1259,12 @@ public class Controller extends Observable {
 
         } finally {
             if (this.webService != null) {
-                LOGGER.info("Stopping WEB server");
+                LOGGER.warn("Stopping WEB server");
                 this.webService.stop();
             }
 
             if (this.rpcService != null) {
-                LOGGER.info("Stopping RPC server");
+                LOGGER.warn("Stopping RPC server");
                 this.rpcService.stop();
             }
 
@@ -1132,24 +1272,23 @@ public class Controller extends Observable {
             int size = blocksMap.size();
 
             setChanged();
-            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-            LOGGER.info("Closing database");
+            notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database at size: " + size)));
+            LOGGER.warn("Closing database at size: " + size);
             dcSet.close();
             dlSet.close();
 
-            LOGGER.info("Rebuilding is ended on height:" + size);
+            LOGGER.warn("Rebuilding is ended on height:" + size);
             if (sizeOld > size) {
-                LOGGER.info("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
+                LOGGER.warn("For continue rebuild the chain restart the node with '-rechain' parameter anew.");
             } else {
-                LOGGER.info("Rechain  is DONE. Please delete '" + dataBackFile + "' folder and restart the node without '-rechain' parameter!");
+                LOGGER.warn("Rechain is DONE. Please restart the node without '-rechain' parameter!");
             }
 
         }
 
-
     }
 
-    private void reBuilChainHalt() {
+    public void reBuilChainHalt() {
 
         isStopping = true;
 
@@ -1177,6 +1316,7 @@ public class Controller extends Observable {
                 if (dataBakDC.exists()) {
                     try {
                         Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (NoSuchFileException e) {
                     } catch (IOException e) {
                         LOGGER.error(e.getMessage(), e);
                     }
@@ -1240,9 +1380,21 @@ public class Controller extends Observable {
         this.isStopping = true;
 
         if (reBuildChain) {
-            reBuilChainHalt();
+            if (reBuildChainThread != null)
+                reBuilChainHalt();
+
+            System.exit(par);
             return;
         }
+
+        if (botsManager != null)
+            botsManager.cancel();
+
+        if (!onlyProtocolIndexing && tradeHistoryController != null) {
+            tradeHistoryController.close();
+        }
+
+        botsErachain.forEach(bot -> bot.stop());
 
         if (transactionsPool == null) {
             // иногла крах запуска - не инициализирует даже транзакции и выход после этого - просто выход и все
@@ -1282,7 +1434,9 @@ public class Controller extends Observable {
         try {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
 
         if (fPool != null) {
@@ -1639,18 +1793,23 @@ public class Controller extends Observable {
             }
         }
 
-        if (this.status == STATUS_NO_CONNECTIONS) {
+        if (this.status == STATUS_NO_CONNECTIONS || this.status == STATUS_SYNCHRONIZING) {
             // UPDATE STATUS
-            int myHeight = getMyHeight();
-            if (blockChain.getTimestamp(myHeight)
-                    + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight) >> 1)
-                    < NTP.getTime()) {
-                // мы не во воремени - надо синхронизироваться
-                this.status = STATUS_SYNCHRONIZING;
-                LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
+            if (true) {
+                checkStatus(0);
             } else {
-                // время не ушло вперед - можно не синронизироваться
-                this.status = STATUS_OK;
+                int myHeight = getMyHeight();
+                if (blockChain.getTimestamp(myHeight)
+                        // на полтора блока сдвинем - это считается в синхронизации
+                        + (15 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight) / 10)
+                        < NTP.getTime()) {
+                    // мы не во воремени - надо синхронизироваться
+                    this.status = STATUS_SYNCHRONIZING;
+                    LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
+                } else {
+                    // время не ушло вперед - можно не синронизироваться
+                    this.status = STATUS_OK;
+                }
             }
 
             // NOTIFY
@@ -1660,7 +1819,9 @@ public class Controller extends Observable {
         }
 
         // BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-        if (!this.broadcastUnconfirmedToPeer(peer)) {
+        if (!this.broadcastUnconfirmedToPeer(peer)
+                && false // нет не баним - иначе на каждый чих бан будет
+        ) {
             peer.ban(network.banForActivePeersCounter(), "broken on SEND UNCONFIRMEDs");
             return;
         }
@@ -2236,7 +2397,7 @@ public class Controller extends Observable {
                         }
                     }
 
-                    // сохранимся - хотя может и заря - раньше то работало и так
+                    // сохранимся - хотя может и зря - раньше то работало и так
                     // по размеру файла смотрим - если уже большой то сольем
                     // хотя все равно при каждом ново поиске 300 блоков приостанавливается синхра
                     File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
@@ -2352,9 +2513,14 @@ public class Controller extends Observable {
                 }
                 Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
-                    // Этот пир дает цепочку из будущего - не берем его
-                    peer.ban(5, "FROM FUTURE: " + whPeer);
-                    continue;
+                    if (!BlockChain.TEST_MODE) {
+                        // Этот пир дает цепочку из будущего - не берем его
+                        peer.ban(5, "FROM FUTURE: " + whPeer);
+                        continue;
+                    } else {
+                        // в целях теста позволим из будущего синхриться до текущей
+                        ;;
+                    }
                 }
 
                 if (height < whPeer.a
@@ -2543,7 +2709,7 @@ public class Controller extends Observable {
     }
 
     public Tuple3<String, Integer, String> importAccountSeed(byte[] accountSeed, int baseLen) {
-        return this.wallet.importAccountSeed(accountSeed, baseLen);
+        return this.wallet.importAccountSeed(accountSeed, baseLen, false);
     }
 
     public byte[] exportAccountSeed(String address) {
@@ -2640,7 +2806,6 @@ public class Controller extends Observable {
     }
 
     public Transaction getTransaction(byte[] signature) {
-
         return getTransaction(signature, this.dcSet);
     }
 
@@ -2668,6 +2833,10 @@ public class Controller extends Observable {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
         return null;
+    }
+
+    public Long getTransactionSeqBySign(byte[] signature, DCSet database) {
+        return DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
     }
 
     public Transaction getTransaction(long refDB, DCSet database) {
@@ -2890,7 +3059,7 @@ public class Controller extends Observable {
         if (this.isOnStopping())
             return -1;
 
-        return dcSet.getBlocksHeadsMap().size();
+        return dcSet.getBlockMap().size();
     }
 
     public Block getLastBlock() {
@@ -3742,7 +3911,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DAPP dApp, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DApp dApp, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3862,7 +4031,7 @@ public class Controller extends Observable {
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
@@ -3872,7 +4041,7 @@ public class Controller extends Observable {
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, DApp dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, int actionPackage, Object[][] assetsPackage, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
@@ -3883,10 +4052,10 @@ public class Controller extends Observable {
     }
 
     public Transaction r_SignNote(byte version, byte property1, byte property2,
-                                  PrivateKeyAccount sender, int feePow, long key, byte[] message) {
+                                  PrivateKeyAccount sender, int feePow, long key, byte[] exDataBytes) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_SignNote(version, property1, property2, sender, feePow, key,
-                    message);
+                    exDataBytes);
         }
     }
 
@@ -3943,6 +4112,16 @@ public class Controller extends Observable {
             return this.transactionCreator.r_SetStatusToItem(1, asPack, creator, feePow, key, item, beg_date, end_date,
                     value_1, value_2, data_1, data_2, refParent, description);
         }
+    }
+
+    public Transaction createForNetwork(Transaction record) {
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createForNetwork(record);
+        }
+    }
+
+    public int afterCreateForNetwork(Transaction record, boolean tryFree, boolean notRelease) {
+        return transactionCreator.afterCreate(record, Transaction.FOR_NETWORK, tryFree, notRelease);
     }
 
     /*
@@ -4144,6 +4323,11 @@ public class Controller extends Observable {
     }
 
     public void startApplication(String args[]) {
+
+        if (java.nio.file.Files.exists(Paths.get(System.getProperty("user.dir"),"src", "main"))) {
+            throw new RuntimeException("Wrong directory - set to /ERA");
+        }
+
         boolean cli = false;
 
         // get GRADLE bild time
@@ -4209,6 +4393,12 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-shrink")) {
+                shrinkForReBuildChain = true;
+                useGui = false;
+                continue;
+            }
+
             if (arg.toLowerCase().equals("-inmemory")) {
                 inMemoryDC = true;
                 continue;
@@ -4222,6 +4412,23 @@ public class Controller extends Observable {
 
             if (arg.equals("-nogui")) {
                 useGui = false;
+                continue;
+            }
+
+            if (arg.equals("-utx-in-memory")) {
+                uTxInMemory = true;
+                continue;
+            }
+
+            if (arg.startsWith("-block_period=") && arg.length() > 14) {
+                try {
+                    blockPeriod = Integer.parseInt(arg.substring(14));
+
+                    if (blockPeriod < 7) {
+                        blockPeriod = 7;
+                    }
+                } catch (Exception e) {
+                }
                 continue;
             }
 
@@ -4252,7 +4459,7 @@ public class Controller extends Observable {
 
                     if (dbsChain.equals("rocksdb")) {
                         databaseSystem = DCSet.DBS_ROCK_DB;
-                    } else if (dbsChain.equals("mapdb")) {
+                    } else if (dbsChain.equals("org/mapdb")) {
                         databaseSystem = DCSet.DBS_MAP_DB;
                     } else if (dbsChain.equals("fast")) {
                         databaseSystem = DCSet.DBS_FAST;
@@ -4357,6 +4564,10 @@ public class Controller extends Observable {
                 fpool = true;
                 continue;
             }
+            if (arg.startsWith("-bot_tgm_token=") && arg.length() > 15) {
+                bot_tgm_token = arg.substring(15);
+                continue;
+            }
 
 
         }
@@ -4421,7 +4632,7 @@ public class Controller extends Observable {
                 //STARTING NETWORK/BLOCKCHAIN/RPC
 
                 Controller.getInstance().start();
-                if (reBuildChain && !Settings.simpleTestNet) {
+                if (reBuildChain && !Settings.simpleTestNet || shrinkForReBuildChain) {
                     return;
                 }
 

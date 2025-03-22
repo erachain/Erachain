@@ -83,6 +83,8 @@ public class AdderHeadInfo {
     public static void addHeadInfoCapPersons(Map output, DCSet dcSet, JSONObject langObj) {
         output.put("search_placeholder", Lang.T("Type searching words or person key", langObj));
 
+        output.put("persons_list_tip", Lang.T("persons_list_tip", langObj));
+
         output.put("unconfirmedTxs", dcSet.getTransactionTab().size());
         output.put("Label_Unconfirmed_transactions",
                 Lang.T("Unconfirmed transactions", langObj));
@@ -103,6 +105,8 @@ public class AdderHeadInfo {
      */
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
         output.put("search_placeholder", Lang.T("Type searching words or asset key", langObj));
+
+        output.put("assets_list_tip", Lang.T("assets_list_tip", langObj));
 
         output.put("Label_Title", Lang.T("Assets", langObj));
         output.put("Label_table_asset_key", Lang.T("Key", langObj));

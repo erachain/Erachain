@@ -23,6 +23,10 @@ ErachainBP is a Java application and supported by all operation systems.
 
 All documentation can be found on [WIKI](https://wiki.erachain.org/ru/home).
 
+### Smart-contracts - DAPP
+
+See folder in source java/org/erachain/dapp
+
 # 🚀️ Clone and Build (Windows)
 
 ## Dependencies
@@ -170,9 +174,9 @@ Run a full Erachain node. Use the specified parameters:
 If necessary, the values of the following parameters can be changed:
 - The **-pass** parameter contains the password required to unlock the wallet. Replace 123456789 with the value you wish.
 - The **-seed** parameter contains information about the seed and is divided into sub-parameters:
-  - The **first sub-parameter** is responsible for the number of accounts to be created.
-  - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed. 
-  - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
+    - The **first sub-parameter** is responsible for the number of accounts to be created.
+    - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed.
+    - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
 
 Collapse the erachain session:  ``Ctrl+A+D``
 
@@ -192,9 +196,19 @@ Also, be sure to save seed. You can use it to log in to your web wallet:
 
 ``get wallet/seed``
 
-If you need to restart the machine and then go to the already created wallet, change the startup line a little, because the account information is already saved.
+If you need to restart the machine and then go to the already created wallet, change the startup line a little, because
+the account information is already saved.
 
 ``java -jar erachain.jar -pass=123456789 -nogui -rpc=on -rpcallowed=127.0.0.1``
+
+# Telegram bot onboard
+
+## Blockchain Storage
+
+@blockchain_storage_bot - telegram-bot for auto-storage messages in blockchain
+Code in org.erachain.bot.telegram.ErachainStorageBot
+Documentation
+see https://docs.google.com/document/d/1aW9KqeKFTgGru7z6g4GplRIyqQERWIQVd4Zjje_OrNc/edit#heading=h.6vhy1texy59d
 
 # 🤝 Contributing
 

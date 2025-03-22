@@ -87,8 +87,12 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     @Override
     public List<Trade> getInitiatedTrades(Order order, boolean useCancel) {
+        return getInitiatedTrades(order.getId(), useCancel);
+    }
+
+    public List<Trade> getInitiatedTrades(Long orderId, boolean useCancel) {
         //FILTER ALL TRADES
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId(), false)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(orderId, false)) {
 
             //GET ALL TRADES FOR KEYS
             List<Trade> trades = new ArrayList<Trade>();

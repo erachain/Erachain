@@ -12,17 +12,33 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.gui.transaction.ArbitraryTransactionDetailsFrame;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.ntp.NTP;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-@Ignore
+//@Ignore
 public class txWindowTest {
 
     byte FEE_POWER = 0;
 
+    @Test
+    public void startFolder() {
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+        if (Files.exists(Paths.get(System.getProperty("user.dir"),"src", "main"))) {
+            System.out.println("Wrong dir - set /ERA");
+        }
+    }
+
+    @Ignore
     @Test
     public void windowTest() {
 

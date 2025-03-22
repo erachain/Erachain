@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class FileUtils {
@@ -76,4 +77,7 @@ public class FileUtils {
         return (JSONArray) JSONValue.parse(text);
     }
 
+    public static String readFileAsString(String filePath) throws IOException {
+        return new String(getBytesFromFile(new File(filePath)), StandardCharsets.UTF_8);
+    }
 }

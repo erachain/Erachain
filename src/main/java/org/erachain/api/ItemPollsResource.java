@@ -188,19 +188,7 @@ public class ItemPollsResource {
             JSONArray optionsJSON = (JSONArray) jsonObject.get("options");
             String feePowStr = (String) jsonObject.get("feePow");
 
-            String linkToRefStr = jsonObject.get("linkTo").toString();
-            ExLink linkTo;
-            if (linkToRefStr == null)
-                linkTo = null;
-            else {
-                Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-                if (linkToRef == null) {
-                    throw ApiErrorFactory.getInstance().createError(
-                            Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-                } else {
-                    linkTo = new ExLinkAppendix(linkToRef);
-                }
-            }
+            ExLink linkTo = ExLinkAppendix.of(jsonObject);
 
             //PARSE FEE
             int feePow;
@@ -288,19 +276,7 @@ public class ItemPollsResource {
             JSONArray optionsJSON = (JSONArray) jsonObject.get("options");
             String feePowStr = (String) jsonObject.get("feePow");
 
-            String linkToRefStr = jsonObject.get("linkTo").toString();
-            ExLink linkTo;
-            if (linkToRefStr == null)
-                linkTo = null;
-            else {
-                Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-                if (linkToRef == null) {
-                    throw ApiErrorFactory.getInstance().createError(
-                            Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-                } else {
-                    linkTo = new ExLinkAppendix(linkToRef);
-                }
-            }
+            ExLink linkTo = ExLinkAppendix.of(jsonObject);
 
             //PARSE FEE
             int feePow;

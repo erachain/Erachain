@@ -22,10 +22,14 @@
     <script src="/index/libs/js/explorerTransactions.js"></script>
     <script src="/index/libs/js/explorerTransactionsTable.js"></script>
     <script src="/index/libs/js/third-party/qrcode.min.js"></script>
+    <script src="/index/libs/js/third-party/telegram-bot/view.js"></script>
 
     <script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 
     <link href="/index/libs/css/sidebar.css" rel="stylesheet">
+
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-core.min.js" type="text/javascript"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-stock.min.js" type="text/javascript"></script>
 
     <style type="text/css">
         body {
@@ -379,6 +383,9 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'statement') {
                                     document.getElementById(dest).innerHTML = statement(data);
                                 } else
+                                if (type == 'play') {
+                                    document.getElementById(dest).innerHTML = play(data);
+                                } else
                                 if (type == 'owners') {
                                     document.getElementById(dest).innerHTML = owners(data);
                                 } else
@@ -411,6 +418,7 @@ button.white-bgc[disabled]:focus,
                                 } else
                                 if (type == 'trades') {
                                     document.getElementById(dest).innerHTML = trades(data)
+                                    anyChartEra(data);
                                 } else
                                 if (type == 'search') {
                                     document.getElementById(dest).innerHTML = search(data);
@@ -706,6 +714,72 @@ button.white-bgc[disabled]:focus,
             output += '</table><br><br>';
             output += transactions_Table(data);
 
+            return output;
+        }
+
+        function play(data) {
+
+            var output ='';
+
+            if (data.hasOwnProperty('error')) {
+                output += '<h2>' + data.error + '</h2>';
+                output += '<h4>for Help use blockexplorer.json</h4>';
+                return output;
+            }
+
+            output += '<div class=row><div class=col-md-1></div><div class=col-lg-1></div><div class="col-xs-12 col-md-10 col-lg-8">';
+
+            if (data.hasOwnProperty('play')) {
+                var play = data.play;
+                output += '<h3>' + play.name + ' - ' + play.type;
+                if (play.hasOwnProperty('disabled'))
+                    output += ' (' + play.disabled + ')';
+                output += '</h3><b>' + play.short + '</b><br>';
+
+                output += '<div class=row align=left><p>' + play.desc + '</p>';
+                if (play.hasOwnProperty('tail')) {
+                    output += '<p>' + play.tail + '</p>';
+                }
+
+                if (play.hasOwnProperty('accs')) {
+                    output += '<p><b>' + data.Label_Accounts + '</b>';
+                    var accs = play.accs;
+                    for (addr in accs) {
+                        if (accs[addr].hasOwnProperty('desc')) {
+                            output += '<br><a href ="?address=' + addr +
+                                get_lang() + '">' + addr + '</a> - ' + accs[addr].desc;
+
+                            var commands = accs[addr].commands;
+                            output += '<br>' + data.Label_Commands + ':';
+                            for (com in commands) {
+                                output += '<br><b>' + com  + '</b> - ' + commands[com];
+                            }
+                        } else {
+                            output += '<br><a href ="?address=' + addr +
+                                get_lang() + '">' + addr + '</a> - ' + accs[addr];
+                        }
+                    }
+                    output += '</p>';
+                }
+
+            } else {
+                output += '<p>' + data.Label_Head + '</p>';
+                output += '<table id="pageItemsByID" BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
+                    ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+                output += '<tr bgcolor="f1f1f1"><td><b>ID<td><b>' + data.Label_Type + '<td><b>' + data.Label_Name + '<td><b>' + data.Label_Desc + '</tr>';
+                for (key in data.pageItemsByID) {
+                    var play = data.pageItemsByID[key];
+                    var href = `href="?play=${play.type}.${play.ID + get_lang()}"`;
+                    output += `<tr><td><a ${href}>${play.ID}</a><td>${play.type}<td><a ${href}">${play.name}</a><td>`;
+                    if (play.hasOwnProperty('disabled'))
+                        output += '(' + play.disabled + ') ';
+                    output += play.short;
+
+                }
+                output += '</table>';
+            }
+
+            output += '</div></div><div class=col-lg-1></div><div class=col-md-1></div></div><br><br>';
             return output;
         }
 
@@ -1570,6 +1644,7 @@ button.white-bgc[disabled]:focus,
             var output = '';
             output += lastBlock.Label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
             output += ' (' + convertTimestamp(lastBlock.timestamp, true) + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.Label_ago + ') ';
+            output += lastBlock.version;
             output += '<br>';
 
             return output;
@@ -1732,11 +1807,13 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
             document.getElementById('menu_templates').href = '?templates&lang=' + params['lang'];
+            document.getElementById('menu_play').href = '?play&lang=' + params['lang'];
             document.getElementById('menu_owners').href = '?owners&lang=' + params['lang'];
             document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
 
             document.getElementById('menuBlocks').setAttribute('class', '');
             document.getElementById('menuAddresses').setAttribute('class', '');
+            document.getElementById('menuPlay').setAttribute('class', '');
             document.getElementById('menuOwners').setAttribute('class', '');
             document.getElementById('menuPolls').setAttribute('class', '');
             document.getElementById('menuAssets').setAttribute('class', '');
@@ -1852,6 +1929,7 @@ button.white-bgc[disabled]:focus,
                                 <option value=polls id=menu_polls_op translate="true">Poll</option>
                                 <option value=statuses id=menu_statuses_op translate="true">Status</option>
                                 <option value=templates id=menu_templates_op translate="true">Template</option>
+                                <option value=play id=menu_play_op translate="true">Play</option>
                                 <option value=owners id=menu_owners_op translate="true">Owners</option>
                                 <option value=order id=menu_order_op translate="true">Order</option>
                             </select>
@@ -1895,8 +1973,8 @@ button.white-bgc[disabled]:focus,
                                                            translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a>
                                     </li>
-                                    <li id=menuOwners><a href="?owners" id=menu_owners translate="true">Owners</a>
-                                    </li>
+                                    <li id=menuPlay><a href="?play" id=menu_play translate="true">Play</a></li>
+                                    <li id=menuOwners><a href="?owners" id=menu_owners translate="true">Owners</a></li>
                                     <li id=menuOrder><a href="?order" id=menu_order translate="true">Order</a></li>
                                     <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                 </ul>

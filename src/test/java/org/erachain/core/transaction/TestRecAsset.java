@@ -11,7 +11,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DApp;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
@@ -36,7 +36,7 @@ public class TestRecAsset {
     static Logger LOGGER = LoggerFactory.getLogger(TestRecAsset.class.getName());
 
     ExLink exLink = null;
-    DAPP DAPP = null;
+    DApp DAPP = null;
 
     int forDeal = Transaction.FOR_NETWORK;
 
@@ -800,7 +800,7 @@ public class TestRecAsset {
                 assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                Long key_1 = issueAssetTransaction.getAssetKey(db);
+                Long key_1 = issueAssetTransaction.getAssetKey();
                 assertEquals(key + 1, (long) key_1);
                 assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key_1, db));
 

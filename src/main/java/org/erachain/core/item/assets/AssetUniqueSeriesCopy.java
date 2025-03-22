@@ -20,6 +20,8 @@ import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static org.erachain.core.item.assets.AssetTypes.AS_NON_FUNGIBLE;
+
 /**
  * копия - в ней нет данных при парсинге - наполняется только после loadExtData()
  */
@@ -46,7 +48,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     public AssetUniqueSeriesCopy(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
                                  String description, long origKey, int total, int index) {
-        this(new byte[]{TYPE_ID, 0}, appData, maker, name, icon, image, description, AssetCls.AS_NON_FUNGIBLE,
+        this(new byte[]{TYPE_ID, 0}, appData, maker, name, icon, image, description, AS_NON_FUNGIBLE,
                 origKey, total, index);
 
     }

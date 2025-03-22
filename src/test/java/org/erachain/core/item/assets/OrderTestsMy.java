@@ -181,7 +181,7 @@ public class OrderTestsMy {
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-        keyA = issueAssetTransaction.getAssetKey(dcSet);
+        keyA = issueAssetTransaction.getAssetKey();
         balanceA = accountA.getBalance(dcSet, keyA);
 
         assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
@@ -190,7 +190,7 @@ public class OrderTestsMy {
         issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
-        keyB = issueAssetTransaction.getAssetKey(dcSet);
+        keyB = issueAssetTransaction.getAssetKey();
 
         // CREATE ORDER TRANSACTION
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
@@ -1010,24 +1010,24 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("0.00000333");
         BigDecimal amountWant = new BigDecimal("0.00010000");
 
-        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
-        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
-        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+        BigDecimal price = Order.calcPrice(amountHave, amountWant);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant);
 
-        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
-        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
-        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave);
 
         BigDecimal orderAmountHave = new BigDecimal("30.00000000");
         BigDecimal orderAmountWant = new BigDecimal("1.00000000");
 
-        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
-        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
-        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant);
 
-        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
-        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
-        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave);
 
         int thisPriceRevScale = thisPriceRev.stripTrailingZeros().scale();
         int orderPriceRevScale = orderPriceRev.stripTrailingZeros().scale();
@@ -1056,24 +1056,24 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("10.00000000");
         BigDecimal amountWant = new BigDecimal("0.33333333");
 
-        BigDecimal price = Order.calcPrice(amountHave, amountWant, 3);
-        BigDecimal price1 = Order.calcPrice(amountHave, amountWant, 1);
-        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant, 0);
+        BigDecimal price = Order.calcPrice(amountHave, amountWant);
+        BigDecimal price1 = Order.calcPrice(amountHave, amountWant);
+        BigDecimal thisPrice = Order.calcPrice(amountHave, amountWant);
 
-        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave, 3);
-        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave, 1);
-        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave, 0);
+        BigDecimal priceRev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal price1Rev = Order.calcPrice(amountWant, amountHave);
+        BigDecimal thisPriceRev = Order.calcPrice(amountWant, amountHave);
 
         BigDecimal orderAmountHave = new BigDecimal("1.00000000");
         BigDecimal orderAmountWant = new BigDecimal("30.00000000");
 
-        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant, 3);
-        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant, 1);
-        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant, 0);
+        BigDecimal price10 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal price101 = Order.calcPrice(orderAmountHave, orderAmountWant);
+        BigDecimal orderPrice = Order.calcPrice(orderAmountHave, orderAmountWant);
 
-        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave, 3);
-        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave, 1);
-        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave, 0);
+        BigDecimal price10rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal price101rev = Order.calcPrice(orderAmountWant, orderAmountHave);
+        BigDecimal orderPriceRev = Order.calcPrice(orderAmountWant, orderAmountHave);
 
 
         int thisPriceScale = thisPrice.stripTrailingZeros().scale();
@@ -2382,7 +2382,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet).stripTrailingZeros(), BigDecimal.valueOf(3.2000576)); // BALANCE
+                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet).stripTrailingZeros(), BigDecimal.valueOf(3.20005759)); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2392,19 +2392,19 @@ public class OrderTestsMy {
                 Order orderA = dcSet.getCompletedOrderMap().get(orderID_A);
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(orderA.getId()));
                 Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1));
-                Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88).setScale(8));
+                Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.90).setScale(8));
                 Assert.assertEquals(true, orderA.isFulfilled());
                 Assert.assertEquals(true, orderA.isFulfilled());
 
                 Order orderB = dcSet.getCompletedOrderMap().get(orderID_B);
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(orderB.getId()));
                 Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-                Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33).setScale(8));
+                Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.4).setScale(8));
                 Assert.assertEquals(true, orderB.isFulfilled());
 
                 Order orderC = dcSet.getOrderMap().get(orderID_C);
                 Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderC.getId()));
-                Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2000576));
+                Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.20005759));
                 Assert.assertEquals(false, orderC.isFulfilled());
 
                 // buy order
@@ -2461,7 +2461,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(5.23991481)); // BALANCE
+                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(5.23991989)); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2472,14 +2472,14 @@ public class OrderTestsMy {
                 Order orderE = dcSet.getCompletedOrderMap().get(orderID_E);
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(orderE.getId()));
                 Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(51000));
-                Assert.assertEquals(orderE.getFulfilledWant(), BigDecimal.valueOf(2).setScale(8));
+                Assert.assertEquals(orderE.getFulfilledWant(), new BigDecimal("2.0000007").setScale(8));
                 Assert.assertEquals(true, orderE.isFulfilled());
 
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(orderB.getId()));
                 // reload order_B
                 orderB = dcSet.getCompletedOrderMap().get(orderB.getId());
                 Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
-                Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33).setScale(8));
+                Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(4).setScale(8));
                 Assert.assertEquals(true, orderB.isFulfilled());
 
                 // CHECK TRADES
