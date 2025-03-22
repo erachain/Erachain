@@ -109,6 +109,15 @@ public abstract class DApp {
     }
 
     /**
+     * Это конкретный для одной транзакции - его надо и парсить и десериализовать и подписывать вместе с транзакцией
+     *
+     * @return
+     */
+    public boolean isTxOwned() {
+        return false;
+    }
+
+    /**
      * Переводит со счета на счет средства и для отображения в Сканере создает вычисляемые транзакции
      * @param dcSet
      * @param block
@@ -241,7 +250,7 @@ public abstract class DApp {
             ShibaVerseDApp.blockAction(dcSet, block, asOrphan);
     }
 
-    abstract public boolean process();
+    abstract public void process();
 
     abstract public void orphan();
 

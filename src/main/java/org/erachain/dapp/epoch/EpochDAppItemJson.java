@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import org.erachain.controller.errors.RuntimeExceptionNoTrace;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
@@ -17,7 +18,7 @@ import org.json.simple.parser.ParseException;
 
 import java.nio.charset.StandardCharsets;
 
-public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTimed {
+public abstract class EpochDAppItemJson extends EpochDAppJson {
 
     protected int itemType;
     protected long itemKey;
@@ -38,7 +39,7 @@ public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTim
         try {
             itemPars = (JSONObject) DAppFactory.JSON_PARSER.parse(itemDescription);
         } catch (ParseException e) {
-            throw new RuntimeException("JSON in Asset Description parse field `id` or `dApp` error: " + e.getMessage());
+            throw new RuntimeException("JSON in Asset Description parse error: " + e.getMessage());
         }
     }
 
@@ -81,13 +82,13 @@ public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTim
 
         Integer dAppID;
         try {
-            dAppID = ((Long) jsonObject.getOrDefault("dApp", jsonObject.get("id"))).intValue();
+            dAppID = ((Long) jsonObject.getOrDefault("dApp", jsonObject.getOrDefault("DApp", jsonObject.get("id")))).intValue();
         } catch (Exception e) {
             return new ErrorDApp("JSON in Asset Description parse field `id` or `dApp` error: " + e.getMessage());
         }
 
         if (dAppID == null)
-            return new ErrorDApp("DApp field `id` or `dApp` not found in data. Set Asset Description, for example: {\"dApp\":1012,...}");
+            return new ErrorDApp("DApp field `dApp` or `dApp` or `id` not found in data. Set Asset Description, for example: {\"dApp\":1012,...}");
 
         DApp dAppInfo = DAppFactory.DAPP_BY_ID.get(dAppID);
         if (dAppInfo == null)
@@ -115,7 +116,7 @@ public abstract class EpochDAppItemJson extends EpochDAppJson implements DAppTim
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (itemDescription != null)
-                len += itemDescription.length();
+                len += itemDescription.getBytes(StandardCharsets.UTF_8).length;
         }
 
         return len;

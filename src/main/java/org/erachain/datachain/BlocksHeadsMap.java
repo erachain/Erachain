@@ -52,14 +52,14 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     @Override
     public int size() {
-        return ((DCSet) databaseSet).getBlockSignsMap().size();
+        return ((DCSet) databaseSet).getBlockMap().size();
     }
 
     public Long getFullWeight() {
         return get(size()).totalWinValue;
     }
 
-    public void recalcWeightFull(DCSet dcSet) {
+    public long recalcWeightFull(DCSet dcSet) {
 
         long weightFull = 0L;
         Iterator<Integer> iterator = this.getIterator();
@@ -68,6 +68,8 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
             Block.BlockHead item = this.get(key);
             weightFull += item.winValue;
         }
+
+        return weightFull;
 
     }
 
@@ -79,7 +81,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     }
 
     public Block.BlockHead last() {
-        return this.get(this.size());
+        return this.get(size());
     }
 
     public void deleteAndProcess(Integer key) {

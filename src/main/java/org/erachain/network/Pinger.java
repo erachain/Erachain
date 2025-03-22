@@ -30,7 +30,7 @@ public class Pinger extends Thread {
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger-" + this.getId() + " for: " + peer.getName());
 
-        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight()) << 2;
+        DEFAULT_PING_TIMEOUT = 30000; //BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight()) << 2;
 
         this.start();
     }

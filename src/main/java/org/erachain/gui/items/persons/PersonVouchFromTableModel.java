@@ -2,6 +2,8 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.CertifiedPublicKeys;
+import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.RCertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKeys> implements Observer {
+public class PersonVouchFromTableModel extends TimerTableModelCls<Transaction> implements Observer {
 
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_CREATOR = 1;
@@ -36,9 +38,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKey
     }
 
     public PublicKeyAccount getPublicKey(int row) {
-        RCertifyPubKeys transaction = this.list.get(row);
-        return transaction.getCertifiedPublicKeys().get(0);
-
+        return ((CertifiedPublicKeys)list.get(row)).getCertifiedPublicKeys().get(0);
     }
 
     public String getHeightSeq(int row) {
@@ -60,23 +60,22 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKey
     public Object getValueAt(int row, int column) {
         if (this.list == null || this.list.isEmpty()) return null;
 
-        RCertifyPubKeys transaction = this.list.get(row);
+        Transaction transaction = this.list.get(row);
         if (transaction == null)
             return null;
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-
                 return DateTimeFormat.timestamptoString(transaction.getTimestamp()); //.viewTimestamp(); // + " " +
 
             case COLUMN_CREATOR:
+                if (transaction instanceof CertifiedPublicKeys)
+                    return ((CertifiedPublicKeys)transaction).getCertifiedPublicKeys().get(0).getPersonAsString();
 
-                return transaction.getCertifiedPublicKeys().get(0).getPersonAsString();
+                return "";
 
             case COLUMN_HEIGHT:
-
                 return transaction.getBlockHeight();
-
 
         }
 
@@ -101,10 +100,11 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKey
                 }
 
                 Fun.Tuple3<Integer, Integer, Integer> itemTransaction = stack.peek();
-                RCertifyPubKeys transaction = (RCertifyPubKeys) mapTransactions.get(itemTransaction.b, itemTransaction.c);
-                if (transaction != null) {
-                    list.add(transaction);
-                }
+                Transaction tx = mapTransactions.get(itemTransaction.b, itemTransaction.c);
+                if (tx == null)
+                    continue;
+
+                list.add(tx);
             }
 
             this.fireTableDataChanged();

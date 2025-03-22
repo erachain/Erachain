@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.HasDataString;
+import org.erachain.core.transaction.Orderable;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransferredBalances;
 import org.erachain.core.transaction.dto.TransferBalanceDto;
@@ -56,7 +57,7 @@ public class MoneyStaking extends EpochDAppItemJson {
     /**
      * Коэффициент на 1 секунду для 1% в банковский год (360 дней)
      */
-    static final BigDecimal STAKE_PERIOD_MULTI = BigDecimal.ONE.divide(new BigDecimal(360L * 86400L * 100L), 10, RoundingMode.HALF_DOWN);
+    static final BigDecimal STAKE_PERIOD_MULTI = BigDecimal.ONE.divide(new BigDecimal(365L * 86400L * 100L), 14, RoundingMode.HALF_DOWN);
 
     /**
      * Постоянный множитель доходности annualPercentage - Reward multiplier as a Percentage per year. По умолчанию 10% годовых
@@ -107,6 +108,10 @@ public class MoneyStaking extends EpochDAppItemJson {
         return DISABLED;
     }
 
+    public static String getPointsKey(Account account, Long assetKey) {
+        return account.getAddress() + "." + assetKey;
+    }
+
     /**
      * Берем множитель для награды
      *
@@ -138,7 +143,11 @@ public class MoneyStaking extends EpochDAppItemJson {
     void makePointTransfer(List<Object[]> stateSubPoints, Account account, Long assetKey, AssetCls asset,
                            boolean asSender, Account sideAccount) {
 
-        if (asset.getItemType() != itemType || asset.getKey() != itemKey)
+        if (asset.getItemType() != itemType ||
+                // TODO тут можно и второй актив обработать - но нужна проверка что он к этому же ДАПП
+                // но лучше все же списки ДАПП делать - Пока обработка только стороны одной - сразу два актива с ДАПП не обработаются
+                // (!(commandTx instanceof Orderable) && asset.getKey() != itemKey))
+                asset.getKey() != itemKey)
             return;
 
         PublicKeyAccount assetMaker = asset.getMaker();
@@ -147,11 +156,13 @@ public class MoneyStaking extends EpochDAppItemJson {
             return;
         }
 
-        BigDecimal balanceOwnNew = account.getBalanceForPosition(asset.getKey(), BALANCE_POS_OWN).b;
+        BigDecimal balanceOwnNew = account.getBalanceForPosition(dcSet, asset.getKey(), BALANCE_POS_OWN).b;
 
-        Object[] point = (Object[]) valueGet(account.getAddress());
+        String pointsKey = account.getAddress() + "." + assetKey;
+
+        Object[] point = (Object[]) valueGet(pointsKey);
         // NULL тоже заносим для стирания при откате. И баланс старый
-        stateSubPoints.add(new Object[]{account.getAddress(), point});
+        stateSubPoints.add(new Object[]{pointsKey, point});
 
         // Накопленный, время, Депозит
         Object[] pointNew = new Object[]{BigDecimal.ZERO, blockTimestamp, balanceOwnNew};
@@ -214,10 +225,12 @@ public class MoneyStaking extends EpochDAppItemJson {
                     } else {
                         BigDecimal diff = balanceOwnNew.add(reward);
                         if (diff.signum() < 0) {
+                            String pointsSideKey = sideAccount.getAddress() + "." + assetKey;
+
                             // Перенос остатков с минусом которые на счет получателя платежа
-                            Object[] pointSideAccount = (Object[]) valueGet(sideAccount.getAddress());
+                            Object[] pointSideAccount = (Object[]) valueGet(pointsSideKey);
                             // Для Отката их запомним
-                            stateSubPoints.add(new Object[]{sideAccount.getAddress(), pointSideAccount});
+                            stateSubPoints.add(new Object[]{pointsSideKey, pointSideAccount});
                             status += "transfer demerrage to aSide: " + diff.abs().toString();
                             Object[] pointSideAccountNew;
                             if (pointSideAccount == null) {
@@ -225,14 +238,14 @@ public class MoneyStaking extends EpochDAppItemJson {
                             } else {
                                 pointSideAccountNew = new Object[]{((BigDecimal) pointSideAccount[0]).add(diff), pointSideAccount[1], pointSideAccount[2]};
                             }
-                            valuePut(sideAccount.getAddress(), pointSideAccountNew);
+                            valuePut(pointsSideKey, pointSideAccountNew);
                         }
 
                         pointNew[0] = BigDecimal.ZERO;
 
                         // Сперва запомним балансы для отката
-                        Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
-                        Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                        Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
+                        Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
                         stateSubPoints.add(new Object[]{assetKey,
                                 assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
                                 account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
@@ -257,9 +270,10 @@ public class MoneyStaking extends EpochDAppItemJson {
 
                     } else {
                         // Перенос всего Дохода на счет получателя платежа
-                        Object[] pointSideAccount = (Object[]) valueGet(sideAccount.getAddress());
+                        String pointsSideKey = sideAccount.getAddress() + "." + assetKey;
+                        Object[] pointSideAccount = (Object[]) valueGet(pointsSideKey);
                         // Для Отката их запомним
-                        stateSubPoints.add(new Object[]{sideAccount.getAddress(), pointSideAccount});
+                        stateSubPoints.add(new Object[]{pointsSideKey, pointSideAccount});
                         status += "transfer reward to aSide: " + pointNew[0].toString();
                         Object[] pointSideAccountNew;
                         if (pointSideAccount == null) {
@@ -267,7 +281,7 @@ public class MoneyStaking extends EpochDAppItemJson {
                         } else {
                             pointSideAccountNew = new Object[]{((BigDecimal) pointSideAccount[0]).add((BigDecimal) pointNew[0]), pointSideAccount[1], pointSideAccount[2]};
                         }
-                        valuePut(sideAccount.getAddress(), pointSideAccountNew);
+                        valuePut(pointsSideKey, pointSideAccountNew);
                         pointNew[0] = BigDecimal.ZERO;
                         pointNew[2] = BigDecimal.ZERO;
                         return; // выход - так как остатки уже перенесли
@@ -281,8 +295,8 @@ public class MoneyStaking extends EpochDAppItemJson {
             if ((blockTimestamp - lastTimeAction) / 1000 >= SKIP_SECONDS) {
                 // Выплату сделать
                 // Сперва запомним балансы для отката
-                Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
-                Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(assetKey, BALANCE_POS_OWN);
+                Fun.Tuple2<BigDecimal, BigDecimal> assetMakerBalOwn = assetMaker.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
+                Fun.Tuple2<BigDecimal, BigDecimal> accountBalOwn = account.getBalanceForPosition(dcSet, assetKey, BALANCE_POS_OWN);
                 stateSubPoints.add(new Object[]{assetKey,
                         assetMaker.getShortAddressBytes(), new Object[]{assetMakerBalOwn.a, assetMakerBalOwn.b},
                         account.getShortAddressBytes(), new Object[]{accountBalOwn.a, accountBalOwn.b}});
@@ -302,15 +316,16 @@ public class MoneyStaking extends EpochDAppItemJson {
                 // reset pending reward
                 pointNew[0] = BigDecimal.ZERO;
                 status += " Withdraw.";
+
             } else {
+                // запишем в сообщение
+                status += (asSender ? " Sender " : " Recipient ") + (multiSignum > 0? "reward " : "demurrage ") + rewardAbs.toPlainString() + ".";
                 status += " Pending.";
             }
 
-            return;
-
         } finally {
             // STORE NEW POINT
-            valuePut(account.getAddress(), pointNew);
+            valuePut(pointsKey, pointNew);
         }
     }
 
@@ -325,16 +340,18 @@ public class MoneyStaking extends EpochDAppItemJson {
      * @param asOrphan
      * @return
      */
-    private boolean job(boolean asOrphan) {
+    private void job(boolean asOrphan) {
 
         if (asOrphan) {
+            // 4280 - 9586 - 79-2
             Object[][][] statePoints = (Object[][][]) removeState(commandTx.getDBRef());
             Object[][] stateSubPoints;
             Object[] stateSubPoint;
             ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
             Long assetKey;
             byte[] shortAddress;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance;
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance;
             // Разворачиваем в обратном порядке
             for (int ii = statePoints.length - 1; ii >= 0; ii--) {
                 stateSubPoints = statePoints[ii];
@@ -368,7 +385,7 @@ public class MoneyStaking extends EpochDAppItemJson {
             status = "";
             TransferBalanceDto[] transfers = ((TransferredBalances) commandTx).getTransfers();
             if (transfers == null || transfers.length == 0)
-                return false;
+                return;
 
             Object[][][] statePoints = new Object[transfers.length][][];
             int i = 0;
@@ -389,7 +406,8 @@ public class MoneyStaking extends EpochDAppItemJson {
                     if (transferRecipient.getBalancePos() != BALANCE_POS_OWN)
                         continue;
 
-                    makePointTransfer(stateSubPoints, transferRecipient.getAccount(), assetKey, asset, false, sender);
+                    makePointTransfer(stateSubPoints, transferRecipient.getAccount(),
+                            assetKey, asset, false, sender);
                 }
 
                 statePoints[i++] = (Object[][]) stateSubPoints.toArray(new Object[stateSubPoints.size()][]);
@@ -400,31 +418,22 @@ public class MoneyStaking extends EpochDAppItemJson {
 
         }
 
-        return true;
-
     }
 
     @Override
-    public boolean processByTime() {
-        fail("unknown command");
-        return false;
-    }
-
-    @Override
-    public boolean process() {
+    public void process() {
         if (block == null) {
             // Это еще неподтвержденная - нечего исполнять или не Послать
-            return true;
+            return;
         }
-        return job(false);
-    }
 
-    @Override
-    public void orphanByTime() {
+        job(false);
     }
 
     @Override
     public void orphanBody() {
+        super.orphanBody();
+
         job(true);
     }
 
@@ -452,6 +461,7 @@ public class MoneyStaking extends EpochDAppItemJson {
             byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
             pos += dataSize;
             data = new String(dataBytes, StandardCharsets.UTF_8);
+
         } else {
             data = "";
             status = "";

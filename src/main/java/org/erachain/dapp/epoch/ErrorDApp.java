@@ -57,7 +57,7 @@ public class ErrorDApp extends DApp {
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (message != null)
-                len += message.length();
+                len += message.getBytes(StandardCharsets.UTF_8).length;
         }
         return len;
     }
@@ -105,8 +105,7 @@ public class ErrorDApp extends DApp {
     }
 
     @Override
-    public boolean process() {
-        return false;
+    public void process() {
     }
 
     @Override

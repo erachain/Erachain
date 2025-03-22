@@ -1,7 +1,8 @@
 package org.erachain.dapp;
 
 public interface DAppTimed {
-    boolean processByTime();
+
+    void processByTime();
 
     void orphanByTime();
 

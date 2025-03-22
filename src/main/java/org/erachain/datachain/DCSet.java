@@ -31,6 +31,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.Random;
 
 /**
@@ -44,7 +45,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 542;
+    final static int CURRENT_VERSION = 544;
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -88,10 +89,13 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
      * нельзя делать DBS_NATIVE_MAP !!! - так как он не удаляет транзакции по вторичному индексу
-     * И трнзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
+     * И транзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
      * блока на проверке и исполнении
+     * По умолчанию ставим DBS_MAP_DB - чтобы сохранялись при выходе - для надежности
+     * Но при старт ноду можно задать ключ -utx-in-memory - тогда включится DBS_MAP_DB_IN_MEM
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;;
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB;
+    ;
     public static final int UNCONF_TX_MAP_FORK = DBS_MAP_DB_IN_MEM;
 
     /**
@@ -549,7 +553,7 @@ public class DCSet extends DBASet implements Closeable {
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(BlockChain.TEST_DB > 0 ? 3 : 7)// не нагружать процессор для поиска свободного места в базе данных
 
-                //.compressionEnable()
+                //.compressionEnable() // толку мало от сжатия
                 ;
 
         /**
@@ -620,7 +624,25 @@ public class DCSet extends DBASet implements Closeable {
             throw new RuntimeException("File not exists - " + dbFile.getName());
         }
 
-        return DBMaker.newFileDB(dbFile).readOnly().checksumEnable().make();
+        return DBMaker.newFileDB(dbFile).readOnly()
+                .checksumEnable()
+                .make();
+
+    }
+
+    public static DB makeShrinkFileDB(File dbFile) {
+
+        if (dbFile.exists()) {
+            throw new RuntimeException("File already exists - " + dbFile.getName());
+        }
+
+        return DBMaker.newFileDB(dbFile)
+                .checksumEnable() // same as in makeReadOnlyFileDB
+                .cacheDisable()
+                .mmapFileEnableIfSupported()
+                .commitFileSyncDisable()
+                .asyncWriteFlushDelay(2)
+                .make();
 
     }
 
@@ -681,6 +703,7 @@ public class DCSet extends DBASet implements Closeable {
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (NoSuchFileException e1) {
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
             }
@@ -688,12 +711,14 @@ public class DCSet extends DBASet implements Closeable {
         }
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
+            logger.warn("New Version of DB: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
+            logger.warn("Closing Current DB...");
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
+            logger.warn("Current DB closed");
 
             if (Controller.getInstance().useGui) {
-                Object[] options = {Lang.T("Rebuild locally"),
-                        Lang.T("Clear chain"),
+                Object[] options = {Lang.T("Rebuild from old DB locally (Fast)"),
+                        Lang.T("Clear DB and reload from Network (Slow)"),
                         Lang.T("Exit")};
 
                 //As the JOptionPane accepts an object as the message
@@ -721,12 +746,17 @@ public class DCSet extends DBASet implements Closeable {
                     try {
                         Files.walkFileTree(dbFile.getParentFile().toPath(),
                                 new SimpleFileVisitorForRecursiveFolderDeletion());
+                    } catch (NoSuchFileException e) {
                     } catch (Throwable e) {
                         logger.error(e.getMessage(), e);
                     }
+
+                    //reCreateDB(withObserver, dynamicGUI);
                     database = makeFileDB(dbFile);
+
                 } else {
-                    Controller.getInstance().stopAndExit(-22);
+                    logger.warn("Please rebuild chain local by use '-rechain' parameter (quick case) or delete folder " + dbFile.getParentFile().toPath() + " for full synchronize chain from network (slow case).");
+                    System.exit(-22);
                 }
 
             } else {
@@ -1652,7 +1682,7 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
+     * Нужно не забыть переменные внутри каждой таблицы тоже в Родителя скинуть
      */
     @Override
     public synchronized void writeToParent() {
@@ -1679,6 +1709,10 @@ public class DCSet extends DBASet implements Closeable {
             // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
             // иначе размер больше будет в форке и не то значение
             ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+            if (false) {
+                // это не переменная а данные - он в таблице сами перекинутся
+                ///((AddressForging) addressForging.getParent()).getLast(block.getCreator().getAddress());
+            }
 
             for (DBTab table : tables) {
                 table.writeToParent();
@@ -1925,8 +1959,9 @@ public class DCSet extends DBASet implements Closeable {
                     if (tempDir.exists()) {
                         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
                     }
+                } catch (NoSuchFileException e) {
                 } catch (Throwable e) {
-                    ///logger.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
 
             }

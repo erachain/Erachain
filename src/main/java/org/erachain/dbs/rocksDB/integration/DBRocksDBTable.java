@@ -25,6 +25,7 @@ import org.rocksdb.WriteOptions;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -526,6 +527,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         dbSource.close();
         try {
             Files.walkFileTree(dbSource.getDbPathAndFile(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (NoSuchFileException e) {
         } catch (IOException e) {
         }
         openSource();

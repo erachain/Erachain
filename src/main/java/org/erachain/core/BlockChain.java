@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import com.google.common.primitives.Longs;
+import lombok.Setter;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -116,6 +118,7 @@ public class BlockChain {
     /**
      * default = 30 sec
      */
+    @Setter
     private static int BLOCKS_PERIOD = 30000; // [milsec]
 
     /**
@@ -204,8 +207,7 @@ public class BlockChain {
             : MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES ? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
     public static final int MAX_BLOCK_SIZE_GEN = TEST_DB > 0 ? TEST_DB << 1 : MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 2;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_BLOCK_SIZE_GEN << 2;
 
     public static final int GENESIS_WIN_VALUE = TEST_MODE ? 3000 : ERA_COMPU_ALL_UP ? 10000 : 22000;
 
@@ -518,6 +520,9 @@ public class BlockChain {
         }
 
         if (TEST_MODE) {
+
+            if (!DEMO_MODE)
+                BLOCKS_PERIOD = Controller.blockPeriod * 1000;
 
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
@@ -861,7 +866,7 @@ public class BlockChain {
         if (CLONE_MODE)
             return BLOCKS_PERIOD;
         else if (TEST_MODE && !DEMO_MODE)
-            return 7000;
+            return BLOCKS_PERIOD;
         else if (DEMO_MODE)
             return 30000;
 
@@ -1387,7 +1392,7 @@ public class BlockChain {
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, block.getReference())) {
             block.close();
-            LOGGER.info("new winBlock from FORK!");
+            LOGGER.info("new winBlock from FORK! {}", peer);
             return false;
         }
 
@@ -1434,12 +1439,19 @@ public class BlockChain {
 
             if (peer != null) {
                 if (noValid > Block.INVALID_REFERENCE) {
+                    LOGGER.info("new winBlock {} invalid: {} - from peer {}", block, noValid, peer);
                     peer.ban(10, "invalid block");
-                } else if (noValid > Block.INVALID_BRANCH) {
-                    peer.ban(0, "invalid block reference");
+                } else if (noValid == Block.INVALID_BLOCK_TIME) {
+                    LOGGER.info("new winBlock {} TIME wrong {} - from peer {}", block, new Timestamp(block.getTimestamp()), peer);
+                    if (Controller.getInstance().getActivePeersCounter() >= Settings.getInstance().getMaxConnections() - 1)
+                        peer.ban(0, "invalid block time " + new Timestamp(block.getTimestamp()));
+                } else if (noValid == Block.INVALID_REFERENCE) {
+                    LOGGER.info("new winBlock {} is FORK from peer {}", block, peer);
+                    if (Controller.getInstance().getActivePeersCounter() >= Settings.getInstance().getMaxConnections() - 1)
+                        peer.ban(0, "invalid block reference");
                 } else {
-                    // вообще не баним - это просто не успел блок встать в цепочку а мы ее уже обновили
-                    LOGGER.info("new winBlock is LATE");
+                    // вообще не баним - это просто не успел блок встать в цепочку, а мы ее уже обновили
+                    LOGGER.info("new winBlock {} is LATE", block);
                 }
             } else {
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
@@ -1479,6 +1491,10 @@ public class BlockChain {
         // иначе просто прилетевший блок в момент синхронизации не будет принят
         if (this.waitWinBuffer != null) {
             synchronized (waitWinBuffer) {
+                if (Arrays.equals(waitWinBuffer.getSignature(), block.getReference()))
+                    // Тут еще сидит предыдущий блок, который надо внести в цепочку
+                    return;
+
                 waitWinBuffer.close();
                 waitWinBuffer = null; // поможем сборщику мусора явно
                 this.waitWinBuffer = block;
@@ -1489,7 +1505,7 @@ public class BlockChain {
     }
 
     public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
-        return new Tuple2<Integer, Long>(dcSet.getBlocksHeadsMap().size(),
+        return new Tuple2<Integer, Long>(dcSet.getBlockMap().size(),
                 dcSet.getBlocksHeadsMap().getFullWeight());
     }
 
@@ -1693,6 +1709,9 @@ public class BlockChain {
     }
 
     public String blockFromFuture(int height) {
+        if (TEST_MODE)
+            return null;
+
         long blockTimestamp = getTimestamp(height);
         if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
             return "invalid Timestamp from FUTURE: "

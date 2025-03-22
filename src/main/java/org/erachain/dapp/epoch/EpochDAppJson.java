@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Общий класс в котором параметры задаются вОписании к транзакции в виде JSON
  */
-public abstract class EpochDAppJson extends EpochDAppStatus implements DAppTimed {
+public abstract class EpochDAppJson extends EpochDAppStatus {
 
     protected String command;
     // TODO нужно наследный класс делать для Версии - так как там другой парсинг и в байты для ДБ нужно версию тоже катать
@@ -36,6 +36,8 @@ public abstract class EpochDAppJson extends EpochDAppStatus implements DAppTimed
     public EpochDAppJson(int id, PublicKeyAccount maker, String dataStr, String status) {
         super(id, maker, status);
         this.dataStr = dataStr;
+        // для отката отката нужен резолв и для API
+        resolveJson();
     }
 
     public EpochDAppJson(int id, PublicKeyAccount maker, String dataStr, String status, Transaction commandTx, Block block) {
@@ -113,7 +115,7 @@ public abstract class EpochDAppJson extends EpochDAppStatus implements DAppTimed
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (dataStr != null)
-                len += dataStr.length();
+                len += dataStr.getBytes(StandardCharsets.UTF_8).length;
         }
 
         return len;

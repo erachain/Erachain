@@ -30,7 +30,7 @@ import java.util.*;
  * #### PROPERTY 2
  * typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
  */
-public class CreateOrderTransaction extends Transaction implements Itemable, TransferredBalances {
+public class CreateOrderTransaction extends Transaction implements Itemable, Orderable, TransferredBalances {
     public static final byte[][] VALID_REC = new byte[][]{
             //Base58.decode("4...")
     };
@@ -152,6 +152,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable, Tra
     }
 
     @Override
+    public Order getOrderFromDb() {
+        //return this.signature;
+        Long orderId = getOrderId();
+        Order order = dcSet.getOrderMap().get(orderId);
+        return order == null? dcSet.getCompletedOrderMap().get(orderId) : order;
+    }
+
+    @Override
     public BigDecimal getAmount() {
         return this.amountHave;
     }
@@ -180,6 +188,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable, Tra
         return this.haveKey;
     }
 
+    @Override
     public AssetCls getHaveAsset() {
         return this.haveAsset;
     }
@@ -192,6 +201,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable, Tra
         return this.wantKey;
     }
 
+    @Override
     public AssetCls getWantAsset() {
         return this.wantAsset;
     }
@@ -440,7 +450,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable, Tra
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }

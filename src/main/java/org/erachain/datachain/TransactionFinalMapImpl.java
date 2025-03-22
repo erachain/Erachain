@@ -150,8 +150,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByRecipient(byte[] addressShort, int limit) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, false)) {
@@ -215,8 +218,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByCreator(byte[] addressShort, int limit, int offset) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, false)) {
@@ -248,8 +254,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     public List<Transaction> getTransactionsByCreator(byte[] addressShort, Long fromID, int limit, int offset) {
 
         if (BlockChain.TEST_DB > 0
-            // теперь при множественных выплатах это протокольный индекс
-            ///parent != null || Controller.getInstance().onlyProtocolIndexing
+            // теперь это протокольный индекс - нужен для множественных выплат
         ) {
             return null;
         }
@@ -290,6 +295,37 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
         return ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending) {
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
+        }
+
+        return ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, boolean descending) {
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
+        }
+        return ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, fromSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
+        }
+        return ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort, fromSeqNo, toSeqNo, descending);
     }
 
 
@@ -346,8 +382,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         List<Transaction> txs = new ArrayList<>();
@@ -381,8 +420,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset, boolean descending) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         List<Long> keys = new ArrayList<>();
@@ -415,8 +457,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         List<Transaction> transactions = new ArrayList<>();
@@ -464,8 +509,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     public List<Transaction> getTransactionsByAddressAndType(byte[] address_A_Short, Account address_B, Integer type,
                                                              boolean onlyCreator, Long fromID, int limit, int offset) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         List<Transaction> transactions = new ArrayList<>();
@@ -574,8 +622,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByTitle(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         if (filter == null || filter.isEmpty()) {
@@ -677,8 +728,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     public List<Transaction> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         if (filter == null || filter.isEmpty()) {
@@ -717,9 +771,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     //@Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByTitleFromID(String filter, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
+
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
@@ -867,8 +925,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsFromID(Long fromSeqNo, int offset, int limit,
                                                    boolean noForge, boolean fillFullPage) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         PagedMap<Long, Transaction> pager = new PagedTXMap(DCSet.getInstance(), this, noForge);
@@ -879,9 +940,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending) {
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         return ((TransactionFinalSuit) map).getAddressesIterator(addressShort, fromID, descending);
@@ -903,8 +967,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int offset,
                                                            int limit, boolean noForge, boolean descending) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         int forgedCount = 0;
@@ -962,8 +1029,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, byte[] addressShort) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         //Iterable keys = Fun.filter(this.recipientKey, address);
@@ -993,8 +1063,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
                                               final int maxHeight, int type, int service, boolean desc, int offset, int limit, Long fromSeqNo) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         List<Transaction> txs = new ArrayList<>();
@@ -1018,9 +1091,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public int findTransactionsCount(String address, String sender, String recipient, Long fromSeqNo, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return 0;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return 0;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
+
         try (IteratorCloseable iterator = findTransactionsKeys(address, sender, recipient, fromSeqNo, minHeight, maxHeight,
                 type, service, desc, offset, limit)) {
             return Iterators.size(iterator);
@@ -1047,9 +1124,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"rawtypes", "unchecked"})
     public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, Long fromSeqNo, final int minHeight,
                                                   final int maxHeight, int type, final int service, boolean descending, int offset, int limit) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
+
         IteratorCloseable<Long> creatorIterator = null;
         IteratorCloseable<Long> recipientIterator = null;
 
@@ -1170,11 +1251,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    /**
+     * TODO ERROR - not use PARENT MAP and DELETED in FORK
+     */
     public List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit,
                                                             boolean noForge, boolean fillFullPage) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
+        if (parent != null) {
+            if (Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+            throw new RuntimeException("In FORK DCSet not implimented!");
         }
 
         PagedMap<Long, Transaction> pager = new PagedAddressTXMap(DCSet.getInstance(), this, addressShort, noForge);

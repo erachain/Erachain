@@ -133,7 +133,7 @@ public class DogePlanet extends EpochDApp {
     }
 
     @Override
-    public boolean process() {
+    public void process() {
 
         AssetUnique planet;
         int i = count;
@@ -173,8 +173,6 @@ public class DogePlanet extends EpochDApp {
 
         valuesMap.put(COUNT_KEY, totalIssued);
 
-
-        return false;
     }
 
     @Override

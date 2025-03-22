@@ -77,7 +77,7 @@ public class SynchronizerTests {
 
     }
 
-    @Ignore
+    //@Ignore
     //TODO actualize the test
     @Test
     public void synchronizeNoCommonBlock() {

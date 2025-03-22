@@ -29,6 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 @Path("record")
@@ -516,11 +517,16 @@ public class RecResource {
 
     @POST
     @Path("/broadcast")
-    public String broadcastFromRaw(String rawDataBase58) {
+    public String broadcastFromRaw(@QueryParam("rawbase") Long rawBase, String rawData) {
         int step = 1;
 
         try {
-            byte[] transactionBytes = Base58.decode(rawDataBase58);
+
+            byte[] transactionBytes;
+            if (rawBase == 64)
+                transactionBytes = Base64.getDecoder().decode(rawData);
+            else
+                transactionBytes = Base58.decode(rawData);
 
             step++;
             Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);

@@ -46,7 +46,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private static Controller ctrl = Controller.getInstance();
     private static int local_status = 0;
     private PrivateKeyAccount acc_winner;
-    private byte[] solvingReference;
     private List<PrivateKeyAccount> cachedAccounts;
     private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
     private boolean walletOnceUnlocked = false;
@@ -316,6 +315,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestampEnd, BlockChain bchain,
                                                                          long max_winned_value) {
 
+        List<Transaction> transactionsList = new ArrayList<Transaction>();
+        if (false) // для отладки не включаем в блок их
+            return new Tuple2<List<Transaction>, Integer>(transactionsList, 0);
+
         LOGGER.info("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestampEnd));
 
         long start = System.currentTimeMillis();
@@ -324,8 +327,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         DCSet newBlockDC = null;
 
         Block waitWin;
-
-        List<Transaction> transactionsList = new ArrayList<Transaction>();
 
         //	boolean transactionProcessed;
         long totalBytes = 0;
@@ -452,7 +453,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         LOGGER.error(e.getMessage(), e);
                         //REMOVE FROM LIST
-                        needRemoveInvalids.add(transaction.getSignature());
+                        if (map.size() > 100) {
+                            // если много неподтвержденных то удалим ее, иначе ждем - может тут есть трнзакции типа создать персону которые ее сделают валидной
+                            needRemoveInvalids.add(transaction.getSignature());
+                        }
 
                     }
 
@@ -510,7 +514,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
-            //Block waitWin;
             int counter = 0;
             int totalBytes = 0;
 
@@ -609,6 +612,18 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (forgingStatus != status) {
             forgingStatus = status;
             ctrl.forgingStatusChanged(forgingStatus);
+
+            if (status.equals(ForgingStatus.FORGING_WAIT)) {
+                // запустим сброс ожидания через 30 секунд максимум если что-то другое не сбросит
+                new Thread(() -> {
+                    try {
+                        sleep(30000);
+                    } catch (InterruptedException e) {
+                    }
+                    if (getForgingStatus().equals(ForgingStatus.FORGING_WAIT))
+                        setForgingStatus(ForgingStatus.FORGING);
+                }).run();
+            }
         }
     }
 
@@ -673,6 +688,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
+    public boolean stop;
+
     @Override
     public void run() {
 
@@ -727,11 +744,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             // если только что была синхронизация - возьмем новый блок
             Peer afterUpdatePeer = null;
             Block waitWin = null;
-            while (!ctrl.isOnStopping()) {
+            while (!ctrl.isOnStopping() && !stop) {
 
                 int timeStartBroadcast = BlockChain.WIN_TIME_POINT(height);
 
-                Block solvingBlock;
                 Peer peer = null;
                 Tuple3<Integer, Long, Peer> maxPeer;
                 SignaturesMessage response;
@@ -837,16 +853,19 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForValidTX = timePoint;
+                    timePointForValidTX = timePoint + (blockTimeMS >> 2);
                     betterPeer = null;
                     needRequestWinBlock = false;
 
-                    Timestamp timestampPoit = new Timestamp(timePoint);
-                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit + " for UTX time: " + new Timestamp(timePointForValidTX));
-                    this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
+                    height = bchain.getHeight(dcSet);
+                    Timestamp timestampPoint = new Timestamp(timePoint);
+                    LOGGER.info("+ + + + + START GENERATE HEIGHT [{}] on {} for UTX time: {}", height + 1, timestampPoint, new Timestamp(timePointForValidTX));
+                    this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoint);
+
+                    // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                    ctrl.network.decrementWeightOfPeerMutes();
 
                     flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT(height);
-                    this.solvingReference = null;
                     local_status = 0;
 
                     // пинганем тут все чтобы знать кому слать победный блок
@@ -882,21 +901,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (BlockChain.TEST_DB > 0 ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
-                                    && betterPeer == null && !ctrl.needUpToDate()
-                                    && (this.solvingReference == null // AND GENERATING NOT MAKED
-                                    || !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
-                            ))
-                    ) {
+                                    && betterPeer == null && !ctrl.needUpToDate())
+                        ) {
 
                         /////////////////////////////// TRY FORGING ////////////////////////
 
                         if (ctrl.isOnStopping()) {
                             return;
                         }
-
-                        //SET NEW BLOCK TO SOLVE
-                        this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
-                        solvingBlock = dcSet.getBlockMap().last();
 
                         if (ctrl.isOnStopping()) {
                             return;
@@ -1051,9 +1063,19 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 if (newWinner) {
                                     LOGGER.info("NEW WINER RECEIVED - drop my block");
                                 } else {
-                                    /////////////////////    MAKING NEW BLOCK  //////////////////////
+                                    ///////////////////// MAKING MY NEW BLOCK  //////////////////////
                                     local_status = 7;
                                     this.setMonitorStatus("local_status " + viewStatus());
+
+                                    if (unconfirmedTransactions.b < 1000 && unconfirmedTransactions.b < dcSet.getTransactionTab().size()) {
+                                        // Попробуем добрать
+                                        // Соберем тут транзакции сразу же чтобы потом не тратить время
+                                        unconfirmedTransactions = getUnconfirmedTransactions(height,
+                                    timePointForValidTX + (blockTimeMS >> 2),
+                                                bchain, winned_winValue);
+                                        LOGGER.info("Uptake TXs to: " + unconfirmedTransactions.b);
+
+                                    }
 
                                     // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
                                     LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
@@ -1062,12 +1084,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                     try {
 
-                                        Block generatedBlock = generateNextBlock(acc_winner, solvingBlock,
+                                        //SET NEW BLOCK TO SOLVE
+                                        Block generatedBlock = generateNextBlock(acc_winner, dcSet.getBlockMap().last(),
                                                 unconfirmedTransactions, winned_forgingValue, winned_winValue, previousTarget);
 
                                         processTiming = System.nanoTime() - processTiming;
 
-                                        // только если вблоке есть стрнзакции то вычислим
+                                        // только если в блоке есть транзакции то вычислим
                                         if (generatedBlock.getTransactionCount() > 0
                                                 && processTiming < 999999999999l) {
                                             // при переполнении может быть минус
@@ -1102,9 +1125,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                             continue;
                                         } else {
                                             //PASS BLOCK TO CONTROLLER
-                                            LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+                                            LOGGER.info("Try bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
                                             if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
-                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                                    null // не надо банить тут - может цепочка ушла уже и это мой блок же
                                             )) {
 
                                                 // need to BROADCAST
@@ -1158,11 +1181,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // try solve and flush new block from Win Buffer
 
                     // FLUSH WINER to DB MAP
-                    if (this.solvingReference != null)
-                        if (NTP.getTime() - pointLogWaitFlush > blockTimeMS >> 2) {
-                            pointLogWaitFlush = NTP.getTime();
-                            LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
-                        }
+                    if (NTP.getTime() - pointLogWaitFlush > blockTimeMS >> 2) {
+                        pointLogWaitFlush = NTP.getTime();
+                        LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                    }
 
                     // ждем основное время просто
                     while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && this.syncTo <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
@@ -1250,17 +1272,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.checkStatusAndObserve(waitWin == null ? 0 : 1);
 
                     if (waitWin == null) {
-                        if (this.solvingReference != null) {
-                            if (System.currentTimeMillis() - pointLogGoUpdate > blockTimeMS >> 2) {
-                                pointLogGoUpdate = System.currentTimeMillis();
-                                // сбросим и ссылку для генератора
-                                this.solvingReference = null;
-                                LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
-                                // обнулим - чтобы потом сработало новое создание
-                                this.solvingReference = null;
-                            }
-                        }
-
+                        ;
                     } else if (ctrl.needUpToDate()) {
                         // выбрасываем победителя
                         waitWin = null;
@@ -1287,8 +1299,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     } else {
                         // только если мы не отстали
-
-                        this.solvingReference = null;
 
                         local_status = 1;
                         this.setMonitorStatus("local_status " + viewStatus());
@@ -1374,8 +1384,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     local_status = 3;
                     this.setMonitorStatus("local_status " + viewStatus());
 
-                    this.solvingReference = null;
-
                     afterUpdatePeer = ctrl.update(shift_height);
 
                     local_status = 0;
@@ -1452,7 +1460,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             return;
         }
 
-        if (forgingStatus != ForgingStatus.FORGING) {
+        if (forgingStatus != ForgingStatus.FORGING && forgingStatus != ForgingStatus.FORGING_WAIT) {
             setForgingStatus(ForgingStatus.FORGING_WAIT);
         }
 

@@ -86,7 +86,7 @@ public class TransactionCreator {
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();
-        this.blockHeight = this.fork.getBlockMap().size() + 1;
+        this.blockHeight = lastBlock.heightBlock + 1;
         this.seqNo.set(0); // reset sequence number
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
@@ -119,11 +119,14 @@ public class TransactionCreator {
         Block newBlock = new Block(version, lastBlock, lastBlock.getCreator(),
                 new Fun.Tuple2<>(accountTransactions, accountTransactions.size()), atBytes,
                 0, 1000L, 1000L);
-        byte[] sign = lastBlock.getSignature();
+        // Тут передается по ссылке - сам объект списка
+        // Поэтому его надо копировать чтобы значение не искажалось у источника
+        byte[] sign = lastBlock.getSignature().clone();
         // изменим подпись
         sign[0]++;
         sign[sign.length - 1]++;
-        newBlock.setSignature(lastBlock.getSignature());
+        newBlock.setSignature(sign);
+        newBlock.makeHeadMind(fork);
 
         //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
         try {
@@ -139,11 +142,6 @@ public class TransactionCreator {
             updateFork();
         }
         return this.fork;
-    }
-
-    public long getReference(PublicKeyAccount creator) {
-        this.checkUpdate();
-        return 0l;
     }
 
     public Transaction createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) {
@@ -671,6 +669,7 @@ public class TransactionCreator {
         record = new RCertifyPubKeys(version, creator, (byte) feePow, key,
                 userAccounts,
                 add_day, timestamp, 0L);
+        //
         record.sign(creator, forDeal);
         record.setDC(this.fork, forDeal, this.blockHeight, this.seqNo.incrementAndGet(), false);
 

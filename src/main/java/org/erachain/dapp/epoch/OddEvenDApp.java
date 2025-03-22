@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransferredBalances;
 import org.erachain.dapp.DApp;
 import org.erachain.dapp.DAppFactory;
+import org.erachain.dapp.DAppTimed;
 import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
@@ -35,13 +36,13 @@ import java.util.Arrays;
  * Результат розыгрыша виден в самой транзакции - в блокэксплорере (сканере блоков).
  * Найти все выигрыши можно если в сканере (блокэксплорере) в разделе Транзакции сделать поиск по размеру выигрыша, например: x77
  */
-public class OddEvenDApp extends EpochDAppJson {
+public class OddEvenDApp extends EpochDAppJson implements DAppTimed {
 
     int WAIT_RAND = 3;
 
     static public final int ID = 777;
     static public final String NAME = "Odd-Even";
-    static public final int DISABLED_BEFORE = 5910000;
+    static public int DISABLED_BEFORE = 5910000;
 
     // DApp ACCOUNT: APPC5iANrt6tdDfGHCLV5zmCnjvViC5Bgj
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -141,19 +142,19 @@ public class OddEvenDApp extends EpochDAppJson {
         String data;
         String status;
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
-            int dataSize = Ints.fromByteArray(dataSizeBytes);
-            pos += 4;
-            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
-            pos += dataSize;
-            data = new String(dataBytes, StandardCharsets.UTF_8);
-
             byte[] statusSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
             pos += 4;
             byte[] statusBytes = Arrays.copyOfRange(bytes, pos, pos + statusLen);
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
+
+            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
+            int dataSize = Ints.fromByteArray(dataSizeBytes);
+            pos += 4;
+            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
+            pos += dataSize;
+            data = new String(dataBytes, StandardCharsets.UTF_8);
 
         } else {
             data = "";
@@ -201,7 +202,7 @@ public class OddEvenDApp extends EpochDAppJson {
     /**
      * @param asOrphan
      */
-    private boolean catchWin(boolean asOrphan) {
+    private void catchWin(boolean asOrphan) {
         // рождение выигрыша
 
         PublicKeyAccount creator = commandTx.getCreator();
@@ -246,15 +247,13 @@ public class OddEvenDApp extends EpochDAppJson {
             }
         }
 
-        return true;
-
     }
 
     @Override
-    public boolean process() {
+    public void process() {
 
         if (!isValid())
-            return true;
+            return;
 
         if (commandTx instanceof RSend) {
             if (
@@ -263,22 +262,22 @@ public class OddEvenDApp extends EpochDAppJson {
                 // рождение комет
                 dcSet.getTimeTXWaitMap().put(commandTx.getDBRef(), block.heightBlock + WAIT_RAND);
                 status = "wait";
-                return false;
+                return;
             }
         }
 
         fail("Wrong Transaction type: need 'RSend'");
-        return false;
 
     }
 
     @Override
-    public boolean processByTime() {
-        return catchWin(false);
+    public void processByTime() {
+        catchWin(false);
     }
 
     @Override
     public void orphanBody() {
+        super.orphanBody();
         dcSet.getTimeTXWaitMap().remove(commandTx.getDBRef());
     }
 

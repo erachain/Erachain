@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
@@ -34,7 +35,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     IteratorCloseable<Long> getTimestampIterator(boolean descending);
 
-    int clearByDeadTimeAndLimit(long keepTime, boolean cutDeadTime);
+    int clearByDeadTime(long heightTimestamp);
 
     void put(Transaction transaction);
 

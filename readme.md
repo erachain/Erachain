@@ -174,9 +174,9 @@ Run a full Erachain node. Use the specified parameters:
 If necessary, the values of the following parameters can be changed:
 - The **-pass** parameter contains the password required to unlock the wallet. Replace 123456789 with the value you wish.
 - The **-seed** parameter contains information about the seed and is divided into sub-parameters:
-  - The **first sub-parameter** is responsible for the number of accounts to be created.
-  - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed. 
-  - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
+    - The **first sub-parameter** is responsible for the number of accounts to be created.
+    - The **second sub-parameter** is responsible for the seed itself. Valid values for this parameter are any existing seed or "new" to create a new seed.
+    - The **third sub-parameter** is responsible for the password. Here it's necessary to duplicate the password from the **-pass** parameter
 
 Collapse the erachain session:  ``Ctrl+A+D``
 

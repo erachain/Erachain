@@ -102,13 +102,17 @@ public abstract class DAppFactory {
         if (commandTx instanceof IssueItemRecord) {
             // Пропускаем само создание
             ;
-        } else if (commandTx instanceof CreateOrderTransaction) {
+        } else if (commandTx instanceof Orderable) {
             // TODO надо сделать списки ДАПП в одной транзакции - так как там могут быть разные дапп-Активы
-            CreateOrderTransaction txCreateOrder = (CreateOrderTransaction) commandTx;
-            if (txCreateOrder.getHaveAsset().isUseDApp())
-                return EpochDAppItemJson.of(txCreateOrder.getHaveAsset(), commandTx, block);
-            else if (txCreateOrder.getWantAsset().isUseDApp())
-                return EpochDAppItemJson.of(txCreateOrder.getWantAsset(), commandTx, block);
+            // Можно внутри org.erachain.dapp.epoch.MoneyStaking.makePointTransfer обработать Оба - см там TODO
+            Orderable txCreateOrder = (Orderable) commandTx;
+            Order order = txCreateOrder.getOrderFromDb();
+            if (order.isTraded()) {
+                if (txCreateOrder.getHaveAsset().isUseDApp())
+                    return EpochDAppItemJson.of(txCreateOrder.getHaveAsset(), commandTx, block);
+                else if (txCreateOrder.getWantAsset().isUseDApp())
+                    return EpochDAppItemJson.of(txCreateOrder.getWantAsset(), commandTx, block);
+            }
 
         } else if (commandTx instanceof TransactionAmount) {
             // TODO надо сперва сделать списки ДАПП в одной транзакции - так как там могут быть разные дапп-Активы

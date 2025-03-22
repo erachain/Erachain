@@ -280,6 +280,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable,
 
             // запомним что тут две сущности
             if (key != 0) {
+                if (asset == null) {
+                    // У RCalculated такое может быть в process_after
+                    asset = dcSet.getItemAssetMap().get(key);
+                }
+
                 if (creatorPersonDuration != null) {
                     if (recipientPersonDuration != null) {
                         itemsKeys = new Object[][]{
@@ -796,7 +801,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable,
             base_len += exLink.length();
 
         if (dApp != null) {
-            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+            if (forDeal == FOR_DB_RECORD || dApp.isTxOwned()) {
                 base_len += dApp.length(forDeal);
             }
         }
@@ -1393,6 +1398,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable,
             int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
         }
 
+        int check = isValidTimestamp();
+        if (check != VALIDATE_OK)
+            return check;
+
         boolean wrong = true;
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
@@ -1414,51 +1423,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable,
         }
 
         // CHECK IF REFERENCE TIMESTAMP IS OK
-        if (forDeal > FOR_PACK) {
-            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
-                /// вообще не проверяем в тесте
-                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
-                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (BlockChain.CHECK_BUGS > 2)
-                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    return INVALID_TIMESTAMP;
-                }
-            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
-                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
-                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (BlockChain.CHECK_BUGS > 2)
-                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
-                    errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    return INVALID_TIMESTAMP;
-                }
-
-            } else {
-                long[] reference = this.creator.getLastTimestamp(dcSet);
-                if (reference != null && reference[0] >= this.timestamp
-                    // при откатах для нового счета который первый раз сделал транзакцию
-                    // из нулевого баланса - Референс будет ошибочный
-                    // поэтому отключим эту проверку тут
-                    /////   && !(BlockChain.DEVELOP_USE && height < 897144)
-                ) {
-
-                    if (height > 0 || BlockChain.CHECK_BUGS > 7
-                            || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
-                        if (BlockChain.TEST_DB == 0) {
-                            pointLogg = System.currentTimeMillis();
-                            if (BlockChain.CHECK_BUGS > 2)
-                                LOGGER.debug("INVALID TIME!!! REF TIMESTAMP: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                        + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
-                        }
-                    }
-                    errorValue = "INVALID TIME!!! REF TIMESTAMP: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp);
-                    return INVALID_TIMESTAMP;
-                }
-            }
-        }
+        check = checkReference(forDeal);
+        if (check != VALIDATE_OK)
+            return check;
 
         boolean isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
 

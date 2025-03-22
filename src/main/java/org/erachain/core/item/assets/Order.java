@@ -436,6 +436,9 @@ public class Order implements Comparable<Order> {
     public boolean isNotTraded() {
         return this.fulfilledHave.signum() == 0;
     }
+    public boolean isTraded() {
+        return this.fulfilledHave.signum() != 0;
+    }
 
     public boolean isActive(DCSet dcSet) {
         return dcSet.getOrderMap().contains(id);

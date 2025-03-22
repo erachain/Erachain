@@ -2,6 +2,7 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import lombok.Getter;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class EpochDAppStatus extends EpochDApp {
 
+    @Getter
     protected String status;
 
     public EpochDAppStatus(int id, PublicKeyAccount maker) {
@@ -34,7 +36,7 @@ public abstract class EpochDAppStatus extends EpochDApp {
         if (forDeal == Transaction.FOR_DB_RECORD) {
             len += 4;
             if (status != null)
-                len += status.length();
+                len += status.getBytes(StandardCharsets.UTF_8).length;
         }
         return len;
     }
@@ -79,7 +81,9 @@ public abstract class EpochDAppStatus extends EpochDApp {
     /**
      * For use FAIL status
      */
-    abstract public void orphanBody();
+    public void orphanBody() {
+        status = null;
+    }
 
     /**
      * Use FAIL status

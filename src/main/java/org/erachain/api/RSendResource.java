@@ -55,14 +55,16 @@ public class RSendResource {
                 "make and broadcast SEND asset amount and mail");
         help.put("POST r_send/{creator}/{recipient} {feePowfeePow}&assetKey={assetKey}&amount={amount}&title={title}&encoding={encoding}&encrypt=true&password={password} (message)",
                 "make and broadcast SEND asset amount and mail in body");
-        help.put("GET r_send/raw/{creator}/{recipient}?linkTo=<SeqNo>&feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&password={password}",
+        help.put("GET r_send/raw/{creator}/{recipient}?linkTo=<SeqNo>&feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&encoding={encoding}&encrypt=true&withSign&password={password}",
                 "make RAW for SEND asset amount and mail");
         help.put("POST r_send {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/raw {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send/raw {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": <encoding>, \"encrypt\": <true/false>, \"withSign\":true, \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
-        help.put("GET r_send/test1/{delay}?password={password}",
-                "Start test; delay = 0 - stop");
+        help.put("GET r_send/test1/{probability}/{delay}?password={password}",
+                "Start test send messages. Delay in ms. delay = 0 - stop");
+        help.put("GET r_send/test2/{probability}/{delay}?password={password}",
+                "Start test send COMPU. Delay in ms. delay = 0 - stop");
         help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
                 "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
                         + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
@@ -237,6 +239,7 @@ public class RSendResource {
                              @QueryParam("title") String title,
                              @QueryParam("message") String message,
                              @QueryParam("encoding") int encoding, @QueryParam("encrypt") boolean encrypt,
+                             @DefaultValue("true") @QueryParam("withSign") boolean withSign,
                              @QueryParam("rawbase") int rawbase,
                              @QueryParam("password") String password) {
 
@@ -267,9 +270,11 @@ public class RSendResource {
 
         String str;
         if (rawbase == 64)
-            out.put("raw64", Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, false)));
+            out.put("raw64", Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, withSign)));
         else
-            out.put("raw", Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, false)));
+            out.put("raw", Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, withSign)));
+
+        out.put("signature", transaction.viewSignature());
 
         return out.toJSONString();
 
@@ -314,12 +319,13 @@ public class RSendResource {
             }
         }
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
         BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
         String title = (String) jsonObject.getOrDefault("title", null);
         String message = (String) jsonObject.getOrDefault("message", null);
         int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
         boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
+        Boolean withSign = Boolean.valueOf((boolean) jsonObject.getOrDefault("withSign", false));
         int rawbase = Integer.valueOf(jsonObject.getOrDefault("rawbase", 58).toString());
         String password = (String) jsonObject.getOrDefault("password", null);
 
@@ -331,6 +337,7 @@ public class RSendResource {
                 assetKey, amount,
                 title, message, encoding,
                 encrypt,
+                withSign,
                 rawbase,
                 password
         );

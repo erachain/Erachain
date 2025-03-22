@@ -1352,7 +1352,13 @@ public class Wallet extends Observable implements Observer {
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS
-				this.dwSet.getTransactionMap().set(account, transaction);
+				try {
+					this.dwSet.getTransactionMap().set(account, transaction);
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+					Controller.getInstance().stopAndExit(1355);
+
+				}
 				// UPDATE BALANCE
 				deal_transaction(account, transaction, false);
 			}

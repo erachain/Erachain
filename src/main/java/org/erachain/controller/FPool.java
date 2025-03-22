@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -134,6 +135,7 @@ public class FPool extends MonitoredThread {
             if (dir.exists()) {
                 try {
                     Files.walkFileTree(dir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (NoSuchFileException e3) {
                 } catch (IOException e3) {
                 }
             }
