@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
@@ -211,6 +212,18 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(copyAddress);
+
+        JMenuItem depositPolzaSbp = new JMenuItem(Lang.T("Deposit by SBP"));
+        depositPolzaSbp.getAccessibleContext().setAccessibleDescription(Lang.T("Deposit accounts by SBP"));
+        depositPolzaSbp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    URLViewer.openWebpage(new URL("http://bitloom.ru/polza/sbp/compu?amount=500&receiver=" + creator.getAddress()));
+                } catch (MalformedURLException ex1) {
+                }
+            }
+        });
+        add(depositPolzaSbp);
 
         JMenuItem copyBalance = new JMenuItem(Lang.T("Copy Balance"));
         copyBalance.addActionListener(new ActionListener() {

@@ -10,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
+import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.library.*;
 import org.erachain.gui.status.StatusPanel;
 import org.erachain.gui2.MainPanel;
@@ -17,6 +18,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.SaveStrToFile;
+import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -360,6 +362,38 @@ public class MainFrame extends JFrame implements Observer {
         jMenuExchange.setText(Lang.T("Exchange"));
         jMenuBar1.add(jMenuExchange);
 
+        JMenu depositMenu = new JMenu(Lang.T("Deposit"));
+        JMenuItem depositPolzaSbp = new JMenuItem(Lang.T("Deposit by SBP"));
+        depositPolzaSbp.getAccessibleContext().setAccessibleDescription(Lang.T("Deposit accounts by SBP"));
+        depositPolzaSbp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String accTo;
+                    try {
+                        accTo = Controller.getInstance().getWalletAccounts().get(0).getAddress();
+                        URLViewer.openWebpage(new URL("http://bitloom.ru/polza/sbp/compu?amount=500&receiver=" + accTo));
+                    } catch (Exception ex) {
+                        URLViewer.openWebpage(new URL("http://bitloom.ru/polza/sbp/compu?amount=500"));
+                    }
+                } catch (MalformedURLException ex1) {
+                }
+            }
+        });
+        depositMenu.add(depositPolzaSbp);
+        jMenuBar1.add(depositMenu);
+
+        JMenu helpMenu = new JMenu(Lang.T("Help"));
+        JMenuItem helpWiki = new JMenuItem(Lang.T("See Wiki"));
+        helpWiki.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    URLViewer.openWebpage(new URL("https://wiki.erachain.org/ru/home"));
+                } catch (MalformedURLException e1) {
+                }
+            }
+        });
+        helpMenu.add(helpWiki);
+        jMenuBar1.add(helpMenu);
 
         setJMenuBar(jMenuBar1);
 
