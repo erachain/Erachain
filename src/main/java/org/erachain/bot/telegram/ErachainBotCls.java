@@ -264,8 +264,12 @@ abstract public class ErachainBotCls implements Rechargeable {
     }
 
     protected String scanUrlMarkdown(String text, String item, Object key) {
-        StringBuilder url = new StringBuilder();
-        url.append("[").append(text).append("](").append(scanUrl(item, key)).append(")");
+        StringBuilder url = new StringBuilder().append("[").append(text).append("](").append(scanUrl(item, key)).append(")");
+        return url.toString();
+    }
+
+    protected String urlMarkdown(String text, String uri) {
+        StringBuilder url = new StringBuilder().append("[").append(text).append("](").append(uri).append(")");
         return url.toString();
     }
 
@@ -869,11 +873,23 @@ abstract public class ErachainBotCls implements Rechargeable {
         out.add(new Object[]{new String[]{"account", "счёт", "счет"}, "Работа со счетами летописца"});
         out.add(new Object[]{new String[]{"for", "receivers", "recipients", "получатели", "для"}, "Список получателей сообщений в блокчейн, которые так же смогут расшифровать сообщение если оно зашифровано (закрытое)"});
         out.add(new Object[]{new String[]{"bot", "бот"}, "Команды для самого бота. Например команда `бот счёт`"});
+        out.add(new Object[]{new String[]{"deposit", "пополни", "пополнить"}, "Пополнить счет бота цифровыми чернилами (COMPU), которые нужны для записи в блокчейн."});
         out.add(new Object[]{new String[]{"chain", "цепь", "цепочка"}, "Общая информация о блокчейне: имя, подпись начального Блока, скорость блоков и т.д."});
         return out;
     }
 
     abstract protected List<Object[]> getJobCommandsList();
+
+    protected BaseResponse answerDeposit(String[] command, Long chatId, User user, String lang) {
+        PublicKeyAccount pubKey = getAddress(chatId, user, lang);
+        StringBuilder mess = new StringBuilder();
+        mess.append("*Пополнение счёта*\n\n").append("Ваш счет: *").append(pubKey.getAddress())
+                .append("*\nДля пополнения через *Систему Быстрых Платежей* перейдите по ").append(urlMarkdown("ССЫЛКЕ",
+                        "http://bitloom.ru/polza/sbp/compu?amount=250&receiver=" + pubKey.getAddress()))
+                .append("\n\nВ назначении платежа будет указано что это \"паевой взнос\" - так и должно быть.\nПроверьте что Ваш счет вставлен в форме");
+
+        return sendMarkdown(chatId, mess.toString());
+    }
 
     protected BaseResponse answerChainInfo(Long chatId, String lang) {
         StringBuilder mess = new StringBuilder();
@@ -881,7 +897,10 @@ abstract public class ErachainBotCls implements Rechargeable {
                 .append("*\nДата исходного блока: *").append(new Timestamp(cnt.blockChain.getGenesisBlock().getTimestamp()))
                 .append("*\nПодпись исходного блока: `").append(Base58.encode(cnt.blockChain.getGenesisBlock().getSignature()))
                 .append("`\nСкорость сборки блоков (сек): *").append(BlockChain.GENERATING_MIN_BLOCK_TIME_MS(NTP.getTime()) / 1000)
-                .append("*\nПросмотр цепочки данных: ").append(scanUrlMarkdown("сканер блокчейн", "blocks", null));
+                .append("*\nТелеграм чат: *").append("@erachain_ru")
+                .append("*\nErachain Wiki: ").append(urlMarkdown("Ссылка", "https://wiki.erachain.org/ru/home"))
+                .append("*\nErachain Сайт: ").append(urlMarkdown("Ссылка", "https://erachain.ru"))
+                .append("\nПросмотр цепочки данных: ").append(scanUrlMarkdown("Сканер блокчейн", "blocks", null));
 
         return sendMarkdown(chatId, mess.toString());
     }
@@ -899,6 +918,11 @@ abstract public class ErachainBotCls implements Rechargeable {
             case "счёт":
             case "счет":
                 sendChatAccountMessage(chat, user, lang);
+                return true;
+            case "deposit":
+            case "пополни":
+            case "пополнить":
+                answerDeposit(command, chat.id(), user, user.languageCode());
                 return true;
             case "for":
             case "receivers":
@@ -936,6 +960,11 @@ abstract public class ErachainBotCls implements Rechargeable {
                 }
                 sendChatAccountMessage(chat, user, user.languageCode());
                 return true;
+            case "deposit":
+            case "пополни":
+            case "пополнить":
+                answerDeposit(command, chat.id(), user, user.languageCode());
+                return true;
             case "for":
             case "receivers":
             case "recipients":
@@ -965,6 +994,11 @@ abstract public class ErachainBotCls implements Rechargeable {
             case "счёт":
             case "счет":
                 sendUserAccountMessage(chatId, user);
+                return true;
+            case "deposit":
+            case "пополни":
+            case "пополнить":
+                answerDeposit(command, chatId, user, user.languageCode());
                 return true;
             case "for":
             case "receivers":
@@ -1105,7 +1139,9 @@ abstract public class ErachainBotCls implements Rechargeable {
     private String accountPerson(PublicKeyAccount pubKey, String lang) {
         Fun.Tuple2<Integer, PersonCls> result = pubKey.getPerson();
         return "`" + pubKey.getAddress() + "` (" + scanUrlMarkdown("ссылка", "address", pubKey.getAddress()) + ")"
-                + "\n\n" + accountFeeBalance(pubKey, lang) + "\n----\nДля оплаты комиссий блокчейн пополняйте этот счет своевременно, иначе сохранение в блокчейн может не сработать.\n"
+                + "\n\n" + accountFeeBalance(pubKey, lang) + "\n----\nДля оплаты комиссий блокчейн "
+                + urlMarkdown("пополняйте", "http://bitloom.ru/polza/sbp/compu?amount=250&receiver=" + pubKey.getAddress())
+                + " этот счет своевременно, иначе сохранение в блокчейн может не сработать.\n"
                 + (result == null ? "\nЭто *неудостоверенный счёт*. С него можно отправлять *Открытые* сообщения только очень короткие."
                 + " Для снятия этого ограничения, удостоверьте этот открытый ключ: `" + pubKey.getBase58()
                 + "`.\nКак удостоверить счёт и свою [персону в блокчейн](https://wiki.erachain.org/ru/Persons)"

@@ -48,7 +48,7 @@ public class OddEvenDApp extends EpochDAppJson implements DAppTimed {
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     static public final BigDecimal MIN_BET_ERA = new BigDecimal("1");
-    static public final BigDecimal MIN_BET_COMPU = new BigDecimal("0.05");
+    static public final BigDecimal MIN_BET_COMPU = new BigDecimal("0.01");
     static public final BigDecimal WIN_MULTI = new BigDecimal("2");
     static public final BigDecimal ZERO_MULTI = new BigDecimal("777");
     static public final BigDecimal BINGO_MULTI = new BigDecimal("77");
@@ -81,6 +81,36 @@ public class OddEvenDApp extends EpochDAppJson implements DAppTimed {
             DAppFactory.STOCKS.put(pair.getA(), instance);
         }
         DAppFactory.DAPP_BY_ID.put(ID, instance);
+    }
+
+    @Override
+    protected void resolveJson() {
+
+        command = "";
+
+        if (dataStr == null || dataStr.isEmpty()) {
+            // Именно высота транзакции, а не Блока - он тут из будущего будет потом
+            int height = commandTx.getBlockHeight();
+            if (BlockChain.MAIN_MODE & height < 6085199 + 15000)
+                // По старому протоколу - выход и отказ (fail) дальше будет
+                return;
+
+            int mod10 = height % 10;
+            switch (mod10) {
+                case 0:
+                    dataStr = "0";
+                    break;
+                case 9:
+                    // девятка - тогда по одному биту более старшему
+                    dataStr = (height & 16) != 0? "1" : "2";
+                    break;
+                default:
+                    dataStr = (mod10 & 1) != 0? "1" : "2";
+            }
+        }
+
+        command = dataStr;
+
     }
 
     @Override
