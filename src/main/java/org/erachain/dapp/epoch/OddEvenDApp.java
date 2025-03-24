@@ -84,6 +84,36 @@ public class OddEvenDApp extends EpochDAppJson implements DAppTimed {
     }
 
     @Override
+    protected void resolveJson() {
+
+        command = "";
+
+        if (dataStr == null || dataStr.isEmpty()) {
+            // Именно высота транзакции, а не Блока - он тут из будущего будет потом
+            int height = commandTx.getBlockHeight();
+            if (BlockChain.MAIN_MODE & height < 6085199 + 15000)
+                // По старому протоколу - выход и отказ (fail) дальше будет
+                return;
+
+            int mod10 = height % 10;
+            switch (mod10) {
+                case 0:
+                    dataStr = "0";
+                    break;
+                case 9:
+                    // девятка - тогда по одному биту более старшему
+                    dataStr = (height & 16) != 0? "1" : "2";
+                    break;
+                default:
+                    dataStr = (mod10 & 1) != 0? "1" : "2";
+            }
+        }
+
+        command = dataStr;
+
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }
