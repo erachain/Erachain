@@ -60,7 +60,7 @@ public abstract class EpochDAppJson extends EpochDAppStatus {
         return new ErrorDApp("Wrong Transaction type: need 'HasDataString' - Data not found");
     }
 
-    private void resolveJson() {
+    protected void resolveJson() {
 
         if (dataStr != null && !dataStr.isEmpty()) {
 

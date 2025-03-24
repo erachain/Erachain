@@ -487,4 +487,52 @@ public class OddEvenDAppTest extends TestCase {
         assertEquals(contractParse.getName(), contract.getName());
     }
 
+    String getResHeightBlock(int heightBlock) {
+        int mod10 = heightBlock % 10;
+        switch (mod10) {
+            case 0:
+                return  "0";
+            case 9:
+                // девятка - тогда по одному биту более старшему
+                return (heightBlock & 16) != 0? "1" : "2";
+            default:
+                return  (mod10 & 1) != 0? "1" : "2";
+        }
+    }
+
+    @Test
+    public void testResolveJson_1() {
+
+        int heightBlock = 16;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("2", getResHeightBlock(heightBlock));
+
+        heightBlock = 121279;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("1", getResHeightBlock(heightBlock));
+
+        heightBlock = 125419;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("2", getResHeightBlock(heightBlock));
+
+        heightBlock = 12133;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("1", getResHeightBlock(heightBlock));
+
+        heightBlock = 121290;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("0", getResHeightBlock(heightBlock));
+
+        heightBlock = 121040;
+        System.out.println(Integer.toBinaryString(heightBlock));
+        System.out.println(heightBlock + " -> " + getResHeightBlock(heightBlock));
+        assertEquals("0", getResHeightBlock(heightBlock));
+
+
+    }
 }
