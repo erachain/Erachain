@@ -48,7 +48,7 @@ public class OddEvenDApp extends EpochDAppJson implements DAppTimed {
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     static public final BigDecimal MIN_BET_ERA = new BigDecimal("1");
-    static public final BigDecimal MIN_BET_COMPU = new BigDecimal("0.05");
+    static public final BigDecimal MIN_BET_COMPU = new BigDecimal("0.01");
     static public final BigDecimal WIN_MULTI = new BigDecimal("2");
     static public final BigDecimal ZERO_MULTI = new BigDecimal("777");
     static public final BigDecimal BINGO_MULTI = new BigDecimal("77");
